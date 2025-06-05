@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import fs from "fs/promises";
 
 
 
@@ -8,6 +9,7 @@ async function getMovies(): Promise<string> {
         const response = await axios.get("http://localhost:3000/mock-lb-test");
         console.log(response.data);
         const html: string = response.data;
+        await fs.writeFile("../cache/page1.html", html);
         return html
     } catch(error){
         console.log(error)
