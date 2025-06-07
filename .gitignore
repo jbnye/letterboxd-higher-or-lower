@@ -4,6 +4,8 @@ node_modules/
 # Build files
 dist/
 build/
+cache/*
+posters/*
 
 # Environment files
 .env
