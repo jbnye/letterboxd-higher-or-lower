@@ -1,20 +1,19 @@
 import * as cheerio from "cheerio";
 import fs from "fs/promises";
 import path from "path";
-import axios from "axios";
 
-const HTML_DIR = "./cache";
-const POSTER_DIR = "./posters";
+const HTML_DIR = "./cache/letterboxdPopularPages";
 
 
-interface slugsAndRatings{
+export interface slugsAndRatings{
     slug: string,
     averageRating: number
 }
 
-async function extractSlugsAndRatingsFromFiles(): Promise<slugsAndRatings[]>{
+export async function extractSlugsAndRatingsFromFiles(): Promise<slugsAndRatings[]>{
 
     const files = await fs.readdir(HTML_DIR);
+    console.log(`Found ${files.length} files in ${HTML_DIR}`);
     const slugsAndRatings: slugsAndRatings[] = [];
 
     try{
@@ -37,5 +36,3 @@ async function extractSlugsAndRatingsFromFiles(): Promise<slugsAndRatings[]>{
     }
     return slugsAndRatings;
 }
-
-extractSlugsAndRatingsFromFiles();
