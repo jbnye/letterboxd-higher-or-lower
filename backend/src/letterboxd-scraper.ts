@@ -1,5 +1,4 @@
 import axios from "axios";
-import * as cheerio from "cheerio";
 import fs from "fs/promises";
 import UserAgent from 'user-agents';
 import { setTimeout } from 'timers/promises';
@@ -40,7 +39,7 @@ async function getLetterboxdHTML(){
             }
 
             const delayTimer: number = Math.floor((Math.random() * 10000) + 5000);
-            await setTimeout(delayTimer)
+            await setTimeout(delayTimer);
         }
 
     } catch (error){
