@@ -4,21 +4,11 @@ import UserAgent from 'user-agents';
 import * as cheerio from "cheerio";
 import path from "path";
 import { setTimeout } from 'timers/promises';
-import { createObjectCsvWriter } from 'csv-writer';
 import { extractSlugsAndRatingsFromFiles, slugsAndRatings } from './letterboxd-parser';
+import {createLetterboxdCsvWriter} from "./helperFunctions";
 
 
-const csvWriter = createObjectCsvWriter({
-    path: './CSV/letterboxd-films.csv',
-    header: [
-        { id: 'slug', title: 'Slug' },
-        { id: 'averageRating', title: 'Average Rating' },
-        { id: 'title', title: 'Title' },
-        { id: 'year', title: 'Year' },
-        { id: 'posterUrl', title: 'Poster URL' }
-    ],
-    append: true 
-});
+
 
 
 async function downloadImage(url: string, filePath: string, userAgent: string, slug: string, hasTried = false ){
@@ -52,6 +42,7 @@ async function downloadImage(url: string, filePath: string, userAgent: string, s
 async function LBPosterScraper(slugsAndRatings: slugsAndRatings[]){
     await fs.mkdir('./CSV', { recursive: true });
     await fs.mkdir('./posters', { recursive: true });
+    const csvWriter = createLetterboxdCsvWriter('./CSV/rating-sorted-letterboxd.csv');
     const filmResults = [];
     const batch = [];
     const batchSize = 50;
@@ -85,11 +76,11 @@ async function LBPosterScraper(slugsAndRatings: slugsAndRatings[]){
             const [title,year] = frameTitle.split(' (');
             const trimedYear = year ? year.replace(')', '') : '';
 
-            const imageUrl = $('img.image:not(.-empty-poster-image)').attr('src') || '';
+            const posterUrl = $('img.image:not(.-empty-poster-image)').attr('src') || '';
 
-            if(imageUrl){
+            if(posterUrl){
                 const imagePath = path.join('./posters', `${film.slug}.jpg`);
-                await downloadImage(imageUrl, imagePath, userAgent, film.slug);
+                await downloadImage(posterUrl, imagePath, userAgent, film.slug);
             }
 
             const filmData = {
@@ -97,7 +88,7 @@ async function LBPosterScraper(slugsAndRatings: slugsAndRatings[]){
                 averageRating: film.averageRating,
                 title: title.trim(),
                 year: trimedYear,
-                posterUrl: imageUrl
+                posterUrl: posterUrl
             }
           
             filmResults.push(filmData);

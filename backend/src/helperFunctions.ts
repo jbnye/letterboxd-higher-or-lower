@@ -7,7 +7,7 @@ export interface filmData {
     averageRating: number,
     title: string,
     year: string,
-    imageUrl: string
+    posterUrl: string
 }
 
 // CSV Writer 
@@ -32,9 +32,10 @@ export async function parseCSVToMap(filePath: string): Promise<Map<string, filmD
     const map = new Map<string, filmData>();
 
     for(const row of rows.slice(0)){
-        const [slugRaw, averageRating, title, year, imageUrl] = row.split(",");
+        const [slugRaw, stringAverageRating, title, year, posterUrl] = row.split(",");
         const slug = slugRaw.replace(/^"|"$/g, "").trim();
-        map.set(slug, {slug, averageRating, title, year, imageUrl});
+        const averageRating: number = parseFloat(stringAverageRating);
+        map.set(slug, {slug, averageRating, title, year, posterUrl});
     }
     return map;
 
