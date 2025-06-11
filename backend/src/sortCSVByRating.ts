@@ -1,30 +1,18 @@
 import fs from "fs/promises";
-import path from "path";
+import path, { parse } from "path";
 import { createObjectCsvWriter } from "csv-writer";
 import { extractSlugsAndRatingsFromFiles } from "./letterboxd-parser";
-import {filmData, createLetterboxdCsvWriter} from "./helperFunctions";
+import {filmData, createLetterboxdCsvWriter, parseCSVToMap} from "./helperFunctions";
 
 
-const OLD_CSV_PATH = path.join("CSV", "letterboxd-films.csv");
-const Rating_SORTED_CSV_PATH = path.join("CSV", "popularity-sorted-letterboxd.csv");
-'./CSV/rating-sorted-letterboxd.csv'
+const OLD_CSV_PATH = path.join(__dirname, "..", "CSV", "letterboxd-films.csv");
+const Rating_SORTED_CSV_PATH = path.join(__dirname, "..", "CSV", "popularity-sorted-letterboxd.csv");
 
 async function sortByRating(){
-    const csvWriter = createLetterboxdCsvWriter('./CSV/rating-sorted-letterboxd.csv');
-    const data = await fs.readFile(OLD_CSV_PATH, "utf-8");
-    const rows = data.trim().split("\n").slice(0);
-
-    const films: filmData[] = rows.map((row) => {
-        const [slug, rating, title, year, imageUrl] = row.split(",");
-        return{
-            slug,
-            averageRating: parseFloat(rating),
-            title,
-            year,
-            imageUrl,
-        }
-    })
-    const sortedByRatingFilms: filmData[] = mergeSortByRating(films);
+    const csvWriter = createLetterboxdCsvWriter(Rating_SORTED_CSV_PATH);
+    const filmMap: Map<string, filmData> = await parseCSVToMap(OLD_CSV_PATH);
+    const filmDataArray: filmData[] = Array.from(filmMap.values());
+    const sortedByRatingFilms: filmData[] = mergeSortByRating(filmDataArray);
     await csvWriter.writeRecords(sortedByRatingFilms);
 }
 
