@@ -17,7 +17,7 @@ export async function extractSlugsAndRatingsFromFiles(): Promise<slugsAndRatings
     const slugsAndRatings: slugsAndRatings[] = [];
 
     try{
-        for(const file of files.filter(f=>f.endsWith("html"))){
+        for(const file of files.filter(f=>f.endsWith("html")).sort()){
             const html = await fs.readFile(path.join(HTML_DIR, file), "utf-8");
             const $ = cheerio.load(html);
 
@@ -36,3 +36,4 @@ export async function extractSlugsAndRatingsFromFiles(): Promise<slugsAndRatings
     }
     return slugsAndRatings;
 }
+

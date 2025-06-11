@@ -59,14 +59,14 @@ async function LBPosterScraper(slugsAndRatings: slugsAndRatings[]){
     for(const film of slugsAndRatings){
 
         try{
-            const imagePath = path.join('./posters', `${film.slug}.jpg`);
-            try {
-                await fs.access(imagePath);
-                console.log(`🟡 Skipping ${film.slug}, poster already exists.`);
-                continue; // Skip to next film
-            } catch {
-                // File doesn't exist, continue scraping
-            }
+            // const imagePath = path.join('./posters', `${film.slug}.jpg`);
+            // try {
+            //     await fs.access(imagePath);
+            //     console.log(`🟡 Skipping ${film.slug}, poster already exists.`);
+            //     continue; 
+            // } catch {
+            //     // File doesn't exist
+            // }
             const url = `https://letterboxd.com/ajax/poster/film/${film.slug}/std/292730/1000x1500/`;
             const response = await axios.get(url, {
                 headers: {
@@ -132,3 +132,43 @@ async function main() {
 
 main().catch(console.error);
 
+    // const films: slugsAndRatings[] = [
+    // { slug: "uhf", averageRating: 3.51 },
+    // { slug: "lethal-weapon-4", averageRating: 3.12 },
+    // { slug: "harvey", averageRating: 3.98 },
+    // { slug: "expend4bles", averageRating: 1.71 },
+    // { slug: "all-my-friends-hate-me", averageRating: 3.33 },
+    // { slug: "lyle-lyle-crocodile", averageRating: 2.41 },
+    // { slug: "opal-2020", averageRating: 4.21 },
+    // { slug: "julieta", averageRating: 3.62 },
+    // { slug: "zabriskie-point", averageRating: 3.65 },
+    // { slug: "puppy-love-2023", averageRating: 2.86 },
+    // { slug: "the-last-laugh", averageRating: 4.05 },
+    // { slug: "the-hole", averageRating: 4.00 },
+    // { slug: "plan-b-2021", averageRating: 3.50 },
+    // { slug: "astro-boy", averageRating: 2.84 },
+    // { slug: "superman-iii", averageRating: 2.28 },
+    // { slug: "the-informant-2009", averageRating: 3.27 },
+    // { slug: "coneheads", averageRating: 2.62 },
+    // { slug: "system-crasher", averageRating: 3.96 },
+    // { slug: "pictures-of-ghosts", averageRating: 3.88 },
+    // { slug: "leatherface", averageRating: 2.13 },
+    // { slug: "on-swift-horses", averageRating: 3.10 },
+    // { slug: "peppermint-candy", averageRating: 3.99 },
+    // { slug: "billie-eilish-the-worlds-a-little-blurry", averageRating: 4.08 },
+    // { slug: "close-your-eyes-2023", averageRating: 3.98 },
+    // { slug: "never-goin-back", averageRating: 3.22 },
+    // { slug: "ophelia-2018", averageRating: 3.20 },
+    // { slug: "scouts-guide-to-the-zombie-apocalypse", averageRating: 2.98 },
+    // { slug: "troll-2022", averageRating: 2.48 },
+    // { slug: "the-surfer-2024", averageRating: 3.18 },
+    // { slug: "zelig", averageRating: 3.89 },
+    // { slug: "mouchette", averageRating: 4.05 },
+    // { slug: "bamboozled", averageRating: 3.83 },
+    // { slug: "holiday", averageRating: 3.96 },
+    // { slug: "adventures-in-babysitting", averageRating: 3.44 },
+    // { slug: "mowgli-legend-of-the-jungle", averageRating: 2.73 },
+    // { slug: "k-12", averageRating: 3.41 },
+    // { slug: "when-life-gives-you-tangerines-2025", averageRating: 4.63 },
+    // { slug: "mystery-men", averageRating: 3.08 }
+    // ];
