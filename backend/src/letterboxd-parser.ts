@@ -2,7 +2,7 @@ import * as cheerio from "cheerio";
 import fs from "fs/promises";
 import path from "path";
 
-const HTML_DIR = "./cache/letterboxdPopularPages";
+// const HTML_DIR = "./cache/letterboxdPopularPages";
 
 
 export interface slugsAndRatings{
@@ -10,15 +10,15 @@ export interface slugsAndRatings{
     averageRating: number
 }
 
-export async function extractSlugsAndRatingsFromFiles(): Promise<slugsAndRatings[]>{
+export async function extractSlugsAndRatingsFromFiles(dirPath:string): Promise<slugsAndRatings[]>{
 
-    const files = await fs.readdir(HTML_DIR);
-    console.log(`Found ${files.length} files in ${HTML_DIR}`);
+    const files = await fs.readdir(dirPath);
+    console.log(`Found ${files.length} files in ${dirPath}`);
     const slugsAndRatings: slugsAndRatings[] = [];
 
     try{
         for(const file of files.filter(f=>f.endsWith("html")).sort()){
-            const html = await fs.readFile(path.join(HTML_DIR, file), "utf-8");
+            const html = await fs.readFile(path.join(dirPath, file), "utf-8");
             const $ = cheerio.load(html);
 
             $('li.listitem.poster-container[data-average-rating]').each((i, element) => {

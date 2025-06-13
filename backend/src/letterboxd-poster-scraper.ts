@@ -5,7 +5,7 @@ import * as cheerio from "cheerio";
 import path from "path";
 import { setTimeout } from 'timers/promises';
 import { extractSlugsAndRatingsFromFiles, slugsAndRatings } from './letterboxd-parser';
-import {createLetterboxdCsvWriter} from "./helperFunctions";
+import {createLetterboxdCsvWriter, parseCSVToMap, filmData} from "./helperFunctions";
 
 
 
@@ -42,15 +42,23 @@ async function downloadImage(url: string, filePath: string, userAgent: string, s
 async function LBPosterScraper(slugsAndRatings: slugsAndRatings[]){
     await fs.mkdir('./CSV', { recursive: true });
     await fs.mkdir('./posters', { recursive: true });
-    const csvWriter = createLetterboxdCsvWriter('./CSV/rating-sorted-letterboxd.csv');
+    const CSV_FILE_PATH = path.join(__dirname, "..", "CSV", "popularity-sorted-letterboxd.csv");
+    const csvWriter = createLetterboxdCsvWriter('../CSV/filtered-popularity-sorted-letterboxd.csv');
     const filmResults = [];
     const batch = [];
     const batchSize = 50;
     const userAgent = new UserAgent().toString();
+    const filmDataMap: Map<string, filmData> = await parseCSVToMap(CSV_FILE_PATH);
     for(const film of slugsAndRatings){
 
         try{
-            // const imagePath = path.join('./posters', `${film.slug}.jpg`);
+            const filmDataGet: filmData | undefined = filmDataMap.get(film.slug);
+            if(filmDataGet){
+                console.log(`🟢 Skipping ${film.slug}, already in CSV.`);
+                batch.push(filmDataGet);
+                continue;
+            }
+            const imagePath = path.join('./posters', `${film.slug}.jpg`);
             // try {
             //     await fs.access(imagePath);
             //     console.log(`🟡 Skipping ${film.slug}, poster already exists.`);
@@ -83,7 +91,7 @@ async function LBPosterScraper(slugsAndRatings: slugsAndRatings[]){
                 await downloadImage(posterUrl, imagePath, userAgent, film.slug);
             }
 
-            const filmData = {
+            const filmDataHelper = {
                 slug: film.slug,
                 averageRating: film.averageRating,
                 title: title.trim(),
@@ -91,8 +99,8 @@ async function LBPosterScraper(slugsAndRatings: slugsAndRatings[]){
                 posterUrl: posterUrl
             }
           
-            filmResults.push(filmData);
-            batch.push(filmData);
+            filmResults.push(filmDataHelper);
+            batch.push(filmDataHelper);
 
             if (batch.length >= batchSize) {
                 await csvWriter.writeRecords(batch);
@@ -116,7 +124,8 @@ async function LBPosterScraper(slugsAndRatings: slugsAndRatings[]){
 }
 
 async function main() {
-    const films: slugsAndRatings[] = await extractSlugsAndRatingsFromFiles();
+    const dirPath = path.join(__dirname, "..", "cache", "filteredLetterboxdPopularPages")
+    const films: slugsAndRatings[] = await extractSlugsAndRatingsFromFiles(dirPath);
     console.log("Parsed Files...");
     await LBPosterScraper(films);
 }
