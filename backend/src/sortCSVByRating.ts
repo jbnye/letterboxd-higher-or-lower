@@ -1,6 +1,4 @@
-import fs from "fs/promises";
-import path, { parse } from "path";
-import { createObjectCsvWriter } from "csv-writer";
+import path from "path";
 import { extractSlugsAndRatingsFromFiles } from "./letterboxd-parser";
 import {filmData, createLetterboxdCsvWriter, parseCSVToMap} from "./helperFunctions";
 
@@ -42,6 +40,4 @@ function helperMergeSortByRating(left: filmData[], right: filmData[]): filmData[
     while (j < right.length) result.push(right[j++]);
     return result;
 }
-
-
 sortByRating();

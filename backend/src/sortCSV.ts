@@ -33,8 +33,9 @@ async function sortedByPopularityCSV(orderedSlugs: string[], csvMap: Map<string,
 async function main(){
     // await fs.mkdir('./CSV/popularity-sorted-letterboxd.csv', { recursive: true });
     const filePath = path.join(__dirname, "..", "CSV", "rating-sorted-letterboxd.csv");
+    const dirPath = path.join(__dirname, "..", "cache", "letterboxdPopularPages");
     const csvMap = await parseCSVToMap(filePath);
-    const orderedSlugs = (await extractSlugsAndRatingsFromFiles()).map(f => f.slug);
+    const orderedSlugs = (await extractSlugsAndRatingsFromFiles(dirPath)).map(f => f.slug);
     await sortedByPopularityCSV(orderedSlugs, csvMap);
 
 }
