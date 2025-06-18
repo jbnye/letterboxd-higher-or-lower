@@ -1,0 +1,48 @@
+import { createContext, useState, useEffect, useContext } from "react";
+
+
+type ServerStatus = 'checking' | 'online' | 'offline';
+interface ServerStatusContextType {
+  status: ServerStatus;
+}
+const ServerStatusContext = createContext<ServerStatusContextType | undefined>(undefined);
+export const ServerStatusProvider = ({ children }: { children: React.ReactNode }) => {
+  const [status, setStatus] = useState<ServerStatus>('checking');
+  console.log(status);
+
+  const pingServer = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/ping");
+      if(response.ok){
+        setStatus('online');
+      }
+      else {
+        setStatus('offline');
+        }
+    } catch (error) {
+      setStatus('offline');
+      throw error;
+    }
+  };
+
+
+  useEffect(() => {
+    pingServer();
+    // const interval = setInterval(pingServer, 10000); 
+    // return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <ServerStatusContext.Provider value={{ status }}>
+      {children}
+    </ServerStatusContext.Provider>
+  );
+};
+
+export const useServerStatus = () => {
+  const context = useContext(ServerStatusContext);
+    if (!context) {
+    throw new Error("useServerStatus must be used within a ServerStatusProvider");
+  }
+  return context;
+};
