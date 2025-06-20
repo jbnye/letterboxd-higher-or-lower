@@ -12,10 +12,10 @@ type GameStatus = "Welcome" | "Playing" | "Lost";
 
 export default function GameWrapper(){
     const {status} = useServerStatus();
-    const [gameStatus, setGameStatus] = useState<GameStatus>('Welcome')
+    const [gameStatus, setGameStatus] = useState<GameStatus>('Welcome');
     const [gameKey, setGameKey] = useState(0);
     console.log(gameStatus);
-    
+
     const startNewGame = () => {
         setGameKey(prev=>prev + 1);
         setGameStatus('Playing');
