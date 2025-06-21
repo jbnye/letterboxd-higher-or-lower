@@ -4,15 +4,16 @@ import LostPage from "./LostPage.tsx";
 import WelcomePage from "./WelcomePage.tsx";
 import { useServerStatus } from '../Context/ServerStatusContext';
 import {Spinner} from "../UI/spinner.tsx";
+import type { GameStatus, Difficulty } from "../types/types.ts";
 // to do import PlayAgainButton from "./PlayAgain.tsx";
 
 
-type GameStatus = "Welcome" | "Playing" | "Lost";
 
 
 export default function GameWrapper(){
     const {status} = useServerStatus();
     const [gameStatus, setGameStatus] = useState<GameStatus>('Welcome');
+    const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>("Easy");
     const [gameKey, setGameKey] = useState(0);
     console.log(gameStatus);
 
@@ -30,7 +31,12 @@ export default function GameWrapper(){
     }
     if(gameStatus === 'Welcome'){
         return (
-            <WelcomePage />
+            <WelcomePage 
+            onStartGame={(chosenDifficulty) => {
+                setDifficultyPicked(chosenDifficulty);
+                setGameStatus("Playing");
+            }}
+            />
         )
 
     } else if(gameStatus === "Lost"){
@@ -39,7 +45,10 @@ export default function GameWrapper(){
         )
     }
 
-    return ( <></>
-    //<Game key={gameKey} onLose={() => setGameStatus("Lost")} />
+    return (
+        <>
+            <Game key={gameKey} difficulty = {difficultyPicked} onLose={() => setGameStatus("Lost")} />
+        </>
     );
+
 }

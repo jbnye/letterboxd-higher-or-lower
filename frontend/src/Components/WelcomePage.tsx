@@ -1,33 +1,29 @@
 import {useState} from "react";
+import DifficultyBoxes from "./Difficulties";
+import type { Difficulty } from "../types/types";
 
-type Difficulty = 'Easy' | 'Medium' | 'Hard' | 'Impossible';
+interface WelcomePageProps {
+    onStartGame: (difficulty: Difficulty) => void;
+}
 
-export default function WelcomePage(){
+
+export default function WelcomePage({onStartGame}: WelcomePageProps){
     const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>("Easy");
-    const difficulties: Difficulty[] = ['Easy', 'Medium', 'Hard', 'Impossible'];
-
-    const handleDifficultyClick = (difficulty: Difficulty) => {
-        setDifficultyPicked(difficulty);
-    };
-    
 
     return(
         <div>
-            <h1>Letterboxd Higher or Lower Game</h1>
-            <div className="flex gap-4 justify-center flex-wrap mt-8">
-                {difficulties.map((level) =>(
-                    <div
-                    key = {level}
-                    onClick={() => handleDifficultyClick(level)}
-                    className={`w-32 h-32 flex items-center justify-center rounded-xl shadow-md cursor-pointer transition-all select-none
-                    ${difficultyPicked === level ? "bg-blue-500 text-white" : "bg-white hover:bg-gray-100"}
-                    `}
-                    >
-                    <span className="text-lg font-semibold">{level}</span>
-                    </div>
-                )
-                )}
-            </div>
+            <h1 className="justify-self-center">Letterboxd Higher or Lower Game</h1>
+            <DifficultyBoxes 
+            onDifficultyChoice={(difficulty) => {
+                setDifficultyPicked(difficulty);
+            }} 
+            difficultyPicked={difficultyPicked}
+            />
+
+            <button onClick={() => onStartGame(difficultyPicked)}
+            className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                Play
+            </button>
         </div>
     )
 
