@@ -4,9 +4,12 @@ import { createObjectCsvWriter } from "csv-writer";
 import { extractSlugsAndRatingsFromFiles } from "./letterboxd-parser";
 import {parseCSVToMap, filmData, createLetterboxdCsvWriter} from "./helperFunctions";
 
-const OLD_CSV_PATH = path.join("CSV", "letterboxd-films.csv");
-const POPULARITY_SORTED_CSV_PATH = path.join("CSV", "popularity-sorted-letterboxd.csv");
-
+// WRITE TO THIS CSV
+const POPULARITY_SORTED_CSV_PATH = path.join(__dirname, "..", "CSV", "filtered-popularity-sorted-letterboxd.csv");
+// SEARCH THIS FILE FOR INFO FOR THE NEW CSV
+const filePath = path.join(__dirname, "..", "CSV", "filtered-popularity-letterboxd.csv");
+//PARSE THIS CACHED HTML FOLDER
+const dirPath = path.join(__dirname, "..", "cache", "filteredLetterboxdPopularPages");
 
 
 
@@ -31,9 +34,7 @@ async function sortedByPopularityCSV(orderedSlugs: string[], csvMap: Map<string,
 }
 
 async function main(){
-    // await fs.mkdir('./CSV/popularity-sorted-letterboxd.csv', { recursive: true });
-    const filePath = path.join(__dirname, "..", "CSV", "rating-sorted-letterboxd.csv");
-    const dirPath = path.join(__dirname, "..", "cache", "letterboxdPopularPages");
+
     const csvMap = await parseCSVToMap(filePath);
     const orderedSlugs = (await extractSlugsAndRatingsFromFiles(dirPath)).map(f => f.slug);
     await sortedByPopularityCSV(orderedSlugs, csvMap);

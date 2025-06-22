@@ -53,7 +53,7 @@ const getFilmHandler: RequestHandler = async (req, res) => {
             const film = result.rows[0]
             const filmData = {
                 filmData: film,
-                inHouseURL: `${baseURL}/posters/${result.rows[0].id}.jpg`
+                inHouseURL: `${baseURL}/posters/${result.rows[0].slug}.jpg`
             }
             console.log("Sending film: ", filmData);
             res.json({ filmData });
@@ -85,7 +85,7 @@ const getFilmsHandler: RequestHandler = async (req, res) =>{
         if (result && result.rows.length > 0) {
             const filmData = result.rows.map((film) => ({
                 ...film,
-                inHouseURL: `${baseURL}/posters/${film.id}.jpg`
+                inHouseURL: `${baseURL}/posters/${film.slug}.jpg`
             }));
             console.log("Sending films: ", filmData);
             res.json({ filmData });

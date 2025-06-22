@@ -11,16 +11,14 @@ export interface slugsAndRatings{
 }
 
 export async function extractSlugsAndRatingsFromFiles(dirPath:string): Promise<slugsAndRatings[]>{
-
-    const files = await fs.readdir(dirPath);
-    console.log(`Found ${files.length} files in ${dirPath}`);
     const slugsAndRatings: slugsAndRatings[] = [];
 
     try{
-        for(const file of files.filter(f=>f.endsWith("html")).sort()){
-            const html = await fs.readFile(path.join(dirPath, file), "utf-8");
+        for(let i = 1; i<= 139; i++){
+            const fileName = `page${i}.html`;
+            const fullPath = path.join(dirPath, fileName);
+            const html = await fs.readFile(fullPath, "utf-8");
             const $ = cheerio.load(html);
-
             $('li.listitem.poster-container[data-average-rating]').each((i, element) => {
                 const averageRating: number = parseFloat($(element).attr("data-average-rating") || '0');
                 const slug: string = $(element).find(("div[data-film-slug]")).attr('data-film-slug') || 'empty';
@@ -30,6 +28,7 @@ export async function extractSlugsAndRatingsFromFiles(dirPath:string): Promise<s
                     averageRating: averageRating,
                 });
             })
+            console.log("parsed: ",fileName);
         }
     } catch (error){
         console.log(error);

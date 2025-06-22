@@ -2,9 +2,8 @@ import pool from "./db";
 import path from "path";
 import {parseCSVToMap, filmData} from "../helperFunctions";
 
-
 async function PopulateFilmsDatabaseFromCSV(){
-    const filePath = path.join(".", "CSV", "filtered-popularity-sorted-letterboxd.csv");
+    const filePath = path.join(__dirname, "..", "..", "CSV", "filtered-popularity-sorted-letterboxd.csv");
     const client = await pool.connect();
     const filmMap: Map<string, filmData> = await parseCSVToMap(filePath);
     const films: filmData[] = [];
@@ -45,7 +44,7 @@ async function PopulateFilmsDatabaseFromCSV(){
 } 
 
 async function PopulateTop250List(){
-    const filePath = path.join(".", "CSV", "Top-TwoFifty-sorted-letterboxd.csv");
+    const filePath = path.join("..", "..", "CSV", "Top-TwoFifty-sorted-letterboxd.csv");
     const client = await pool.connect();
     const filmMap: Map<string, filmData> = await parseCSVToMap(filePath);
     const films: filmData[] = [];
