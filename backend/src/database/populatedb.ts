@@ -3,7 +3,7 @@ import path from "path";
 import {parseCSVToMap, filmData} from "../helperFunctions";
 
 async function PopulateFilmsDatabaseFromCSV(){
-    const filePath = path.join(__dirname, "..", "..", "CSV", "filtered-popularity-sorted-letterboxd.csv");
+    const filePath = path.join(__dirname, "..", "..", "CSV", "ALLFILMS.csv");
     const client = await pool.connect();
     const filmMap: Map<string, filmData> = await parseCSVToMap(filePath);
     const films: filmData[] = [];
@@ -11,10 +11,9 @@ async function PopulateFilmsDatabaseFromCSV(){
         films.push(film);
     });
     try{
-        let popularity = 1;
             const insertFilmQuery: string = 
-            `INSERT INTO films (slug, averageRating, title, year, posterURL, isTop250, popularityRank)
-                VALUES ($1,$2,$3,$4,$5,$6,$7)
+            `INSERT INTO films (slug, averageRating, watchedNumber, title, year, category, posterURL, isTop250)
+                VALUES ($1,$2,$3,$4,$5,$6,$7, $8)
             `;
         for (const film of films.slice(1)) {
             const parsedYear = parseInt(film.year);
@@ -22,12 +21,12 @@ async function PopulateFilmsDatabaseFromCSV(){
             await client.query(insertFilmQuery,[
                 film.slug, 
                 film.averageRating,
+                film.watchedNumber,
                 film.title,
                 releaseYear,
+                film.category,
                 film.posterUrl,
-                false,
-                popularity]);
-            popularity++;
+                false]);
             console.log("Adding film: ", film.slug);
         };
 
@@ -70,5 +69,5 @@ async function PopulateTop250List(){
 }
 
 
-//PopulateFilmsDatabaseFromCSV(); 
-PopulateTop250List();           
+PopulateFilmsDatabaseFromCSV(); 
+//PopulateTop250List();           

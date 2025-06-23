@@ -8,11 +8,12 @@ import pool from './db';
                 id SERIAL PRIMARY KEY,
                 slug VARCHAR(128) UNIQUE NOT NULL,
                 averageRating NUMERIC(3, 2) NOT NULL,
+                watchedNumber INTEGER,
                 title VARCHAR(128),
                 year INTEGER,
+                category varchar(16),
                 posterURL TEXT,
-                isTop250 BOOLEAN NOT NULL,
-                popularityRank INTEGER UNIQUE NOT NULL
+                isTop250 BOOLEAN NOT NULL
             )
         `);
         await pool.query(`
