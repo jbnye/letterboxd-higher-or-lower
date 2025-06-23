@@ -7,7 +7,8 @@ import path from "path";
 
 export interface slugsAndRatings{
     slug: string,
-    averageRating: number
+    averageRating: number,
+    category?: string
 }
 
 export async function extractSlugsAndRatingsFromFiles(dirPath:string): Promise<slugsAndRatings[]>{
