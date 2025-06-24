@@ -26,7 +26,7 @@ export async function validateCSV(filePath: string): Promise<string[]> {
         const category = row["Category"];
         const posterUrl = row["Poster URL"];
 
-        // Slug check
+        // Slug check found 3 films that have their slug set to their film id actually in letterboxd
         if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
             errors.push(`Invalid slug: "${slug}"`);
         }
