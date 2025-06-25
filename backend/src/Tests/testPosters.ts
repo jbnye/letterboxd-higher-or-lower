@@ -3,7 +3,7 @@ import * as fs from 'fs/promises';
 import path from 'path';
 import {parseCSVToMap, filmData, symbols} from "../helperFunctions";
 
-export async function TestPostersForAllFilms( CSVFile: string): boolean{
+export async function TestPostersForAllFilms( CSVFile: string): Promise<boolean>{
     const PosterDirPath = path.join(__dirname, "..", "..", "posters");
     const SlugMap: Map<string, filmData> = await parseCSVToMap(CSVFile);
     let AllPassed: boolean = true;
@@ -22,10 +22,13 @@ export async function TestPostersForAllFilms( CSVFile: string): boolean{
 
 if (require.main === module) {
     const CSVPath = path.join(__dirname, "..", "..", "CSV", "ALLFILMS.csv");
-    const AllPassed: boolean = TestPostersForAllFilms(CSVPath);
-    if(AllPassed){
-        console.log("All psoter tests passed");
-    } else{
-        console.log("Failed poster test");
-    }
+    (async () => {
+        const AllPassed: boolean = await TestPostersForAllFilms(CSVPath);
+        if(AllPassed){
+            console.log("All poster tests passed");
+        } else{
+            console.log("Failed poster test");
+        }
+    })()
+
 }
