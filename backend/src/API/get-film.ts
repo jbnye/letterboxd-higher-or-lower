@@ -1,6 +1,5 @@
 import pool from "../database/db";
-import path from "path";
-import { RequestHandler,Router, Request, Response } from "express";
+import { RequestHandler,Router} from "express";
 
 const router = Router();
 
@@ -60,7 +59,7 @@ const getFilmHandler: RequestHandler = async (req, res) => {
         const film = result.rows[0];
         const filmData = {
             filmData: film,
-            averageRating: parseFloat(film.averageRating),
+            averageRating: parseFloat(film.averagerating),
             inHouseURL: `${baseURL}/posters/${film.slug}.jpg`
         };
 
@@ -97,7 +96,7 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
         if (result && result.rows.length > 0) {
             const filmData = result.rows.map((film) => ({
                 ...film,
-                averageRating: parseFloat(film.averageRating),
+                averageRating: parseFloat(film.averagerating),
                 inHouseURL: `${baseURL}/posters/${film.slug}.jpg`
             }));
             console.log("Sending films: ", filmData);
