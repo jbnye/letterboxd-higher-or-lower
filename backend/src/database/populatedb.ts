@@ -20,7 +20,7 @@ async function PopulateFilmsDatabaseFromCSV(){
             const releaseYear = Number.isNaN(parsedYear) ? null : parsedYear;
             await client.query(insertFilmQuery,[
                 film.slug, 
-                film.averageRating,
+                parseFloat((Math.round(film.averageRating * 10) / 10).toFixed(1)),
                 film.watchedNumber,
                 film.title,
                 releaseYear,

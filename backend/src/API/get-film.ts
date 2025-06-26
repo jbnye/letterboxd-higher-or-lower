@@ -39,7 +39,7 @@ const getFilmHandler: RequestHandler = async (req, res) => {
 
     try {
         let getFilmQuery = `
-            SELECT * FROM (
+            SELECT id, slug, title, year, posterurl  FROM (
                 SELECT * FROM films
                 ${limit === 10000 ? "" : "WHERE category = 'movie'"}
                 ORDER BY watchedNumber DESC
@@ -59,7 +59,7 @@ const getFilmHandler: RequestHandler = async (req, res) => {
         const film = result.rows[0];
         const filmData = {
             filmData: film,
-            averageRating: parseFloat(film.averagerating),
+            averagerating: film.averageRating,
             inHouseURL: `${baseURL}/posters/${film.slug}.jpg`
         };
 
@@ -84,7 +84,7 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
     }
     try {
         let getFilmsQuery: string = `
-            SELECT * FROM (
+            SELECT id, slug, title, year, posterurl FROM (
                 SELECT * FROM films
                 ${limit === 10000 ? "" : `WHERE category = 'movie'`}
                 ORDER BY watchedNumber DESC LIMIT $1
@@ -96,7 +96,7 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
         if (result && result.rows.length > 0) {
             const filmData = result.rows.map((film) => ({
                 ...film,
-                averageRating: parseFloat(film.averagerating),
+                averagerating: parseFloat((Math.round(film.averageRating * 10) / 10).toFixed(1)),
                 inHouseURL: `${baseURL}/posters/${film.slug}.jpg`
             }));
             console.log("Sending films: ", filmData);
