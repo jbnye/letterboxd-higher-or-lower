@@ -52,7 +52,7 @@ export async function parseCSVToMap(filePath: string): Promise<Map<string, filmD
 
     for (const row of records) {
         const slug = row["Slug"]?.trim();
-        const averageRating = parseFloat(row["Average Rating"]);
+        const averageRating = parseFloat((Math.round(row["Average Rating"] * 10) / 10).toFixed(1));
 
         if (!slug || isNaN(averageRating)) {
             console.warn(`${symbols.fail} Skipping invalid row: ${JSON.stringify(row)}`);

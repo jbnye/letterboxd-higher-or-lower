@@ -7,7 +7,7 @@ import pool from './db';
             CREATE TABLE IF NOT EXISTS films (
                 id SERIAL PRIMARY KEY,
                 slug VARCHAR(128) UNIQUE NOT NULL,
-                averageRating NUMERIC(3, 2) NOT NULL,
+                averageRating NUMERIC(3, 1) NOT NULL,
                 watchedNumber INTEGER,
                 title VARCHAR(128),
                 year INTEGER,
