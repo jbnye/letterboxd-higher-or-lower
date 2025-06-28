@@ -41,17 +41,23 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
     const client = await pool.connect();
     try{
         const checkGuessQuery = `
-            SELECT slug, averagerating from films where id IN ($1, $2)
+            SELECT id, slug, averagerating from films where id IN ($1, $2)
         `;
         const result = await client.query(checkGuessQuery, [excludeFilms[0], excludeFilms[1]]);
-        if (result.rows.length !== 2) {
+        const rows = result.rows;
+        if (rows.length !== 2) {
             res.status(400).json({ error: "Could not find the two films to exclude" });
             return;
         }
-        const rating1 = parseFloat(result.rows[0].averagerating);
-        const rating2 = parseFloat(result.rows[1].averagerating);
-        const slug1 = result.rows[0].slug;
-        const slug2 = result.rows[1].slug;
+
+        if (excludeFilms[0] !== rows[0].id) {
+        [rows[0], rows[1]] = [rows[1], rows[0]];
+        }
+
+        const rating1 = parseFloat(rows[0].averagerating);
+        const rating2 = parseFloat(rows[1].averagerating);
+        const slug1 = rows[0].slug;
+        const slug2 = rows[1].slug;
         if(rating1 > rating2){
             correctChoice = 0;
         }
