@@ -1,5 +1,5 @@
 import {useState} from "react";
-import DifficultyBoxes from "./Difficulties";
+import DifficultyBoxes from "./DifficultyBoxes";
 import type { Difficulty } from "../types/types";
 
 interface WelcomePageProps {

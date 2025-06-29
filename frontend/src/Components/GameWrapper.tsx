@@ -4,7 +4,7 @@ import LostPage from "./LostPage.tsx";
 import WelcomePage from "./WelcomePage.tsx";
 import { useServerStatus } from '../Context/ServerStatusContext';
 import {Spinner} from "../UI/spinner.tsx";
-import type { GameStatus, Difficulty } from "../types/types.ts";
+import type { GameStatus, Difficulty} from "../types/types.ts";
 // to do import PlayAgainButton from "./PlayAgain.tsx";
 
 
