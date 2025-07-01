@@ -50,6 +50,7 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
             return;
         }
 
+        //swap if in the wrong order from the filmIdParams
         if (excludeFilms[0] !== rows[0].id) {
         [rows[0], rows[1]] = [rows[1], rows[0]];
         }
@@ -65,8 +66,10 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
             correctChoice = 1;
         }
         if(choice === correctChoice){
-            const ranSelectedToRemove: number = Math.floor(Math.random() * 1);
-            const newFilm = await getFilmHelper(client, limit, result.rows[ranSelectedToRemove].averagerating, excludeFilms, baseURL);
+            const ranSelectedToRemove: number = Math.round(Math.random() * 1);
+            const stayIndex: number = ranSelectedToRemove === 1 ? 0 : 1;
+            const newFilm = await getFilmHelper(client, limit, rows[stayIndex].averagerating, excludeFilms, baseURL);
+
             res.status(200).json({
                 success: true,
                 correctChoice: correctChoice,
@@ -108,7 +111,7 @@ async function getFilmHelper(client: PoolClient, limit: number, excludedRating: 
                 LIMIT $1
             ) AS film_list
              WHERE id NOT IN ($2, $3)
-             AND averagerating <> $4
+             AND ABS(averagerating - $4) > 0.01
              ORDER BY RANDOM()
              LIMIT 1
         `;
