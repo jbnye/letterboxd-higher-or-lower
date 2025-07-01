@@ -103,19 +103,22 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
 async function getFilmHelper(client: PoolClient, limit: number, excludedRating: number, excludedFilms: number[], baseURL: string){
     
     try{
-        const getFilmQuery = `
-            SELECT id, slug, title, year, posterurl FROM (
-                SELECT * FROM films
-                ${limit === 10000 ? "" : "WHERE category = 'movie'"}
-                ORDER BY watchednumber DESC
-                LIMIT $1
-            ) AS film_list
-             WHERE id NOT IN ($2, $3)
-             AND ABS(averagerating - $4) > 0.01
-             ORDER BY RANDOM()
-             LIMIT 1
-        `;
-        const result = await client.query(getFilmQuery, [limit, excludedFilms[0], excludedFilms[1], excludedRating]);
+        //AND ABS(averagerating - $4) > 0.01
+        const getNewFilmQuery = `
+        SELECT id, slug, title, year, posterurl
+        FROM (
+            SELECT id, slug, title, year, posterurl, averagerating
+            FROM films
+            WHERE ${limit !== 10000 ? "category = 'movie'" : ""}
+            ORDER BY watchednumber DESC
+            LIMIT $1
+        ) AS sorted_films
+        WHERE id NOT IN ($2, $3)
+        AND averagerating <> $4
+        OFFSET FLOOR(RANDOM() * $1)
+        LIMIT 1`;
+
+        const result = await client.query(getNewFilmQuery, [limit, excludedFilms[0], excludedFilms[1], excludedRating]);
         const film = result.rows[0];
         const newFilm = {
         ...film,
