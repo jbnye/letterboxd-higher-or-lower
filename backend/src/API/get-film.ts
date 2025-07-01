@@ -25,68 +25,51 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
         return;
     }
     try {
-        let getFilmsQuery: string = `
-            SELECT   
-            f1.id AS id1,
-            f1.slug AS slug1,
-            f1.watchednumber AS watchednumber1,
-            f1.title as title1,
-            f1.year as year1,
-            f1.posterurl as posterurl1,
-            f2.id AS id2,
-            f2.slug AS slug2,
-            f2.watchednumber AS watchednumber2,
-            f2.title as title2,
-            f2.year as year2,
-            f2.posterurl as posterurl2
-            FROM (
-                SELECT * FROM films
-                ${limit === 10000 ? "" : "WHERE category = 'movie'"}
-                ORDER BY watchedNumber DESC
-                LIMIT $1
-            ) f1
-             JOIN (
-                SELECT * FROM films
-                ${limit === 10000 ? "" : "WHERE category = 'movie'"}
-                ORDER BY watchedNumber DESC
-                LIMIT $1
-            ) f2
-            ON f1.averagerating <> f2.averagerating
-            AND f1.id <> f2.id
-            ORDER BY RANDOM()
+        const getFirstFilmQuery = `
+            SELECT id, slug, averagerating, title, year, posterurl
+            FROM films ${limit !== 10000 ? "WHERE category = 'movie'": ""}
+            ORDER BY watchedNumber DESC
+            OFFSET FLOOR(RANDOM() * $1)
             LIMIT 1
         `;
-
-        const result = await client.query(getFilmsQuery, [limit]);
-        const row = result.rows[0];
-        if (result && result.rows.length > 0) {
-            const film1 = {
-                id: row.id1,
-                slug: row.slug1,
-                // averageRating: row.averagerating1,
-                title: row.title1,
-                year: row.year1,
-                posterurl: row.posterurl1,
-                inHouseURL: `${baseURL}/posters/${row.slug1}.jpg`
-                // isTop250: row.istop2501
-            };
-
-            const film2 = {
-                id: row.id2,
-                slug: row.slug2,
-                // averageRating: row.averagerating2,
-                title: row.title2,
-                year: row.year2,
-                posterurl: row.posterurl2,
-                inHouseURL: `${baseURL}/posters/${row.slug2}.jpg`
-                // isTop250: row.istop2502
-            };
-            console.log("Fetched two films: ", film1, film2);
-            res.json({ newFilms: [film1, film2] });
-
-        } else {
-            res.status(404).json({error:'No films found'})
+        const firstFilmResult = await client.query(getFirstFilmQuery, [limit]);
+        const film1Row = firstFilmResult.rows[0];
+        const excludeRatingFromFirstFilm =  firstFilmResult.rows[0].averagerating;
+        const film1 = {
+            id: film1Row.id1,
+            slug: film1Row.slug1,
+            // averageRating: film1Row.averagerating1,
+            title: film1Row.title1,
+            year: film1Row.year1,
+            posterurl: film1Row.posterurl1,
+            inHouseURL: `${baseURL}/posters/${film1Row.slug1}.jpg`
+            // isTop250: film1Row.istop2501
         }
+
+        const getSecondFilmQuery = `
+            SELECT id, slug, averagerating, title, year, posterurl
+            FROM films ${limit !== 10000 ? "WHERE category = 'movie AND '": "WHERE "}
+            averagerating <> $1
+            ORDER BY watchedNumber DESC
+            OFFSET FLOOR(RANDOM() * $2)
+            LIMIT 1
+        `;
+        const secondFilmResult = await client.query(getSecondFilmQuery, [excludeRatingFromFirstFilm,limit]);
+        const film2Row = secondFilmResult.rows[0];
+
+        const film2 = {
+            id: film2Row.id,
+            slug: film2Row.slug,
+            // averageRating: film2Row.averagerating2,
+            title: film2Row.title,
+            year: film2Row.year,
+            posterurl: film2Row.posterurl,
+            inHouseURL: `${baseURL}/posters/${film2Row.slug}.jpg`
+            // isTop250: film2Row.istop2502
+        };
+
+        console.log("Fetched two films: ", film1, film2);
+        res.json({ newFilms: [film1, film2] });
     } catch (error){
         console.error(error);
         res.status(500).json({error:'Error getFilmQuery'})

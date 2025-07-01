@@ -35,6 +35,9 @@ import pool from './db';
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             )
         `);
+        await pool.query(`CREATE INDEX IF NOT EXISTS idx_films_category_watchednumber ON films (category, watchednumber DESC)`);
+        await pool.query(`CREATE INDEX IF NOT EXISTS idx_films_watchednumber ON films (watchednumber DESC)`);
+        await pool.query(`CREATE INDEX IF NOT EXISTS idx_films_averagerating ON films (averageRating)`);
 
         console.log('Table and Type initialized');
     } catch (error) {
