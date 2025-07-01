@@ -12,6 +12,7 @@ import type { GameStatus, Difficulty} from "../types/types.ts";
 
 export default function GameWrapper(){
     const {status} = useServerStatus();
+    const [finalScore, setFinalScore] = useState<number>(0);
     const [gameStatus, setGameStatus] = useState<GameStatus>('Welcome');
     const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>("Easy");
     const [gameKey, setGameKey] = useState(0);
@@ -32,22 +33,35 @@ export default function GameWrapper(){
     if(gameStatus === 'Welcome'){
         return (
             <WelcomePage 
-            onStartGame={(chosenDifficulty) => {
-                setDifficultyPicked(chosenDifficulty);
-                setGameStatus("Playing");
+                onStartGame={(chosenDifficulty) => {
+                    setDifficultyPicked(chosenDifficulty);
+                    setGameStatus("Playing");
             }}
             />
         )
 
     } else if(gameStatus === "Lost"){
         return (
-            <LostPage />
+            <LostPage 
+                onStartGame={(chosenDifficulty) => {
+                    setDifficultyPicked(chosenDifficulty);
+                    setGameStatus("Playing");
+                }}
+                finalScore={finalScore}
+            />
         )
     }
 
     return (
         <>
-            <Game key={gameKey} difficulty = {difficultyPicked} onLose={() => setGameStatus("Lost")} />
+            <Game 
+                key={gameKey} 
+                difficulty = {difficultyPicked} 
+                onLose={(score: number) => {
+                    setFinalScore(score);
+                    setGameStatus("Lost");
+                }} 
+            />
         </>
     );
 
