@@ -103,23 +103,47 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
 async function getFilmHelper(client: PoolClient, limit: number, excludedRating: number, excludedFilms: number[], baseURL: string){
     
     try{
-        //AND ABS(averagerating - $4) > 0.01
+        //When you're doing a COUNT(*) over a filtered subquery, and you're not going to use any of the data, you can use SELECT 1 to reduce overhead.
+
+        const countQuery = `
+        SELECT COUNT(*) FROM (
+            SELECT 1
+            FROM (
+            SELECT id, averagerating
+            FROM films
+            WHERE ${limit !== 10000 ? "category = 'movie' " : ""}
+            ORDER BY watchedNumber DESC
+            LIMIT $1
+            ) AS inner_sorted
+            WHERE id NOT IN ($2, $3)
+            AND averagerating <> $4
+        ) AS filtered`;
+
+        const countResult = await client.query(countQuery, [limit, excludedFilms[0], excludedFilms[1], excludedRating]);
+        const countOfRows =  parseInt(countResult.rows[0].count);
+        if (countOfRows === 0) {
+            throw new Error("No valid replacement films found.");
+        }
+        const ranOFFSET = Math.floor(Math.random() * countOfRows);
+
         const getNewFilmQuery = `
         SELECT id, slug, title, year, posterurl
         FROM (
             SELECT id, slug, title, year, posterurl, averagerating
             FROM films
-            WHERE ${limit !== 10000 ? "category = 'movie'" : ""}
-            ORDER BY watchednumber DESC
+            WHERE ${limit !== 10000 ? "category = 'movie' " : ""}
+            ORDER BY watchedNumber DESC
             LIMIT $1
         ) AS sorted_films
         WHERE id NOT IN ($2, $3)
         AND averagerating <> $4
-        OFFSET FLOOR(RANDOM() * $1)
+        OFFSET $5
         LIMIT 1`;
 
-        const result = await client.query(getNewFilmQuery, [limit, excludedFilms[0], excludedFilms[1], excludedRating]);
+        const result = await client.query(getNewFilmQuery, [limit, excludedFilms[0], excludedFilms[1], excludedRating, ranOFFSET]);
         const film = result.rows[0];
+
+
         const newFilm = {
         ...film,
         inHouseURL: `${baseURL}/posters/${film.slug}.jpg`

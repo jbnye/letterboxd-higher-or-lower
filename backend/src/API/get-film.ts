@@ -27,34 +27,61 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
     try {
         const getFirstFilmQuery = `
             SELECT id, slug, averagerating, title, year, posterurl
-            FROM films ${limit !== 10000 ? "WHERE category = 'movie'": ""}
+            FROM films ${limit !== 10000 ? "WHERE category = 'movie' ": ""}
             ORDER BY watchedNumber DESC
             OFFSET FLOOR(RANDOM() * $1)
             LIMIT 1
         `;
         const firstFilmResult = await client.query(getFirstFilmQuery, [limit]);
         const film1Row = firstFilmResult.rows[0];
-        const excludeRatingFromFirstFilm =  firstFilmResult.rows[0].averagerating;
+        const excludeRatingFromFirstFilm =  film1Row.averagerating;
         const film1 = {
-            id: film1Row.id1,
-            slug: film1Row.slug1,
+            id: film1Row.id,
+            slug: film1Row.slug,
             // averageRating: film1Row.averagerating1,
-            title: film1Row.title1,
-            year: film1Row.year1,
-            posterurl: film1Row.posterurl1,
-            inHouseURL: `${baseURL}/posters/${film1Row.slug1}.jpg`
+            title: film1Row.title,
+            year: film1Row.year,
+            posterurl: film1Row.posterurl,
+            inHouseURL: `${baseURL}/posters/${film1Row.slug}.jpg`
             // isTop250: film1Row.istop2501
         }
 
-        const getSecondFilmQuery = `
-            SELECT id, slug, averagerating, title, year, posterurl
-            FROM films ${limit !== 10000 ? "WHERE category = 'movie AND '": "WHERE "}
-            averagerating <> $1
+
+        // 1. Get count of valid candidates
+        const countQuery = `
+        SELECT COUNT(*) FROM (
+            SELECT id, averagerating
+            FROM films
+            WHERE ${limit !== 10000 ? "category = 'movie'" : "TRUE"}
             ORDER BY watchedNumber DESC
-            OFFSET FLOOR(RANDOM() * $2)
-            LIMIT 1
+            LIMIT $1
+        ) AS filtered
+        WHERE averagerating <> $2
         `;
-        const secondFilmResult = await client.query(getSecondFilmQuery, [excludeRatingFromFirstFilm,limit]);
+
+        const countResult = await client.query(countQuery, [limit, excludeRatingFromFirstFilm]);
+        const countOfRows = parseInt(countResult.rows[0].count);
+        if (countOfRows === 0) {
+            throw new Error("No valid replacement films found.");
+        }
+
+        const ranOffSET = Math.floor(Math.random() * countOfRows);
+
+        const filmQuery = `
+        SELECT id, slug, averagerating, title, year, posterurl
+        FROM (
+            SELECT id, slug, averagerating, title, year, posterurl
+            FROM films
+            WHERE ${limit !== 10000 ? "category = 'movie'" : "TRUE"}
+            ORDER BY watchedNumber DESC
+            LIMIT $1
+        ) AS sorted
+        WHERE averagerating <> $2
+        OFFSET $3
+        LIMIT 1
+        `;
+
+        const secondFilmResult = await client.query(filmQuery, [limit, excludeRatingFromFirstFilm, ranOffSET]);
         const film2Row = secondFilmResult.rows[0];
 
         const film2 = {
