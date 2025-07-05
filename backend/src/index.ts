@@ -3,7 +3,9 @@ import filmRouter from "./API/get-film";
 import checkGuessRouter from "./API/check-guess";
 import path from "path";
 import cors from "cors";
+import {connectRedisAndLoad} from './redis';
 import dotenv from 'dotenv';
+import { connect } from "http2";
 dotenv.config();
 
 const port: number = parseInt(process.env.PORT || "3000");
@@ -15,6 +17,9 @@ app.use("/api", filmRouter);
 app.use("/api", checkGuessRouter);
 app.use('/posters', express.static(path.resolve(__dirname, '..', 'posters')));
 
+(async () =>  (
+    await connectRedisAndLoad()
+))();
 
 
 app.get('/', (_req: Request, res: Response) => {

@@ -50,7 +50,7 @@ async function main(){
         const posterUrl = filmPosters.get(slug);
         const updatedFilm: filmData = {
             ...film,
-            posterUrl: posterUrl ?? ""  // fallback to "" if missing
+            posterUrl: posterUrl ?? ""  
         };
 
         if (!posterUrl) {
