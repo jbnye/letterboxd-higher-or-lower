@@ -54,6 +54,7 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
 
 
             if(choice === correctChoice){
+                console.log("Checking cache from a correct choice");
                 const bucketKey = `bucket:${difficulty.toLowerCase()}`;
                 const bucketJSON = await redisClient.get(bucketKey);
                 if(!bucketJSON){
