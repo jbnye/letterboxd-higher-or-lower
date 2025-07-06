@@ -16,19 +16,21 @@ async function loadFilms(){
     try {
        const result = await db_client.query(allFilmsQuery);
        console.log(`Caching ${result.rows.length} films in Redis`);
-
+       const multi = redisClient.multi();
         for(const film of result.rows){
             const key = `film:${film.id}`;
-            redisClient.multi().set(key, JSON.stringify(film));
+            film.averagerating = Number(film.averagerating);
+            multi.set(key, JSON.stringify(film));
             topAll.push(film.id);
             if(film.category === 'movie'){
                 topMovies.push(film.id);
             }
         }
-        redisClient.set('bucket:easy', JSON.stringify(topMovies.slice(0, 500)));
-        redisClient.set('bucket:medium', JSON.stringify(topMovies.slice(0, 1200)));
-        redisClient.set('bucket:hard', JSON.stringify(topMovies.slice(0, 2500)));
-        redisClient.set('bucket:impossible', JSON.stringify(topAll.slice(0, 10000)));
+        await multi.exec();
+        await redisClient.set('bucket:easy', JSON.stringify(topMovies.slice(0, 500)));
+        await redisClient.set('bucket:medium', JSON.stringify(topMovies.slice(0, 1200)));
+        await redisClient.set('bucket:hard', JSON.stringify(topMovies.slice(0, 2500)));
+        await redisClient.set('bucket:impossible', JSON.stringify(topAll.slice(0, 10000)));
 
        console.log(` ${symbols.success} Films cached in Redis!`);
     } catch (error) {
