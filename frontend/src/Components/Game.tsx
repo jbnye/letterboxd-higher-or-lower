@@ -50,12 +50,15 @@ export default function Game({difficulty, onLose}: GameProps){
     const [films, setFilms] = useState<getFilmsResponse[]>([]);
     const [filmRatings, setFilmRatings] = useState<number[]>([0,0]);
     const [checkGuessData, setCheckGuessData] = useState<CheckGuessResponse | null>(null);
+    const [showColors, setShowColors] = useState<boolean>(false);
     const [filmDisplayStates, setFilmDisplayStates] = useState<FilmDisplayState[]>([
         { trueRating: 0, displayedRating: 0, status: "secret" },
         { trueRating: 0, displayedRating: 0, status: "secret" },
     ]);
-    const [choice, setChoice] = useState<number>(2);
+    const [choice, setChoice] = useState<number>(-1);
     const isLoading = films.length !== 2;
+    console.log("guess data:", checkGuessData);
+    console.log("film data:",filmDisplayStates);
     const film1 = films[0];
     const film2 = films[1];
 
@@ -78,39 +81,38 @@ export default function Game({difficulty, onLose}: GameProps){
     }, [difficulty]);
 
 
-    useEffect(() => {
-        if(animationIsPlaying === true){
-            const timer = setTimeout(() =>{
-                console.log("TEST");
-            }, 5000);
-
-            return () => clearTimeout(timer); 
-        }
-    },[animationIsPlaying]);
-
 
     useEffect(() => {
         if (!checkGuessData) return;
 
         // Set true ratings in state
-        const newStates = [...filmDisplayStates];
-        newStates[0].trueRating = checkGuessData.filmRatings.film1[1];
-        newStates[1].trueRating = checkGuessData.filmRatings.film2[1];
-        setFilmDisplayStates(newStates);
+        setFilmDisplayStates(prev => [
+            {
+                ...prev[0],
+                trueRating: checkGuessData.filmRatings.film1[1],
+                status: prev[0].status === 'secret' ? 'animating' : prev[0].status,
+            },
+            {
+                ...prev[1],
+                trueRating: checkGuessData.filmRatings.film2[1],
+                status: prev[1].status === 'secret' ? 'animating' : prev[1].status,
+            },
+        ]);
+        const timer = setTimeout(() => {
+            setFilmDisplayStates(prev => [
+                {
+                    ...prev[0],
+                    status: 'revealed',
+                },
+                {
+                    ...prev[1],
+                    status: 'revealed',
+                },
+                ]);
+            }, 10000); // duration should match <AnimatedNumber duration>
 
-        if (filmDisplayStates[0].status !== "revealed") {
-            animateRating(0);
-
-            setTimeout(() => {
-            if (filmDisplayStates[1].status !== "revealed") {
-                animateRating(1);
-            }
-            }, 2000);
-        } else if (filmDisplayStates[1].status !== "revealed") {
-            // If film 0 was already revealed but film 1 wasn't
-            animateRating(1);
-        }
-        }, [checkGuessData]);;
+            return () => clearTimeout(timer);
+        }, [checkGuessData]);
 
 
     useEffect(() => {
@@ -125,46 +127,12 @@ export default function Game({difficulty, onLose}: GameProps){
         } else {
         onLose(score); 
         }
-        setAnimationIsPlaying(false); // Reset for next round
+        //setAnimationIsPlaying(false); // Reset for next round
     }, 1000);
 
     return () => clearTimeout(timer);
     }, [filmDisplayStates]);
 
-
-    function animateRating(index: number) {
-        setFilmDisplayStates(prev => {
-            const updated = [...prev];
-            updated[index].status = "animating";
-            return updated;
-        });
-
-        const duration = 2000;
-        const interval = 50;
-        const startTime = Date.now();
-
-        const timer = setInterval(() => {
-            const elapsed = Date.now() - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 2);
-            
-            setFilmDisplayStates(prev => {
-            const updated = [...prev];
-            const target = updated[index].trueRating;
-            updated[index].displayedRating = parseFloat((target * eased).toFixed(1));
-            return updated;
-            });
-
-            if (progress === 1) {
-                clearInterval(timer);
-                setFilmDisplayStates(prev => {
-                    const updated = [...prev];
-                    updated[index].status = "revealed";
-                    return updated;
-                });
-            }
-        }, interval);
-    }
 
     function handleReplaceFilm(){
         if (!checkGuessData?.success || !checkGuessData.newFilm) return;
@@ -190,6 +158,7 @@ export default function Game({difficulty, onLose}: GameProps){
         })
 
         setScore((prev) => prev + 1);
+        setAnimationIsPlaying(false);
         setCheckGuessData(null);
 
     }
@@ -200,10 +169,13 @@ export default function Game({difficulty, onLose}: GameProps){
         if(animationIsPlaying === true){
             return;
         }
-        else{
-            console.log("CHOICE: ", choice);
-            checkGuessBackend(choice);
-        }
+        setAnimationIsPlaying(true);
+        // setFilmDisplayStates((prev) =>
+        //     prev.map((state) =>
+        //     state.status === "secret" ? { ...state, status: "animating" } : state
+        //     )
+        // );
+        checkGuessBackend(choice);
     }
 
 
@@ -213,7 +185,7 @@ export default function Game({difficulty, onLose}: GameProps){
             const filmIdsParam = `${film1.id},${film2.id}`;
             const response = await fetch(`http://localhost:3000/api/check-guess/${difficulty}?filmIds=${filmIdsParam}&choice=${choice}`);
             if(response.status === 200){
-                setAnimationIsPlaying(true);
+                //setAnimationIsPlaying(true);
                 const data = await response.json();
                 if(data.success === true){
                     console.log("RECIEVED  RIGHT CHOICE RESPONSE: ", data);
@@ -249,7 +221,7 @@ export default function Game({difficulty, onLose}: GameProps){
                 <Spinner />
                 ) : (
                 <>
-                    <FilmBox  film={film1} index={0} handleGuess={handleGuess}  filmDisplayState={filmDisplayStates[0]} />
+                    <FilmBox  film={film1} index={0} handleGuess={handleGuess}  filmDisplayState={filmDisplayStates[0]} animationIsPlaying={animationIsPlaying} />
 
                 </>
                 )}
@@ -261,7 +233,7 @@ export default function Game({difficulty, onLose}: GameProps){
                 <Spinner />
                 ) : (
                 <>
-                    <FilmBox  film={film2} index={1} handleGuess={handleGuess}  filmDisplayState={filmDisplayStates[1]} />
+                    <FilmBox  film={film2} index={1} handleGuess={handleGuess}  filmDisplayState={filmDisplayStates[1]} animationIsPlaying={animationIsPlaying} />
                 </>
                 )}
             </div>
@@ -277,3 +249,39 @@ export default function Game({difficulty, onLose}: GameProps){
         </div>
     );
 }
+
+
+
+    // function animateRating(index: number) {
+    //     setFilmDisplayStates(prev => {
+    //         const updated = [...prev];
+    //         updated[index].status = "animating";
+    //         return updated;
+    //     });
+
+    //     const duration = 2000;
+    //     const interval = 50;
+    //     const startTime = Date.now();
+
+    //     const timer = setInterval(() => {
+    //         const elapsed = Date.now() - startTime;
+    //         const progress = Math.min(elapsed / duration, 1);
+    //         const eased = 1 - Math.pow(1 - progress, 2);
+            
+    //         setFilmDisplayStates(prev => {
+    //         const updated = [...prev];
+    //         const target = updated[index].trueRating;
+    //         updated[index].displayedRating = parseFloat((target * eased).toFixed(1));
+    //         return updated;
+    //         });
+
+    //         if (progress === 1) {
+    //             clearInterval(timer);
+    //             setFilmDisplayStates(prev => {
+    //                 const updated = [...prev];
+    //                 updated[index].status = "revealed";
+    //                 return updated;
+    //             });
+    //         }
+    //     }, interval);
+    // }

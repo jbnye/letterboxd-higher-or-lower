@@ -1,58 +1,53 @@
-import {useState, useEffect} from "react" ;
-
+import { useEffect, useRef, useState } from "react";
 
 interface AnimatedNumberProps {
   target: number;
-  duration?: number; // optional, total time in ms
-  className?: string; // for styling
+  duration?: number;
+  className?: string;
+  onAnimationComplete?: () => void;
 }
 
+export default function AnimatedNumber({
+  target,
+  duration = 600,
+  className = "",
+  onAnimationComplete
+}: AnimatedNumberProps) {
+  const [displayed, setDisplayed] = useState<number>(0);
+  const startTimeRef = useRef<number | null>(null);
+  const rafRef = useRef<number | null>(null);
 
-export default function AniamtedNumber({target, duration = 600, className}: AnimatedNumberProps){
+  useEffect(() => {
+    startTimeRef.current = 0;
 
-    const [displayedNum, setDisplayedNum] = useState<number>(target);
-    const [prev, setPrev] = useState(target);
-    const [isAnimating, setIsAnimating] = useState(false);
+    const step = (timestamp: number) => {
+      if (!startTimeRef.current) startTimeRef.current = timestamp;
+      const elapsed = timestamp - startTimeRef.current;
+      const progress = Math.min(elapsed / duration, 1);
+       const eased = 1 - Math.pow(1 - progress, 3);
 
-    useEffect(() => {
-        if(target === displayedNum) return;
+      const value = 0 + (target - 0) * eased;
+      setDisplayed(parseFloat(value.toFixed(1)));
 
-        setPrev(displayedNum);
-        setIsAnimating(true);
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(step);
+      } else{
+        onAnimationComplete?.();
+      }
+    };
 
-        const timeout = setTimeout(() =>{
-            setDisplayedNum(target);
-        }, duration);
-        return () => clearTimeout(timeout);
-    }, [target]);
+    rafRef.current = requestAnimationFrame(step);
 
-
-
-    useEffect(() => {
-            if(isAnimating){
-                const timer = setTimeout(() => setIsAnimating(false), duration);
-                return () => clearTimeout(timer);
-            }
-    },[isAnimating]);
+    return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, [target]);
 
   return (
-    <div className={`relative h-[2rem] overflow-hidden text-center ${className}`}>
-      <span
-        className={`absolute left-0 right-0 transition-transform duration-[${duration}] ease-out block text-xl ${
-          isAnimating ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100"
-        }`}
-        key={`prev-${prev}`}
-      >
-        {prev.toFixed(1)}
-      </span>
-      <span
-        className={`absolute left-0 right-0 transition-transform duration-[${duration}] ease-out block text-xl ${
-          isAnimating ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
-        }`}
-        key={`curr-${target}`}
-      >
-        {target.toFixed(1)}
-      </span>
+    <div className={`text-center ${className}`}>
+      <span className="text-xl font-bold">{displayed.toFixed(1)}</span>
     </div>
   );
 }

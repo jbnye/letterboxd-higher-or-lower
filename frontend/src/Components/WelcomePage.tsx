@@ -25,6 +25,6 @@ export default function WelcomePage({onStartGame}: WelcomePageProps){
                 Play
             </button>
         </div>
-    )
 
+    )
 }
