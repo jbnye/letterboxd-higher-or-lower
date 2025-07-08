@@ -18,6 +18,8 @@ interface getFilmsResponse {
 }
 
 type RatingStatus = "secret" | "animating" | "revealed";
+type ColorState = "none" | "correct" | "incorrect";
+
 
 interface FilmDisplayState {
   trueRating: number;
@@ -50,15 +52,16 @@ export default function Game({difficulty, onLose}: GameProps){
     const [films, setFilms] = useState<getFilmsResponse[]>([]);
     const [filmRatings, setFilmRatings] = useState<number[]>([0,0]);
     const [checkGuessData, setCheckGuessData] = useState<CheckGuessResponse | null>(null);
-    const [showColors, setShowColors] = useState<boolean>(false);
+    const [ratingColor, setRatingColor] = useState<ColorState>("none");
     const [filmDisplayStates, setFilmDisplayStates] = useState<FilmDisplayState[]>([
         { trueRating: 0, displayedRating: 0, status: "secret" },
         { trueRating: 0, displayedRating: 0, status: "secret" },
     ]);
     const [choice, setChoice] = useState<number>(-1);
     const isLoading = films.length !== 2;
-    console.log("guess data:", checkGuessData);
-    console.log("film data:",filmDisplayStates);
+    //console.log("guess data:", checkGuessData);
+    //console.log("film data:",filmDisplayStates);
+    console.log("COLOR RATING", ratingColor);
     const film1 = films[0];
     const film2 = films[1];
 
@@ -84,53 +87,77 @@ export default function Game({difficulty, onLose}: GameProps){
 
     useEffect(() => {
         if (!checkGuessData) return;
+        const duration = 1000; 
+        const bothAreSecret = filmDisplayStates[0].status === "secret" && filmDisplayStates[1].status === "secret";
 
-        // Set true ratings in state
-        setFilmDisplayStates(prev => [
-            {
-                ...prev[0],
-                trueRating: checkGuessData.filmRatings.film1[1],
-                status: prev[0].status === 'secret' ? 'animating' : prev[0].status,
-            },
-            {
-                ...prev[1],
-                trueRating: checkGuessData.filmRatings.film2[1],
-                status: prev[1].status === 'secret' ? 'animating' : prev[1].status,
-            },
-        ]);
-        const timer = setTimeout(() => {
+        if (bothAreSecret) {
             setFilmDisplayStates(prev => [
                 {
                     ...prev[0],
-                    status: 'revealed',
+                    trueRating: checkGuessData.filmRatings.film1[1],
+                    status: "animating",
                 },
                 {
                     ...prev[1],
-                    status: 'revealed',
+                    trueRating: checkGuessData.filmRatings.film2[1],
+                    status: "secret",
                 },
-                ]);
-            }, 10000); // duration should match <AnimatedNumber duration>
+            ]);
 
-            return () => clearTimeout(timer);
+            setTimeout(() => {
+                setFilmDisplayStates(prev => [
+                    {
+                    ...prev[0],
+                    status: "revealed",
+                    displayedRating: prev[0].trueRating,
+                    },
+                    {
+                    ...prev[1],
+                    status: "animating",
+                    },
+                ]);
+                setTimeout(() => {
+                    setFilmDisplayStates(prev => [
+                        prev[0],
+                        {
+                            ...prev[1],
+                            status: "revealed",
+                            displayedRating: prev[1].trueRating,
+                        },
+                    ]);
+                }, duration);
+            }, duration);
+        } else {
+            setFilmDisplayStates(prev => {
+                return prev.map((film, index) => {
+                    const isSecret = film.status === "secret";
+                    return {
+                    ...film,
+                    trueRating: index === 0 ? checkGuessData.filmRatings.film1[1] : checkGuessData.filmRatings.film2[1],
+                    status: isSecret ? "animating" : film.status,
+                    };
+                });
+            });
+        }
         }, [checkGuessData]);
 
-
     useEffect(() => {
-    // When both are revealed, trigger next step
-    const bothRevealed = filmDisplayStates.every(f => f.status === "revealed");
-    if (!bothRevealed) return;
+        const bothRevealed = filmDisplayStates.every(f => f.status === "revealed");
+        if (!bothRevealed) return;
+        let choiceAnswer: ColorState = "none";
+        choice === checkGuessData?.correctChoice ? choiceAnswer = "correct" : choiceAnswer = "incorrect";
+        setRatingColor(choiceAnswer);
+        const timer = setTimeout(() => {
+            if (checkGuessData?.success) {
+                handleReplaceFilm();
+            } else {
+                onLose(score); 
+            }
+            setRatingColor("none");
+            //setAnimationIsPlaying(false); // Reset for next round
+        }, 2000);
 
-    // Give user 1 second to see ratings before changing
-    const timer = setTimeout(() => {
-        if (checkGuessData?.success) {
-        handleReplaceFilm();
-        } else {
-        onLose(score); 
-        }
-        //setAnimationIsPlaying(false); // Reset for next round
-    }, 1000);
-
-    return () => clearTimeout(timer);
+        return () => clearTimeout(timer);
     }, [filmDisplayStates]);
 
 
@@ -157,9 +184,12 @@ export default function Game({difficulty, onLose}: GameProps){
             return updatedList;
         })
 
+        //setRatingColor("none");
+        setChoice(-1);
         setScore((prev) => prev + 1);
-        setAnimationIsPlaying(false);
+        setAnimationIsPlaying(false)
         setCheckGuessData(null);
+
 
     }
 
@@ -176,6 +206,7 @@ export default function Game({difficulty, onLose}: GameProps){
         //     )
         // );
         checkGuessBackend(choice);
+        setChoice(choice);
     }
 
 
@@ -221,7 +252,7 @@ export default function Game({difficulty, onLose}: GameProps){
                 <Spinner />
                 ) : (
                 <>
-                    <FilmBox  film={film1} index={0} handleGuess={handleGuess}  filmDisplayState={filmDisplayStates[0]} animationIsPlaying={animationIsPlaying} />
+                    <FilmBox  film={film1} index={0} handleGuess={handleGuess}  filmDisplayState={filmDisplayStates[0]} animationIsPlaying={animationIsPlaying} setFilmDisplayStates={setFilmDisplayStates} ratingColor={ratingColor} choice={choice}/>
 
                 </>
                 )}
@@ -233,7 +264,7 @@ export default function Game({difficulty, onLose}: GameProps){
                 <Spinner />
                 ) : (
                 <>
-                    <FilmBox  film={film2} index={1} handleGuess={handleGuess}  filmDisplayState={filmDisplayStates[1]} animationIsPlaying={animationIsPlaying} />
+                    <FilmBox  film={film2} index={1} handleGuess={handleGuess}  filmDisplayState={filmDisplayStates[1]} animationIsPlaying={animationIsPlaying} setFilmDisplayStates={setFilmDisplayStates} ratingColor={ratingColor} choice={choice}/>
                 </>
                 )}
             </div>
