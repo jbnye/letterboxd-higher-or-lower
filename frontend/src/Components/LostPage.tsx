@@ -10,8 +10,8 @@ interface LostageProps {
 export default function LostPage({onStartGame, finalScore}: LostageProps){
     const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>("Easy");
     return(
-        <div className="bg-[#2c3440] min-h-screen w-full flex flex-col items-center justify-center">
-            <h1 className=" text-2xl text-white justify-self-center">{`Final Score: ${finalScore}`}</h1>
+        <div className="bg-letterboxd-background min-h-screen w-full flex flex-col items-center justify-center">
+            <h1 className=" text-2xl text-letterboxd-orange justify-self-center">{`Final Score: ${finalScore}`}</h1>
             <DifficultyBoxes 
             onDifficultyChoice={(difficulty) => {
                 setDifficultyPicked(difficulty);
@@ -20,7 +20,7 @@ export default function LostPage({onStartGame, finalScore}: LostageProps){
             />
 
             <button onClick={() => onStartGame(difficultyPicked)}
-            className="mt-6 px-4 py-2 bg-[#40bcf4] text-white rounded hover:bg-[#1093ef]">
+            className="mt-6 px-4 py-2 bg-letterboxd-blue text-white rounded hover:bg-[#1093ef]">
                 Play Again
             </button>
         </div>

@@ -248,7 +248,7 @@ export default function Game({difficulty, onLose}: GameProps){
     }
     //console.log(showRatings);
     return (
-        <div className="flex h-screen w-screen relative bg-[#2c3440]">
+        <div className="flex h-screen w-screen relative bg-letterboxd-background">
             {/* Left Image Container */}
             <div className="w-1/2 h-full relative">
                 {isLoading ? (
@@ -277,9 +277,16 @@ export default function Game({difficulty, onLose}: GameProps){
                 Score: {score}
             </div>
             {ratingColor === "correct" ? (
-                <div className ={`bg-white absolute bottom-[50%] left-1/2 translate-x-[-50%]  translate-y-1/2 rounded-full text-black text-lg p-5 font-semibold
+                <div className ={`bg-letterboxd-green absolute bottom-[50%] left-1/2 translate-x-[-50%]  translate-y-1/2 rounded-full text-black text-lg p-5 font-semibold
                 border-4 border-black z-50`}>
-                    {symbols.success}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="white"
+                        viewBox="0 0 24 24"
+                        className="w-6 h-6"
+                    >
+                        <path d="M9 16.2l-3.5-3.5L4 14.2l5 5 12-12-1.4-1.4z" />
+                    </svg>
                 </div> 
             ): ratingColor === "incorrect" ? (
                 <div className ={`bg-white absolute bottom-[50%] left-1/2 translate-x-[-50%]  translate-y-1/2 rounded-full text-black text-lg p-5 font-semibold
