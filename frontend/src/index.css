@@ -1,1 +1,53 @@
 @import "tailwindcss";
+
+
+@theme {
+    --slide-in-down-start: translateY(-100%);  
+    --slide-in-down-end: translateY(0);
+    --slide-in-up-start: translateY(100%);
+    --slide-in-up-end: translateY(0);
+    --slide-in-duration: 0.5s;
+    --slide-in-easing: ease-out;
+    --color-letterboxd-green: oklch(0.7899 0.2343 147.07);
+    --color-letterboxd-orange: oklch(0.7319 0.1858 52.98);
+    --color-letterboxd-background: oklch(0.3226 0.0241 258.36);
+    --color-letterboxd-blue: oklch(0.7512 0.1332 232.35);
+}
+
+@keyframes slide-in-down {
+  0% {
+    transform: var(--slide-in-down-start);
+  }
+  100% {
+    transform: var(--slide-in-down-end);
+  }
+}
+
+@keyframes slide-in-up {
+  0% {
+    transform: var(--slide-in-up-start);
+  }
+  100% {
+    transform: var(--slide-in-up-end);
+  }
+}
+@keyframes slide-out-up {
+  0% {
+    transform: var(--slide-out-up-start);
+  }
+  100% {
+    transform: var(--slide-out-up-end);
+  }
+}
+
+.animate-slide-in-down {
+  animation: slide-in-down var(--slide-in-duration) var(--slide-in-easing) forwards;
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up var(--slide-in-duration) var(--slide-in-easing) forwards;
+}
+
+.animate-slide-out-up {
+  animation: slide-out-up var(--slide-duration) var(--slide-easing) forwards;
+}

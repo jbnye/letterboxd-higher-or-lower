@@ -15,7 +15,7 @@ export default function DifficultyBoxes({difficultyPicked, onDifficultyChoice}: 
           onClick={() => onDifficultyChoice(difficulty)}
           className={`w-32 h-32 flex items-center justify-center rounded-xl shadow-md cursor-pointer 
                       transition-all select-none
-                      ${difficultyPicked === difficulty ? "bg-green-500 text-white" : "bg-white hover:bg-gray-100"}`}
+                      ${difficultyPicked === difficulty ? "bg-letterboxd-green text-white" : "bg-white hover:bg-gray-100"}`}
         >
           <span className="text-lg font-semibold">{difficulty}</span>
         </div>

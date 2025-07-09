@@ -1,6 +1,7 @@
 import {useState, useEffect} from "react";
 import type { Difficulty } from "../types/types";
 import {Spinner} from "../UI/spinner.tsx";
+import { symbols } from "../UI/symbols.tsx";
 import FilmBox from "./FilmBox.tsx";
 
 interface GameProps{
@@ -64,6 +65,8 @@ export default function Game({difficulty, onLose}: GameProps){
     console.log("COLOR RATING", ratingColor);
     const film1 = films[0];
     const film2 = films[1];
+    let classColor;
+    ratingColor === "correct" ? classColor = "bg-green-600" : ratingColor === "incorrect" ? classColor="bg-red-600" : classColor = "bg-white";
 
     useEffect(() => {
         async function fetchTwoFilms(){
@@ -245,7 +248,7 @@ export default function Game({difficulty, onLose}: GameProps){
     }
     //console.log(showRatings);
     return (
-        <div className="flex h-screen w-screen relative">
+        <div className="flex h-screen w-screen relative bg-[#2c3440]">
             {/* Left Image Container */}
             <div className="w-1/2 h-full relative">
                 {isLoading ? (
@@ -273,10 +276,23 @@ export default function Game({difficulty, onLose}: GameProps){
             <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 px-6 py-2 rounded-full border-solid-black shadow-md text-black text-lg font-semibold border-4 border-black  z-50">
                 Score: {score}
             </div>
-            <div className ="absolute bottom-[50%] left-1/2 translate-x-[-50%] bg-white translate-y-1/2 rounded-full text-black text-lg p-5 font-semibold
-              border-4 border-black z-50">
-                OR
-            </div> 
+            {ratingColor === "correct" ? (
+                <div className ={`bg-white absolute bottom-[50%] left-1/2 translate-x-[-50%]  translate-y-1/2 rounded-full text-black text-lg p-5 font-semibold
+                border-4 border-black z-50`}>
+                    {symbols.success}
+                </div> 
+            ): ratingColor === "incorrect" ? (
+                <div className ={`bg-white absolute bottom-[50%] left-1/2 translate-x-[-50%]  translate-y-1/2 rounded-full text-black text-lg p-5 font-semibold
+                border-4 border-black z-50`}>
+                    {symbols.fail}
+                </div> 
+            ): (
+                <div className ={`bg-white absolute bottom-[50%] left-1/2 translate-x-[-50%]  translate-y-1/2 rounded-full text-black text-lg p-5 font-semibold
+                border-4 border-black z-50`}>
+                    OR
+                </div> 
+            )
+            }
         </div>
     );
 }

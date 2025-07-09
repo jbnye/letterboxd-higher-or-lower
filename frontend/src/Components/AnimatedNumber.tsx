@@ -42,7 +42,7 @@ export default function AnimatedNumber({target, duration = 600, className = "", 
     console.log(`ClassName color should be: ${className} `)
     return (
       <div className={`text-center`}>
-        <span className={`text-xl font-bold ${className}`}>{displayed.toFixed(1)}</span>
+        <span className={`text-2xl font-bold ${className}`}>{displayed.toFixed(1)}</span>
       </div>
     );
 }
