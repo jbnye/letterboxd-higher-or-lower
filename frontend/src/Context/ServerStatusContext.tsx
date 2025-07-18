@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect, useContext } from "react";
+import type { ServerStatus } from "../types/types";
 
 
-type ServerStatus = 'checking' | 'online' | 'offline';
 interface ServerStatusContextType {
   status: ServerStatus;
 }
