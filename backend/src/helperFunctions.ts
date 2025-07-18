@@ -46,13 +46,13 @@ export async function parseCSVToMap(filePath: string): Promise<Map<string, filmD
         columns: true,
         skip_empty_lines: true,
         trim: true
-    });
+    }) as filmData[];;
 
     const map = new Map<string, filmData>();
 
     for (const row of records) {
-        const slug = row["Slug"]?.trim();
-        const averageRating = parseFloat((Math.round(row["Average Rating"] * 10) / 10).toFixed(1));
+        const slug = row.slug?.trim();
+        const averageRating = parseFloat((Math.round(row.averageRating * 10) / 10).toFixed(1));
 
         if (!slug || isNaN(averageRating)) {
             console.warn(`${symbols.fail} Skipping invalid row: ${JSON.stringify(row)}`);
@@ -62,11 +62,11 @@ export async function parseCSVToMap(filePath: string): Promise<Map<string, filmD
         map.set(slug, {
             slug,
             averageRating,
-            watchedNumber: row["Watched Number"],
-            title: row["Title"],
-            year: row["Year"],
-            category: row["Category"],
-            posterUrl: row["Poster URL"]
+            watchedNumber: row.watchedNumber,
+            title: row.title,
+            year: row.year,
+            category: row.category,
+            posterUrl: row.posterUrl
         });
     }
 
