@@ -1,14 +1,20 @@
 import {useState} from "react";
 import DifficultyBoxes from "./DifficultyBoxes";
 import type { Difficulty } from "../types/types";
+import {useAuth} from '../Context/UserContext';
+import GoogleSignInButton from "./SignInButton";
 
 interface WelcomePageProps {
     onStartGame: (difficulty: Difficulty) => void;
 }
 
 
+
+
 export default function WelcomePage({onStartGame}: WelcomePageProps){
+    const {authStatus} = useAuth();
     const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>("Easy");
+    console.log(authStatus);
 
     return(
         <div className="bg-letterboxd-background min-h-screen w-full flex flex-col items-center justify-center">
@@ -24,6 +30,8 @@ export default function WelcomePage({onStartGame}: WelcomePageProps){
             className="mt-6 px-4 py-2 bg-letterboxd-blue text-white rounded hover:bg-[#1093ef]">
                 Play
             </button>
+
+            <GoogleSignInButton />
         </div>   
     )
 }
