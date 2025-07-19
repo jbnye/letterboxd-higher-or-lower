@@ -4,7 +4,7 @@ import type { AuthStatus } from "../types/types";
 interface User {
     email: string;
     name: string;
-    avatar: string;
+    picture: string;
     sub: string;
 }
 
@@ -44,7 +44,7 @@ export const AuthProvider = ({children }: {children: React.ReactNode}) => {
     )
 };
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
-  return context;
+    const context = useContext(AuthContext);
+    if (!context) throw new Error("useAuth must be used within AuthProvider");
+    return context;
 };
