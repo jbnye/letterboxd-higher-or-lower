@@ -1,6 +1,7 @@
 import express, {RequestHandler, Express, Request, Response} from "express";
 import filmRouter from "./API/get-film";
 import checkGuessRouter from "./API/check-guess";
+import googleAuthRouter from "./API/google-auth";
 import path from "path";
 import cors from "cors";
 import {connectRedisAndLoad} from './redis';
@@ -11,10 +12,14 @@ dotenv.config();
 const port: number = parseInt(process.env.PORT || "3000");
 
 const app: Express = express();
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173", 
+  credentials: true, 
+}));
 app.use(express.json());
 app.use("/api", filmRouter);
 app.use("/api", checkGuessRouter);
+app.use("/api", googleAuthRouter);
 app.use('/posters', express.static(path.resolve(__dirname, '..', 'posters')));
 
 (async () =>  (
