@@ -1,6 +1,9 @@
 import {Pool} from "pg";
 import dotenv from 'dotenv';
-dotenv.config();
+import path from "path";
+dotenv.config({
+  path: path.resolve(__dirname, "../.env"), // adjusts for script being in /database
+});
 
 const pool = new Pool ({
     host: "localhost",

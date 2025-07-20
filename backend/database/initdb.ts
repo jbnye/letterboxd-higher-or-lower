@@ -16,17 +16,18 @@ import pool from './db';
         `);
         await pool.query(`
             CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                googleId TEXT UNIQUE NOT NULL,
+                googleSub TEXT PRIMARY KEY,
                 email TEXT UNIQUE NOT NULL,
                 name TEXT,
-                pictureURL TEXT
+                picture TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                last_login TIMESTAMP
             )
         `);
         await pool.query(`
             CREATE TABLE IF NOT EXISTS leaderboard (
                 id SERIAL PRIMARY KEY,
-                googleId TEXT REFERENCES users(googleId),
+                googleSub TEXT REFERENCES users(googleId),
                 username TEXT,
                 score INTEGER NOT NULL,
                 difficulty VARCHAR(20) CHECK (difficulty IN ('easy', 'medium', 'hard', 'impossible')),
