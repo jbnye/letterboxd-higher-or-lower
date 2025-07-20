@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.ts",
+    "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js"
   },
@@ -12,13 +12,18 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "axios": "^1.10.0",
+    "cheerio": "^1.1.0",
     "cors": "^2.8.5",
     "csv-parse": "^6.1.0",
     "csv-writer": "^1.6.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "google-auth-library": "^10.1.0",
     "pg": "^8.16.3",
-    "redis": "^5.6.0"
+    "redis": "^5.6.0",
+    "user-agents": "^1.1.604",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.18",
@@ -26,6 +31,7 @@
     "@types/express": "^5.0.2",
     "@types/node": "^22.15.29",
     "@types/pg": "^8.15.4",
+    "@types/user-agents": "^1.0.4",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
