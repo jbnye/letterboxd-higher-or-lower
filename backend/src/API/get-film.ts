@@ -1,6 +1,7 @@
 import pool from "../database/db";
 import { RequestHandler,Router} from "express";
 import {redisClient} from '../redis';
+import {v4 as uuidv4} from "uuid";
 
 const router = Router();
 
@@ -17,7 +18,8 @@ function getDifficulty(difficulty: string): number{
 }
 
 const getFilmsHandler: RequestHandler = async (req, res) => {
-    const {difficulty} = req.params;
+    const {difficulty} = req.body;
+    const {userSub} = req.body;
     const baseURL = `${req.protocol}://${req.get('host')}`;
     const client = await pool.connect();
     let limit: number = getDifficulty(difficulty);
@@ -25,8 +27,8 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
         res.status(400).json({error:'Unknown difficulty'})
         return;
     }
+    const gameId: string = await createGameToRedis(userSub);
     try {
-
         if(redisClient.isReady){
             const bucketKey = `bucket:${difficulty.toLowerCase()}`;
             const bucketJSON = await redisClient.get(bucketKey);
@@ -66,7 +68,7 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
                 inHouseURL: `${baseURL}/posters/${film2Data.slug}.jpg`  
             }
             console.log("Fetched two films from cache: ", film1, film2);
-            res.json({ newFilms: [film1, film2] });
+            res.json({ newFilms: [film1, film2], gameId});
             return;
             }
         }
@@ -147,7 +149,7 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
             };
 
             console.log("Fetched two films: ", film1, film2);
-            res.json({ newFilms: [film1, film2] });
+            res.json({ newFilms: [film1, film2], gameId });
         } catch (error){
             console.error(error);
             res.status(500).json({error:'Error getFilmQuery'})
@@ -159,6 +161,19 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
 };
 
 
-router.get("/get-films/:difficulty", getFilmsHandler);
+router.post("/get-films/", getFilmsHandler);
 export default router;
 
+const createGameToRedis = async (userSub: string) => {
+    const gameId = uuidv4();
+    console.log(`MAKING GAMEID IN REDIS: ${gameId}`);
+    await redisClient.set(
+        `game:${gameId}`,
+        JSON.stringify({
+            sub: userSub,
+            score: 0
+        }),
+        {EX: 300}
+    );
+    return gameId;
+}

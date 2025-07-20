@@ -3,6 +3,7 @@ import {redisClient} from  '../redis';
 import pool from "../database/db";
 import { RequestHandler,Router} from "express";
 import { diff } from "util";
+import { symbols } from "../helperFunctions";
 
 const router = Router();
 
@@ -20,27 +21,20 @@ function getDifficulty(difficulty: string): number{
  
 const checkGuessHandler: RequestHandler = async (req, res) => {
     const baseURL = `${req.protocol}://${req.get('host')}`;
-    const { difficulty } = req.params;
-    const filmIdsRaw = req.query.filmIds;
-    const choice = parseInt(req.query.choice as string, 10);
+    const { gameId, choice, difficulty, filmIds, user } = req.body;
     let correctChoice;
     
-    if (!filmIdsRaw) {
-        res.status(400).json({ error: "filmIds query parameter is required" });
-        return;
+    if (!gameId || (choice !== 0 && choice !== 1) || !filmIds) {
+        return res.status(400).json({ error: "Missing required fields" });
     }
-    if(choice !== 0 && choice !== 1 ){
-        res.status(400).json({ error: "Invalid choice" });
-        return;
-    }
-    const excludeFilms = filmIdsRaw.toString().split(",").map(id => parseInt(id, 10));
+    console.log("Made is past check if statement");
+    const excludeFilms = filmIds;
     let limit = getDifficulty(difficulty.toLowerCase());
     if(limit === 0){
         res.status(400).json({error:'Unknown difficulty'})
         return;
 
     }
-    const client = await pool.connect();
     try {
         if(redisClient.isReady){
             const film1RatingRaw = await redisClient.get(`film:${excludeFilms[0]}`);
@@ -54,6 +48,7 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
 
 
             if(choice === correctChoice){
+                const score: number = await handleGameId(gameId, true);
                 console.log("Checking cache from a correct choice");
                 const bucketKey = `bucket:${difficulty.toLowerCase()}`;
                 const bucketJSON = await redisClient.get(bucketKey);
@@ -102,13 +97,24 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
 
             }
             else{
+                const score: number = await handleGameId(gameId, false);
+                console.log(
+                    {success: false,
+                    correctChoice: correctChoice,
+                    filmRatings: {
+                        film1: [film1Data.slug, film1Data.averagerating],
+                        film2: [film2Data.slug, film2Data.averagerating]
+                    },
+                    score: score,
+                })
                 res.status(200).json({
                     success: false,
                     correctChoice: correctChoice,
                     filmRatings: {
                         film1: [film1Data.slug, film1Data.averagerating],
                         film2: [film2Data.slug, film2Data.averagerating]
-                    }
+                    },
+                    score: score
                 })
                 return;
             }
@@ -121,6 +127,7 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
         }
         
     } catch (error) {
+        const client = await pool.connect();
         console.log("Redis error with check-guess", error);
         try{
             const checkGuessQuery = `
@@ -179,10 +186,9 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
         } catch (error) {
             throw error;
         }
-    }
-
-    finally{
-        client.release();
+        finally{
+            client.release();
+        }
     }
 
 }
@@ -242,5 +248,27 @@ async function getFilmHelper(client: PoolClient, limit: number, excludedRating: 
 }
 
 
-router.get("/check-guess/:difficulty", checkGuessHandler);
+router.post("/check-guess", checkGuessHandler);
 export default router;
+
+const handleGameId = async (gameId: string, correctGuess: boolean) => {
+    console.log("checking redis for gameId");
+    const dataRaw = await redisClient.get(`game:${gameId}`);
+    if(!dataRaw){
+        console.error(symbols.fail, " GAMEID NOT FOUND IN CACHE");
+        return;
+    }
+    const data = JSON.parse(dataRaw);
+    const score = data.score;
+    if(correctGuess === true){
+        data.score = data.score + 1;
+        await redisClient.set(`gameId:${gameId}`, JSON.stringify(data), {EX: 300});
+    }
+    else{
+        await redisClient.del(`gameId:${gameId}`);
+    }
+
+    return score;
+}
+
+
