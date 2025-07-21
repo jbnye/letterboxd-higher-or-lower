@@ -6,38 +6,33 @@ import pool from './db';
         await pool.query(`
             CREATE TABLE IF NOT EXISTS films (
                 id SERIAL PRIMARY KEY,
-                slug VARCHAR(128) UNIQUE NOT NULL,
-                averageRating NUMERIC(3, 1) NOT NULL,
-                watchedNumber INTEGER,
-                title VARCHAR(128),
-                year INTEGER,
-                category varchar(16),
+                slug VARCHAR(64) UNIQUE NOT NULL,
+                averageRating NUMERIC(3, 2) NOT NULL,
+                title VARCHAR(64),
                 posterURL TEXT,
-                isTop250 BOOLEAN NOT NULL
+                isTop250 BOOLEAN NOT NULL,
+                popularityRank INTEGER UNIQUE NOT NULL
             )
         `);
         await pool.query(`
             CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                googleId TEXT UNIQUE NOT NULL,
+                googleSub TEXT PRIMARY KEY,
                 email TEXT UNIQUE NOT NULL,
                 name TEXT,
-                pictureURL TEXT
+                picture TEXT,
+                createdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                lastlogin TIMESTAMP
             )
         `);
         await pool.query(`
             CREATE TABLE IF NOT EXISTS leaderboard (
-                id SERIAL PRIMARY KEY,
-                googleId TEXT REFERENCES users(googleId),
-                username TEXT,
-                score INTEGER NOT NULL,
+                googleSub TEXT REFERENCES users(googleSub),
                 difficulty VARCHAR(20) CHECK (difficulty IN ('easy', 'medium', 'hard', 'impossible')),
-                created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-            )
+                score INTEGER NOT NULL,
+                createdat TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+                PRIMARY KEY (googleSub, difficulty)
+            );
         `);
-        await pool.query(`CREATE INDEX IF NOT EXISTS idx_films_category_watchednumber ON films (category, watchednumber DESC)`);
-        await pool.query(`CREATE INDEX IF NOT EXISTS idx_films_watchednumber ON films (watchednumber DESC)`);
-        await pool.query(`CREATE INDEX IF NOT EXISTS idx_films_averagerating ON films (averageRating)`);
 
         console.log('Table and Type initialized');
     } catch (error) {
