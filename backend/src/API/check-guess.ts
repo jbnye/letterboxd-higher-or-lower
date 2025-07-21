@@ -7,6 +7,12 @@ import { symbols } from "../helperFunctions";
 
 const router = Router();
 
+interface user {
+    sub: string,
+    name: string,
+    email: string,
+    picture: string
+}
 
 function getDifficulty(difficulty: string): number{
   switch (difficulty.toLowerCase()) {
@@ -18,7 +24,7 @@ function getDifficulty(difficulty: string): number{
   }
 
 }
- 
+
 const checkGuessHandler: RequestHandler = async (req, res) => {
     const baseURL = `${req.protocol}://${req.get('host')}`;
     const { gameId, choice, difficulty, filmIds, user } = req.body;
@@ -92,12 +98,18 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
                         film2: [film2Data.slug, film2Data.averagerating]
                     },
                     newFilm: newFilm,
+                    score: score,
                 });
                 return;
 
             }
             else{
+                const client = await pool.connect();
                 const score: number = await handleGameId(gameId, false);
+                let highscore: boolean | undefined;
+                if(user){
+                    highscore = await updateLeaderboard(client, user.sub, score, difficulty)
+                }
                 console.log(
                     {success: false,
                     correctChoice: correctChoice,
@@ -106,6 +118,7 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
                         film2: [film2Data.slug, film2Data.averagerating]
                     },
                     score: score,
+                    highscore: highscore
                 })
                 res.status(200).json({
                     success: false,
@@ -114,142 +127,23 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
                         film1: [film1Data.slug, film1Data.averagerating],
                         film2: [film2Data.slug, film2Data.averagerating]
                     },
-                    score: score
+                    score: score,
+                    ...(highscore !== undefined && {highscore: highscore})
                 })
                 return;
             }
             
-
-
         }
         else{
             throw new Error("Redis server is not ready");
         }
         
-    } catch (error) {
-        const client = await pool.connect();
-        console.log("Redis error with check-guess", error);
-        try{
-            const checkGuessQuery = `
-                SELECT id, slug, averagerating from films where id IN ($1, $2)
-            `;
-            const result = await client.query(checkGuessQuery, [excludeFilms[0], excludeFilms[1]]);
-            const rows = result.rows;
-            if (rows.length !== 2) {
-                res.status(400).json({ error: "Could not find the two films to exclude" });
-                return;
-            }
-
-            //swap if in the wrong order from the filmIdParams
-            if (excludeFilms[0] !== rows[0].id) {
-            [rows[0], rows[1]] = [rows[1], rows[0]];
-            }
-
-            const rating1 = parseFloat(rows[0].averagerating);
-            const rating2 = parseFloat(rows[1].averagerating);
-            const slug1 = rows[0].slug;
-            const slug2 = rows[1].slug;
-            if(rating1 > rating2){
-                correctChoice = 0;
-            }
-            else{
-                correctChoice = 1;
-            }
-            if(choice === correctChoice){
-                const ranSelectedToRemove: number = Math.round(Math.random() * 1);
-                const stayIndex: number = ranSelectedToRemove === 1 ? 0 : 1;
-                const newFilm = await getFilmHelper(client, limit, rows[stayIndex].averagerating, excludeFilms, baseURL);
-
-                res.status(200).json({
-                    success: true,
-                    correctChoice: correctChoice,
-                    replacedFilm: ranSelectedToRemove,
-                    filmRatings: {
-                        film1: [slug1, rating1],
-                        film2: [slug2, rating2]
-                    },
-                    newFilm: newFilm,
-                });
-                return;
-            }
-            else {
-                res.status(200).json({
-                    success: false,
-                    correctChoice: correctChoice,
-                    filmRatings: {
-                        film1: [slug1, rating1],
-                        film2: [slug2, rating2]
-                    }
-                })
-                return;
-            }
-        } catch (error) {
-            throw error;
-        }
-        finally{
-            client.release();
-        }
-    }
-
-}
-
-async function getFilmHelper(client: PoolClient, limit: number, excludedRating: number, excludedFilms: number[], baseURL: string){
-    
-    try{
-        //When you're doing a COUNT(*) over a filtered subquery, and you're not going to use any of the data, you can use SELECT 1 to reduce overhead.
-
-        const countQuery = `
-        SELECT COUNT(*) FROM (
-            SELECT 1
-            FROM (
-            SELECT id, averagerating
-            FROM films
-            WHERE ${limit !== 10000 ? "category = 'movie' " : ""}
-            ORDER BY watchedNumber DESC
-            LIMIT $1
-            ) AS inner_sorted
-            WHERE id NOT IN ($2, $3)
-            AND averagerating <> $4
-        ) AS filtered`;
-
-        const countResult = await client.query(countQuery, [limit, excludedFilms[0], excludedFilms[1], excludedRating]);
-        const countOfRows =  parseInt(countResult.rows[0].count);
-        if (countOfRows === 0) {
-            throw new Error("No valid replacement films found.");
-        }
-        const ranOFFSET = Math.floor(Math.random() * countOfRows);
-
-        const getNewFilmQuery = `
-        SELECT id, slug, title, year, posterurl
-        FROM (
-            SELECT id, slug, title, year, posterurl, averagerating
-            FROM films
-            WHERE ${limit !== 10000 ? "category = 'movie' " : ""}
-            ORDER BY watchedNumber DESC
-            LIMIT $1
-        ) AS sorted_films
-        WHERE id NOT IN ($2, $3)
-        AND averagerating <> $4
-        OFFSET $5
-        LIMIT 1`;
-
-        const result = await client.query(getNewFilmQuery, [limit, excludedFilms[0], excludedFilms[1], excludedRating, ranOFFSET]);
-        const film = result.rows[0];
-
-
-        const newFilm = {
-        ...film,
-        inHouseURL: `${baseURL}/posters/${film.slug}.jpg`
-        };
-        return newFilm;
     } catch (error){
-        throw error;
+        console.error("Check Guess Handler Error:", error);
+        res.status(500).json({ error: "Server error during check guess" });
     }
 }
 
-
-router.post("/check-guess", checkGuessHandler);
-export default router;
 
 const handleGameId = async (gameId: string, correctGuess: boolean) => {
     console.log("checking redis for gameId");
@@ -265,10 +159,89 @@ const handleGameId = async (gameId: string, correctGuess: boolean) => {
         await redisClient.set(`gameId:${gameId}`, JSON.stringify(data), {EX: 300});
     }
     else{
+        
         await redisClient.del(`gameId:${gameId}`);
     }
 
     return score;
 }
 
+const updateLeaderboard = async (client: PoolClient, userSub: user, score: number, difficulty: string) => {
+    try{
+        const result = await client.query(
+            `INSERT INTO leaderboard (googleSub, difficulty, score)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (googleSub, difficulty)
+            DO UPDATE SET score = GREATEST(leaderboard.score, EXCLUDE.score)
+            RETURNING score = EXCLUDED.score AS is_high_score
+            `, [userSub, difficulty, score]
+        );
+        const isHighScore: boolean = result.rows[0]?.is_high_score;
+        console.log(`${userSub} highscore: ${isHighScore}`);
+        return isHighScore;
+    } catch (error) {
+        console.error("ERROR in updateLeaderboard ", error);
+        return false;
+    }
 
+}
+
+router.post("/check-guess", checkGuessHandler);
+export default router;
+
+
+
+
+// async function getFilmHelper(client: PoolClient, limit: number, excludedRating: number, excludedFilms: number[], baseURL: string){
+    
+//     try{
+//         //When you're doing a COUNT(*) over a filtered subquery, and you're not going to use any of the data, you can use SELECT 1 to reduce overhead.
+
+//         const countQuery = `
+//         SELECT COUNT(*) FROM (
+//             SELECT 1
+//             FROM (
+//             SELECT id, averagerating
+//             FROM films
+//             WHERE ${limit !== 10000 ? "category = 'movie' " : ""}
+//             ORDER BY watchedNumber DESC
+//             LIMIT $1
+//             ) AS inner_sorted
+//             WHERE id NOT IN ($2, $3)
+//             AND averagerating <> $4
+//         ) AS filtered`;
+
+//         const countResult = await client.query(countQuery, [limit, excludedFilms[0], excludedFilms[1], excludedRating]);
+//         const countOfRows =  parseInt(countResult.rows[0].count);
+//         if (countOfRows === 0) {
+//             throw new Error("No valid replacement films found.");
+//         }
+//         const ranOFFSET = Math.floor(Math.random() * countOfRows);
+
+//         const getNewFilmQuery = `
+//         SELECT id, slug, title, year, posterurl
+//         FROM (
+//             SELECT id, slug, title, year, posterurl, averagerating
+//             FROM films
+//             WHERE ${limit !== 10000 ? "category = 'movie' " : ""}
+//             ORDER BY watchedNumber DESC
+//             LIMIT $1
+//         ) AS sorted_films
+//         WHERE id NOT IN ($2, $3)
+//         AND averagerating <> $4
+//         OFFSET $5
+//         LIMIT 1`;
+
+//         const result = await client.query(getNewFilmQuery, [limit, excludedFilms[0], excludedFilms[1], excludedRating, ranOFFSET]);
+//         const film = result.rows[0];
+
+
+//         const newFilm = {
+//         ...film,
+//         inHouseURL: `${baseURL}/posters/${film.slug}.jpg`
+//         };
+//         return newFilm;
+//     } catch (error){
+//         throw error;
+//     }
+// }
