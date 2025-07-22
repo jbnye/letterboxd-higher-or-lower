@@ -21,13 +21,14 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
     const {difficulty} = req.body;
     const {userSub} = req.body;
     const baseURL = `${req.protocol}://${req.get('host')}`;
+    const diff = difficulty.toLowerCase();
     const client = await pool.connect();
     let limit: number = getDifficulty(difficulty);
     if(limit === 0){
         res.status(400).json({error:'Unknown difficulty'})
         return;
     }
-    const gameId: string = await createGameToRedis(userSub);
+    const gameId: string = await createGameToRedis(userSub, diff);
     try {
         if(redisClient.isReady){
             const bucketKey = `bucket:${difficulty.toLowerCase()}`;
@@ -164,13 +165,14 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
 router.post("/get-films/", getFilmsHandler);
 export default router;
 
-const createGameToRedis = async (userSub: string) => {
+const createGameToRedis = async (userSub: string, difficulty: string) => {
     const gameId = uuidv4();
     console.log(`MAKING GAMEID IN REDIS: ${gameId}`);
     await redisClient.set(
-        `game:${gameId}`,
+        `gameId:${gameId}`,
         JSON.stringify({
             sub: userSub,
+            difficulty: difficulty,
             score: 0
         }),
         {EX: 300}

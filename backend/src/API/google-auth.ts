@@ -1,8 +1,11 @@
 import pool from "../database/db";
 import { RequestHandler,Router} from "express";
 import { OAuth2Client } from "google-auth-library";
-import {redisClient} from '../redis';
+import jwt from "jsonwebtoken";
 import { symbols } from "../helperFunctions";
+const JWT_SECRET = process.env.JWT_SECRET!;
+const ONE_DAY = 24 * 60 * 60; // seconds
+
 
 const router = Router();
 const CLIENT_ID = process.env.Client_ID;
@@ -24,11 +27,13 @@ const googleAuthHandler: RequestHandler = async (req,res) => {
         const user = {sub, email, name, picture};
         const client = pool.connect();
         try{
-            (await client).query(
+                (await client).query(
                 `INSERT INTO users (googleSub, email, name, picture, lastlogin)
                 VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
                 ON CONFLICT (googleSub) DO UPDATE 
-                SET lastlogin = CURRENT_TIMESTAMP`,
+                SET lastlogin = CURRENT_TIMESTAMP
+                
+                `,
                 [sub, email, name, picture]
             );
         } catch{
@@ -38,7 +43,26 @@ const googleAuthHandler: RequestHandler = async (req,res) => {
             (await client).release()
         }
         console.log(user);
-        //todo create cookie
+
+        //payload, secret, options
+        const JWTtoken = jwt.sign(
+            {
+                sub: user.sub,
+                email: user.email,
+                name: user.name,
+                picture: user.picture,
+            },
+            JWT_SECRET,
+            { expiresIn: ONE_DAY }
+        );
+
+        res.cookie('token', JWTtoken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: ONE_DAY * 1000,
+            sameSite: 'lax',
+        });
+
 
         res.status(200).json({user})
 
