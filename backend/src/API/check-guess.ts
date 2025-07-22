@@ -29,7 +29,7 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
     const baseURL = `${req.protocol}://${req.get('host')}`;
     const { gameId, choice, difficulty, filmIds, user } = req.body;
     let correctChoice;
-    
+    const diff = difficulty.toLowerCase();
     if (!gameId || (choice !== 0 && choice !== 1) || !filmIds) {
         return res.status(400).json({ error: "Missing required fields" });
     }
@@ -108,7 +108,7 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
                 const score: number = await handleGameId(gameId, false);
                 let highscore: boolean | undefined;
                 if(user){
-                    highscore = await updateLeaderboard(client, user.sub, score, difficulty)
+                    highscore = await updateLeaderboard(client, user.sub, score, diff)
                 }
                 console.log(
                     {success: false,
@@ -147,44 +147,49 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
 
 const handleGameId = async (gameId: string, correctGuess: boolean) => {
     console.log("checking redis for gameId");
-    const dataRaw = await redisClient.get(`game:${gameId}`);
+    const dataRaw = await redisClient.get(`gameId:${gameId}`);
     if(!dataRaw){
         console.error(symbols.fail, " GAMEID NOT FOUND IN CACHE");
         return;
     }
     const data = JSON.parse(dataRaw);
-    const score = data.score;
+    const currentScore = data.score;
     if(correctGuess === true){
         data.score = data.score + 1;
         await redisClient.set(`gameId:${gameId}`, JSON.stringify(data), {EX: 300});
     }
     else{
-        
         await redisClient.del(`gameId:${gameId}`);
+        return currentScore; 
     }
 
-    return score;
 }
 
 const updateLeaderboard = async (client: PoolClient, userSub: user, score: number, difficulty: string) => {
-    try{
-        const result = await client.query(
-            `INSERT INTO leaderboard (googleSub, difficulty, score)
-            VALUES ($1, $2, $3)
-            ON CONFLICT (googleSub, difficulty)
-            DO UPDATE SET score = GREATEST(leaderboard.score, EXCLUDE.score)
-            RETURNING score = EXCLUDED.score AS is_high_score
-            `, [userSub, difficulty, score]
-        );
-        const isHighScore: boolean = result.rows[0]?.is_high_score;
-        console.log(`${userSub} highscore: ${isHighScore}`);
-        return isHighScore;
-    } catch (error) {
-        console.error("ERROR in updateLeaderboard ", error);
-        return false;
-    }
+    try {
+    const result = await client.query(
+        `
+        INSERT INTO leaderboard (googleSub, difficulty, score)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (googleSub, difficulty)
+        DO UPDATE SET score = GREATEST(leaderboard.score, EXCLUDED.score)
+        RETURNING score
+        `,
+        [userSub, difficulty.toLowerCase(), score]
+    );
 
-}
+    const updatedScore = result.rows[0]?.score;
+    const isHighScore = updatedScore === score;
+
+    console.log(`${userSub} highscore: ${isHighScore}`);
+    console.log(`current score: ${score} - updatedScore? = ${updatedScore}`);
+    return isHighScore;
+    } catch (error) {
+    console.error("ERROR in updateLeaderboard ", error);
+    return false;
+    }
+};
+
 
 router.post("/check-guess", checkGuessHandler);
 export default router;
