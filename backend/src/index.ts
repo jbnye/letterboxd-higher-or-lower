@@ -2,11 +2,12 @@ import express, {RequestHandler, Express, Request, Response} from "express";
 import filmRouter from "./API/get-film";
 import checkGuessRouter from "./API/check-guess";
 import googleAuthRouter from "./API/google-auth";
+import authStatusRouter from "./API/auth-status";
+import logoutRouter from "./API/logout";
 import path from "path";
 import cors from "cors";
 import {connectRedisAndLoad} from './redis';
 import dotenv from 'dotenv';
-import { connect } from "http2";
 dotenv.config();
 
 const port: number = parseInt(process.env.PORT || "3000");
@@ -20,6 +21,8 @@ app.use(express.json());
 app.use("/api", filmRouter);
 app.use("/api", checkGuessRouter);
 app.use("/api", googleAuthRouter);
+app.use("/api", authStatusRouter);
+app.use("/api", logoutRouter);
 app.use('/posters', express.static(path.resolve(__dirname, '..', 'posters')));
 
 (async () =>  (
@@ -39,7 +42,6 @@ app.get("/ping", (_req,res)=> {
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
-
 
 
 app.get("/mock-lb-test", (_req: Request, res: Response) => {
