@@ -27,7 +27,7 @@ const googleAuthHandler: RequestHandler = async (req,res) => {
         const user = {sub, email, name, picture};
         const client = pool.connect();
         try{
-                (await client).query(
+            (await client).query(
                 `INSERT INTO users (googleSub, email, name, picture, lastlogin)
                 VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
                 ON CONFLICT (googleSub) DO UPDATE 
