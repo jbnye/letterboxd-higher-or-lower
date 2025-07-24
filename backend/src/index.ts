@@ -3,7 +3,9 @@ import filmRouter from "./API/get-film";
 import checkGuessRouter from "./API/check-guess";
 import googleAuthRouter from "./API/google-auth";
 import authStatusRouter from "./API/auth-status";
+import cookieParser from "cookie-parser";
 import logoutRouter from "./API/logout";
+import highscoreRouter from "./API/get-highscores";
 import path from "path";
 import cors from "cors";
 import {connectRedisAndLoad} from './redis';
@@ -17,12 +19,14 @@ app.use(cors({
   origin: "http://localhost:5173", 
   credentials: true, 
 }));
+app.use(cookieParser());
 app.use(express.json());
 app.use("/api", filmRouter);
 app.use("/api", checkGuessRouter);
 app.use("/api", googleAuthRouter);
 app.use("/api", authStatusRouter);
 app.use("/api", logoutRouter);
+app.use("/api", highscoreRouter)
 app.use('/posters', express.static(path.resolve(__dirname, '..', 'posters')));
 
 (async () =>  (

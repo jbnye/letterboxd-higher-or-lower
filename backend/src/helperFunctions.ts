@@ -13,6 +13,12 @@ export interface filmData {
     posterUrl: string
 
 }
+export interface Highscores {
+    easy: number,
+    medium: number,
+    hard: number,
+    impossible: number,
+}
 export const symbols = {
     success: "✅",
     fail: "❌",
