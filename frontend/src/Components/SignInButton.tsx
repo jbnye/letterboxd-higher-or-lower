@@ -2,7 +2,7 @@ import {GoogleLogin } from "@react-oauth/google";
 import {useAuth} from "../Context/UserContext";
 
 export default function GoogleSignInButton() {
-    const { setUser, setAuthStatus, authStatus, user} = useAuth(); 
+    const { setUser, setAuthStatus, authStatus, user, logout} = useAuth(); 
 
 
     const handleLoginSuccess = async (credentialResponse: any) => {
@@ -59,6 +59,7 @@ export default function GoogleSignInButton() {
                         </div>
                         <button
                         onClick={() => {
+                            logout();
                             setUser(null);
                             setAuthStatus("not-authenticated");
                         }}
@@ -67,7 +68,7 @@ export default function GoogleSignInButton() {
                         Logout
                         </button>
                     </div>
-                )
+                    )
                 }
             </div>
         </>

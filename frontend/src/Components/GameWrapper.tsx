@@ -14,7 +14,7 @@ export default function GameWrapper(){
     const {status} = useServerStatus();
     const [finalScore, setFinalScore] = useState<number>(0);
     const [gameStatus, setGameStatus] = useState<GameStatus>('Welcome');
-    const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>("Easy");
+    const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>("easy");
     const [gameKey, setGameKey] = useState(0);
     console.log(gameStatus);
 
@@ -48,6 +48,7 @@ export default function GameWrapper(){
                     setGameStatus("Playing");
                 }}
                 finalScore={finalScore}
+                difficultyLastPlayed={difficultyPicked}
             />
         )
     }

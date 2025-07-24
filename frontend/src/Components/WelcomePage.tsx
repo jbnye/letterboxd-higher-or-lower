@@ -3,7 +3,7 @@ import DifficultyBoxes from "./DifficultyBoxes";
 import type { Difficulty } from "../types/types";
 import {useAuth} from '../Context/UserContext';
 import GoogleSignInButton from "./SignInButton";
-
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/Components/ui/tooltip";
 interface WelcomePageProps {
     onStartGame: (difficulty: Difficulty) => void;
 }
@@ -13,12 +13,13 @@ interface WelcomePageProps {
 
 export default function WelcomePage({onStartGame}: WelcomePageProps){
     const {authStatus} = useAuth();
-    const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>("Easy");
+    const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>("easy");
     console.log(authStatus);
 
     return(
         <div className="bg-letterboxd-background min-h-screen w-full flex flex-col items-center justify-center">
             <h1 className="text-letterboxd-orange text-2xl">Letterboxd Higher or Lower Game</h1>
+            <h2 className="text-xl text-letterboxd-orange ">Select a difficulty</h2>
             <DifficultyBoxes 
             onDifficultyChoice={(difficulty) => {
                 setDifficultyPicked(difficulty);
@@ -32,6 +33,7 @@ export default function WelcomePage({onStartGame}: WelcomePageProps){
             </button>
 
             <GoogleSignInButton />
+
         </div>   
     )
 }

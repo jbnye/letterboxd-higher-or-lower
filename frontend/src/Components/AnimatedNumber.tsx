@@ -39,7 +39,6 @@ export default function AnimatedNumber({target, duration = 600, className = "", 
         }
       };
     }, [target]);
-    console.log(`ClassName color should be: ${className} `)
     return (
       <div className={`text-center`}>
         <span className={`text-2xl font-bold ${className}`}>{displayed.toFixed(1)}</span>

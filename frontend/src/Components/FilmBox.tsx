@@ -34,7 +34,7 @@ export default function FilmBox({ film, index, handleGuess, filmDisplayState, an
     index === choice ? ratingColor === "correct" ? "text-letterboxd-green" : ratingColor === "incorrect" ? "text-red-600" : "text-[#f5eeec]"
      : 
     "text-[#f5eeec]";
-  console.log(`Film index: ${index}, choice: ${choice}, ratingColor: ${ratingColor}, colorClass: ${colorClass}`);
+  //console.log(`Film index: ${index}, choice: ${choice}, ratingColor: ${ratingColor}, colorClass: ${colorClass}`);
     
   return( 
     <>

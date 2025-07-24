@@ -15,7 +15,7 @@ createRoot(document.getElementById('root')!).render(
     <GoogleOAuthProvider clientId={clientId}>
       <ServerStatusProvider>
         <AuthProvider>
-          <GameWrapper />
+            <GameWrapper />
         </AuthProvider>
       </ServerStatusProvider>
     </GoogleOAuthProvider>
