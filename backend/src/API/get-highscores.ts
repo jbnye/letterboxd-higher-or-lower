@@ -8,14 +8,16 @@ const router = Router();
 export const getHighscores: RequestHandler = async (req,res) => {
     const userSub = req.query.userSub as string;
     if (!userSub) {
+        console.log("no userSub");
         return res.status(400).json({ error: "Missing userSub in query" });
     }
     try{
         const highscore_results_RAW = await redisClient.get(`user:highscores:${userSub}`);
-            if (highscore_results_RAW) {
-                const highscore_results = JSON.parse(highscore_results_RAW);
-                return res.json({highscore_results});
-            }
+        if (highscore_results_RAW) {
+            console.log(highscore_results_RAW);
+            const highscore_results = JSON.parse(highscore_results_RAW);
+            return res.json({ highscores: highscore_results }); 
+        }
 
     }catch (error){
         console.log("Error checking highscore in cache,", error);
@@ -47,10 +49,10 @@ export const getHighscores: RequestHandler = async (req,res) => {
             await redisClient.set(
                 `user:highscores:${userSub}`,
                 JSON.stringify(highscores),
-                { EX: 86400 } 
+                { EX: 86400} 
             );
         }
-        return res.json(highscores);
+        return res.json({highscores});
     } catch (error){
         console.error("Failed to retrieve highscores form user with DB", error);
         return res.status(500).json({ error: "Internal server error" });

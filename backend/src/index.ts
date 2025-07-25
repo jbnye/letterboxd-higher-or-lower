@@ -6,6 +6,7 @@ import authStatusRouter from "./API/auth-status";
 import cookieParser from "cookie-parser";
 import logoutRouter from "./API/logout";
 import highscoreRouter from "./API/get-highscores";
+import timeoutRouter from "./API/timeout";
 import path from "path";
 import cors from "cors";
 import {connectRedisAndLoad} from './redis';
@@ -26,7 +27,8 @@ app.use("/api", checkGuessRouter);
 app.use("/api", googleAuthRouter);
 app.use("/api", authStatusRouter);
 app.use("/api", logoutRouter);
-app.use("/api", highscoreRouter)
+app.use("/api", highscoreRouter);
+app.use("/api", timeoutRouter);
 app.use('/posters', express.static(path.resolve(__dirname, '..', 'posters')));
 
 (async () =>  (

@@ -29,7 +29,7 @@ import pool from './db';
                 googleSub TEXT REFERENCES users(googleSub),
                 difficulty VARCHAR(20) CHECK (difficulty IN ('easy', 'medium', 'hard', 'impossible')),
                 score INTEGER NOT NULL,
-                createdat TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+                createdate TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
                 PRIMARY KEY (googleSub, difficulty)
             );
         `);

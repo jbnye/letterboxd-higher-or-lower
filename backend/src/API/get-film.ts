@@ -28,7 +28,6 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
         res.status(400).json({error:'Unknown difficulty'})
         return;
     }
-    const gameId: string = await createGameToRedis(userSub, diff);
     try {
         if(redisClient.isReady){
             const bucketKey = `bucket:${difficulty.toLowerCase()}`;
@@ -68,6 +67,7 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
                 posterurl: film2Data.posterurl,
                 inHouseURL: `${baseURL}/posters/${film2Data.slug}.jpg`  
             }
+            const gameId: string = await createGameToRedis(userSub, diff, film1.id, film2.id);
             console.log("Fetched two films from cache: ", film1, film2);
             res.json({ newFilms: [film1, film2], gameId});
             return;
@@ -148,7 +148,7 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
                 inHouseURL: `${baseURL}/posters/${film2Row.slug}.jpg`
                 // isTop250: film2Row.istop2502
             };
-
+            const gameId: string = await createGameToRedis(userSub, diff, film1.id, film2.id);
             console.log("Fetched two films: ", film1, film2);
             res.json({ newFilms: [film1, film2], gameId });
         } catch (error){
@@ -165,7 +165,7 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
 router.post("/get-films/", getFilmsHandler);
 export default router;
 
-const createGameToRedis = async (userSub: string, difficulty: string) => {
+const createGameToRedis = async (userSub: string, difficulty: string, filmId1: number, filmId2: number) => {
     const gameId = uuidv4();
     console.log(`MAKING GAMEID IN REDIS: ${gameId}`);
     await redisClient.set(
@@ -173,9 +173,11 @@ const createGameToRedis = async (userSub: string, difficulty: string) => {
         JSON.stringify({
             sub: userSub,
             difficulty: difficulty,
-            score: 0
+            score: 0,
+            films: [filmId1, filmId2],
+            guessDeadline: Date.now() + 10700,
         }),
-        {EX: 300}
+        {EX: 20}
     );
     return gameId;
 }

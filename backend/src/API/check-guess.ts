@@ -3,8 +3,9 @@ import {redisClient} from  '../redis';
 import pool from "../database/db";
 import { RequestHandler,Router} from "express";
 import { diff } from "util";
-import { symbols } from "../helperFunctions";
-
+import { symbols, Highscores } from "../helperFunctions";
+import setHighScore from "./utilities.ts/setHighscore";
+type Difficulty = keyof Highscores; 
 const router = Router();
 
 interface user {
@@ -54,7 +55,6 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
 
 
             if(choice === correctChoice){
-                const score: number = await handleGameId(gameId, true);
                 console.log("Checking cache from a correct choice");
                 const bucketKey = `bucket:${difficulty.toLowerCase()}`;
                 const bucketJSON = await redisClient.get(bucketKey);
@@ -63,7 +63,7 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
                 }
                 const bucket: string [] = JSON.parse(bucketJSON);
                 let success = false;
-                const ranSelectedToRemove= Math.round(Math.random() * 1);
+                const ranSelectedToRemove = Math.round(Math.random() * 1);
                 let stayIndex;
                 ranSelectedToRemove === 1 ? stayIndex = 0: stayIndex = 1;
                 let newFilmData;
@@ -89,6 +89,7 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
                     posterurl: newFilmData.posterurl,
                     inHouseURL: `${baseURL}/posters/${newFilmData.slug}.jpg`
                 }
+                const score: number = await handleGameId(gameId, true, filmIds, newFilm.id, ranSelectedToRemove);
                 res.status(200).json({
                     success: true,
                     correctChoice: correctChoice,
@@ -104,11 +105,12 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
 
             }
             else{
-                const client = await pool.connect();
                 const score: number = await handleGameId(gameId, false);
                 let highscore: boolean | undefined;
+                let highscores: Highscores | undefined;
+                
                 if(user){
-                    highscore = await updateLeaderboard(client, user.sub, score, diff)
+                    ({highscores, highscore} = await setHighScore(user.sub, score, difficulty));
                 }
                 console.log(
                     {success: false,
@@ -118,7 +120,8 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
                         film2: [film2Data.slug, film2Data.averagerating]
                     },
                     score: score,
-                    highscore: highscore
+                    highscore: highscore,
+                    highscores: highscores,
                 })
                 res.status(200).json({
                     success: false,
@@ -128,7 +131,8 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
                         film2: [film2Data.slug, film2Data.averagerating]
                     },
                     score: score,
-                    ...(highscore !== undefined && {highscore: highscore})
+                    ...(highscore !== undefined && {highscore: highscore}),
+                    ...(highscores !== undefined && {highscores: highscore}),
                 })
                 return;
             }
@@ -145,7 +149,7 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
 }
 
 
-const handleGameId = async (gameId: string, correctGuess: boolean) => {
+const handleGameId = async (gameId: string, correctGuess: boolean, filmIds?: number[], newFilmId?: number, ranSelectedToRemove?: number) => {
     console.log("checking redis for gameId");
     const dataRaw = await redisClient.get(`gameId:${gameId}`);
     if(!dataRaw){
@@ -154,9 +158,22 @@ const handleGameId = async (gameId: string, correctGuess: boolean) => {
     }
     const data = JSON.parse(dataRaw);
     const currentScore = data.score;
-    if(correctGuess === true){
+    if(correctGuess === true && filmIds){
+        const newGuessDeadline = Date.now() + 10700;
+        const filmId1 = data.films[0];
+        const filmId2 = data.films[1];
+        if(filmId1 !== filmIds[0] || filmId2 !== filmIds[1]){
+        //MUST RETURN SOME SORT OF ERROR FOR SERVER OR CHEATING
+        return ;
+        }
         data.score = data.score + 1;
-        await redisClient.set(`gameId:${gameId}`, JSON.stringify(data), {EX: 300});
+        data.guessDeadline = newGuessDeadline;
+        if(ranSelectedToRemove === 0){
+            data.films[0] = newFilmId;
+        } else{
+            data.films[1] = newFilmId;
+        }
+        await redisClient.set(`gameId:${gameId}`, JSON.stringify(data), {EX: 20});
     }
     else{
         await redisClient.del(`gameId:${gameId}`);
@@ -164,32 +181,6 @@ const handleGameId = async (gameId: string, correctGuess: boolean) => {
     }
 
 }
-
-const updateLeaderboard = async (client: PoolClient, userSub: user, score: number, difficulty: string) => {
-    try {
-    const result = await client.query(
-        `
-        INSERT INTO leaderboard (googleSub, difficulty, score)
-        VALUES ($1, $2, $3)
-        ON CONFLICT (googleSub, difficulty)
-        DO UPDATE SET score = GREATEST(leaderboard.score, EXCLUDED.score)
-        RETURNING score
-        `,
-        [userSub, difficulty.toLowerCase(), score]
-    );
-
-    const updatedScore = result.rows[0]?.score;
-    const isHighScore = updatedScore === score;
-
-    console.log(`${userSub} highscore: ${isHighScore}`);
-    console.log(`current score: ${score} - updatedScore? = ${updatedScore}`);
-    return isHighScore;
-    } catch (error) {
-    console.error("ERROR in updateLeaderboard ", error);
-    return false;
-    }
-};
-
 
 router.post("/check-guess", checkGuessHandler);
 export default router;
