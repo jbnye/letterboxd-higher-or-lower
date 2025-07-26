@@ -17,9 +17,9 @@ export default function DifficultyBoxes({difficultyPicked, onDifficultyChoice}: 
       if(difficulty === "easy"){
         difficultyDescription = "Top 500 most popular movies on letterboxd";
       } else if(difficulty === "medium"){
-        difficultyDescription = "Top 1200 most popular movieson letterboxd";
+        difficultyDescription = "Top 1,200 most popular movies on letterboxd";
       } else if(difficulty === "hard"){
-        difficultyDescription = "Top 2500 most popular movies on letterboxd";
+        difficultyDescription = "Top 2,500 most popular movies on letterboxd";
       } else {
         difficultyDescription = "Top 10,000 most popular ENTRIES on letterboxd. This includes all categories (movies, documentaries, short-films, and tv shows). Only for letterboxd masters. BE WARNED 💀"
       }
@@ -45,7 +45,11 @@ export default function DifficultyBoxes({difficultyPicked, onDifficultyChoice}: 
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <div>{getDifficultyDescription(difficulty)}</div>
+              <div className="flex flex-col gap-1 break-words">
+                <span>{getDifficultyDescription(difficulty)}</span>
+                {userHighscores && <span>{`Current highscore for ${difficulty}: ${userHighscores[difficulty]}`}</span>}
+              </div>
+
             </TooltipContent>
           </Tooltip>
           ))}

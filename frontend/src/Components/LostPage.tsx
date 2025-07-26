@@ -6,28 +6,28 @@ import { useAuth } from "../Context/UserContext";
 interface LostageProps {
     onStartGame: (difficulty: Difficulty) => void,
     finalScore: number,
+    prevHighscore: number | undefined,
     difficultyLastPlayed: Difficulty,
+    
 }
 
-export default function LostPage({onStartGame, finalScore, difficultyLastPlayed}: LostageProps){
-    const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>("easy");
-    const {userHighscores} = useAuth();
-    const currentDifficultyHighscore = userHighscores ? userHighscores[difficultyLastPlayed] : null;
+export default function LostPage({onStartGame, finalScore, prevHighscore, difficultyLastPlayed, }: LostageProps){
+    const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>(difficultyLastPlayed);
     let isHighScore: "true" | "false" | "tied" | null = null;
     let title: string;
     let subtitle: string;
-    if(currentDifficultyHighscore !== null){
-        if(currentDifficultyHighscore > finalScore) {
+    if(prevHighscore !== undefined){
+        if(prevHighscore > finalScore) {
             isHighScore = "false";
             title = "Nice try!";
-            subtitle = `Final Score: ${finalScore}`;
-        } else if (currentDifficultyHighscore === finalScore) {
+            subtitle = `Final Score: ${finalScore}, current highscore for ${difficultyLastPlayed} is ${prevHighscore}`;
+        } else if (prevHighscore === finalScore) {
             isHighScore = "tied";
             title = "Nice try!";
             subtitle = `Final Score: ${finalScore} (Tied high score)`;
         } else {
             isHighScore = "true";
-            title = "WOW! You have a new high score!";
+            title = `WOW! You have a new high score for ${difficultyLastPlayed}! (previous was ${prevHighscore})`;
             subtitle = `New High Score: ${finalScore}`;
         }
     } else {

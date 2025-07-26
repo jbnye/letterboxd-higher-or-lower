@@ -3,7 +3,6 @@ import DifficultyBoxes from "./DifficultyBoxes";
 import type { Difficulty } from "../types/types";
 import {useAuth} from '../Context/UserContext';
 import GoogleSignInButton from "./SignInButton";
-import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/Components/ui/tooltip";
 interface WelcomePageProps {
     onStartGame: (difficulty: Difficulty) => void;
 }
@@ -33,7 +32,6 @@ export default function WelcomePage({onStartGame}: WelcomePageProps){
             </button>
 
             <GoogleSignInButton />
-
         </div>   
     )
 }

@@ -5,6 +5,7 @@ import WelcomePage from "./WelcomePage.tsx";
 import { useServerStatus } from '../Context/ServerStatusContext';
 import {Spinner} from "../UI/spinner.tsx";
 import type { GameStatus, Difficulty} from "../types/types.ts";
+import { useAuth } from "@/Context/UserContext.tsx";
 // to do import PlayAgainButton from "./PlayAgain.tsx";
 
 
@@ -16,6 +17,8 @@ export default function GameWrapper(){
     const [gameStatus, setGameStatus] = useState<GameStatus>('Welcome');
     const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>("easy");
     const [gameKey, setGameKey] = useState(0);
+    const {userHighscores} = useAuth();
+    const prevHighscore: number | undefined = userHighscores ? userHighscores[difficultyPicked] : undefined;
     console.log(gameStatus);
 
     const startNewGame = () => {
@@ -49,6 +52,8 @@ export default function GameWrapper(){
                 }}
                 finalScore={finalScore}
                 difficultyLastPlayed={difficultyPicked}
+                prevHighscore={prevHighscore}
+
             />
         )
     }
