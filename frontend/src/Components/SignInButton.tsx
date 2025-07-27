@@ -50,8 +50,9 @@ export default function GoogleSignInButton() {
                 ) : (
                     <div className="flex items-center gap-2 bg-white p-2 rounded shadow">
                         <img
-                        src={user?.picture}
+                        src={user.picture}
                         alt="User avatar"
+                        referrerPolicy="no-referrer"
                         className="w-8 h-8 rounded-full"
                         />
                         <div className="text-sm">

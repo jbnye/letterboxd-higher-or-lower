@@ -175,6 +175,7 @@ export default function Game({difficulty, onLose}: GameProps){
             } else {
                 onLose(score, prevHighscore);
                 if (checkGuessData?.highscores) {
+                    console.log("user highscores", checkGuessData.highscores);
                     setUserHighscores(checkGuessData.highscores);
                     }
             }
@@ -235,6 +236,10 @@ export default function Game({difficulty, onLose}: GameProps){
     }
 
 
+    async function onTimeout() {
+        handleGuess(-1);
+    }
+
     async function checkGuessBackend(choice: number){
         
         try{
@@ -248,7 +253,7 @@ export default function Game({difficulty, onLose}: GameProps){
                 body: JSON.stringify({gameId, choice, difficulty, filmIds, user}),
                 credentials: "include",
             });
-
+                         
             if(response.status === 200){
                 //setAnimationIsPlaying(true);
                 const data = await response.json();
@@ -307,7 +312,7 @@ export default function Game({difficulty, onLose}: GameProps){
             <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 px-6 py-2 rounded-full border-solid-black shadow-md text-black text-lg font-semibold border-4 border-black z-50">
                 Score: {score}
             </div>
-            <TimeLimit />
+            <TimeLimit films={films} onTimeout={onTimeout} animationIsPlaying = {animationIsPlaying}/>
             <div className="absolute left-0 bottom-0 ">
                 <a className= "underline cursor-pointer text-white hover:text-blue-300 "href={`https://letterboxd.com/film/${film1.slug}/`}
                    target="_blank"
@@ -321,3 +326,4 @@ export default function Game({difficulty, onLose}: GameProps){
         </div>
     );
 }
+

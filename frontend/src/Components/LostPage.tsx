@@ -1,7 +1,6 @@
 import {useState} from "react";
 import DifficultyBoxes from "./DifficultyBoxes";
 import type { Difficulty} from "../types/types";
-import { useAuth } from "../Context/UserContext";
 
 interface LostageProps {
     onStartGame: (difficulty: Difficulty) => void,
@@ -20,7 +19,7 @@ export default function LostPage({onStartGame, finalScore, prevHighscore, diffic
         if(prevHighscore > finalScore) {
             isHighScore = "false";
             title = "Nice try!";
-            subtitle = `Final Score: ${finalScore}, current highscore for ${difficultyLastPlayed} is ${prevHighscore}`;
+            subtitle = `Final Score: ${finalScore}, your current highscore for ${difficultyLastPlayed} is ${prevHighscore}`;
         } else if (prevHighscore === finalScore) {
             isHighScore = "tied";
             title = "Nice try!";

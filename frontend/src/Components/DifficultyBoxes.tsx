@@ -1,4 +1,4 @@
-import {useState} from "react";
+
 import type { Difficulty } from "../types/types";
 import { useAuth } from "../Context/UserContext";
 import type { Highscores } from "../types/types";
@@ -11,6 +11,7 @@ interface DifficultyBoxesProps{
 }
 export default function DifficultyBoxes({difficultyPicked, onDifficultyChoice}: DifficultyBoxesProps){
     const {userHighscores} = useAuth();
+    console.log(userHighscores);
     const difficulties: Difficulty[] = ['easy', 'medium', 'hard', 'impossible'];
     const getDifficultyDescription = (difficulty: keyof Highscores ): string => {
       let difficultyDescription;

@@ -30,7 +30,7 @@ const AuthContext = createContext<AuthConextProps | undefined> (undefined);
 export const AuthProvider = ({children }: {children: React.ReactNode}) => {
     const [user, setUserState] = useState <User | null> (null);
     const [authStatus, setAuthStatusState] = useState<AuthStatus>("not-authenticated");
-    const [userHighscores, setUserHighscores] = useState<Highscores | null>(null);
+    const [userHighscores, setUserHighscoresState] = useState<Highscores | null>(null);
 
     const setUser = (user: User | null) => {
         setUserState(user);
@@ -39,20 +39,23 @@ export const AuthProvider = ({children }: {children: React.ReactNode}) => {
     const setAuthStatus = (status: AuthStatus) => {
         setAuthStatusState(status);
     };
-
-    const logout = async () => {
-    try {
-        await fetch("http://localhost:3000/api/logout", {
-        method: "POST",
-        credentials: "include", 
-        });
-    } catch (error) {
-        console.error("Logout request failed", error);
+    const setUserHighscores = (highscores: Highscores | null) => {
+        setUserHighscoresState(highscores);
     }
 
-    setUserState(null);
-    setAuthStatus("not-authenticated");
-    setUserHighscores(null);
+    const logout = async () => {
+        try {
+            await fetch("http://localhost:3000/api/logout", {
+            method: "POST",
+            credentials: "include", 
+            });
+        } catch (error) {
+            console.error("Logout request failed", error);
+        }
+
+        setUserState(null);
+        setAuthStatus("not-authenticated");
+        setUserHighscoresState(null);
     };
 
     useEffect(() => {
