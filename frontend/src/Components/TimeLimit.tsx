@@ -1,4 +1,4 @@
-import {useState, useEffect, useRef} from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface getFilmsResponse {
     id: number;
@@ -9,31 +9,37 @@ interface getFilmsResponse {
     inHouseURL: string;
 }
 
-interface TimeLimitProps{
+interface TimeLimitProps {
     films: getFilmsResponse[],
     onTimeout: () => void,
     animationIsPlaying: boolean,
 }
+    const TOTAL_TIME = 10.5;
 export default function TimeLimit({ films, onTimeout, animationIsPlaying }: TimeLimitProps) {
-    const [time, setTime] = useState<number>(10.0);
+    const [time, setTime] = useState<number>(TOTAL_TIME)
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
-    const onTimeoutRef = useRef(onTimeout);
+    const radius = 50;
+    const stroke = 8
+    const normalizedRadius = radius - stroke / 2;
+    const circumferance = normalizedRadius * 2 * Math.PI;
+    const strokeColor = time >= 7.0 ? "#40bcf4": (time >= 3 && time < 7) ? "#ff8000" : "#f70000";
 
     useEffect(() => {
-        setTime(10.0);
+        if (animationIsPlaying) return;
+        setTime(10.5);
 
         if (intervalRef.current) clearInterval(intervalRef.current);
         intervalRef.current = setInterval(() => {
             if (animationIsPlaying) return;
             setTime(prev => {
-                const next = parseFloat((prev - 0.1).toFixed(1));
-                if (next <= 0) {
-                    clearInterval(intervalRef.current!);
-                    return 0.0;
+                if (prev <= 0.032) {
+                clearInterval(intervalRef.current!);
+                onTimeout?.();
+                return 0;
                 }
-                return next;
+                return parseFloat((prev - 0.032).toFixed(3));
             });
-        }, 100);
+        }, 32);
 
         return () => {
             if (intervalRef.current) clearInterval(intervalRef.current);
@@ -47,8 +53,47 @@ export default function TimeLimit({ films, onTimeout, animationIsPlaying }: Time
     }, [time]);
 
     return (
-        <div className="bg-black text-white">
-            {time.toFixed(1)}
+        <div className="p-0 m-0">
+            <svg height={radius * 2} width={radius *2}>
+                {/* Background circle */}
+                <circle
+                    
+                    fill="transparent"
+                    strokeWidth="stroke"
+                    r={normalizedRadius}
+                    cx={radius}
+                    cy={radius}
+                />
+
+                {/* Animated progress circle */}
+                <circle
+                    stroke={strokeColor}
+                    fill="transparent"
+                    strokeWidth={stroke}
+                    strokeDasharray={circumferance}
+                    strokeDashoffset = {(1 - time / TOTAL_TIME) * circumferance}
+                    strokeLinecap="butt"
+                    r={normalizedRadius}
+                    cx={radius}
+                    cy={radius}
+                    style={{
+                    transition: "stroke-dashoffset 0.1s linear",
+                    transform: "rotate(-90deg)",
+                    transformOrigin: "center",
+                    }}
+                />
+                      {/* Countdown number in center */}
+                <text
+                    x="50%"
+                    y="50%"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize="20"
+                    fill="#111827" // Tailwind gray-900
+                >
+                    {Math.floor(time)}
+                </text>
+            </svg>
         </div>
     );
 }

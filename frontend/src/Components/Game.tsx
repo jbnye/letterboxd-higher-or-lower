@@ -307,12 +307,11 @@ export default function Game({difficulty, onLose}: GameProps){
                 </>
                 )}
             </div>
-            <WrongOrRight ratingColor={ratingColor} />
+            <WrongOrRight films={films} onTimeout={onTimeout} ratingColor={ratingColor} animationIsPlaying={animationIsPlaying} />
             {/* Score Display (floating above everything) #00ac1c */}
             <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 px-6 py-2 rounded-full border-solid-black shadow-md text-black text-lg font-semibold border-4 border-black z-50">
                 Score: {score}
             </div>
-            <TimeLimit films={films} onTimeout={onTimeout} animationIsPlaying = {animationIsPlaying}/>
             <div className="absolute left-0 bottom-0 ">
                 <a className= "underline cursor-pointer text-white hover:text-blue-300 "href={`https://letterboxd.com/film/${film1.slug}/`}
                    target="_blank"
