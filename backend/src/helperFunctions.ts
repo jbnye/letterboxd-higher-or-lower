@@ -13,6 +13,12 @@ export interface filmData {
     posterUrl: string
 
 }
+export interface user {
+    sub: string,
+    name: string,
+    email: string,
+    picture: string
+}
 export interface Highscores {
     easy: number,
     medium: number,
@@ -27,7 +33,8 @@ export const symbols = {
     retry: "🔁",
     time: "🕐"
 };
-
+export type Difficulty = "easy" | "medium" |"hard" | "impossible";
+ 
 // CSV Writer 
 export function createLetterboxdCsvWriter(outputPath: string, append: boolean = false) {
     return createObjectCsvWriter({
