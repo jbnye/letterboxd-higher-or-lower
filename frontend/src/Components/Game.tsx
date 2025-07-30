@@ -66,6 +66,7 @@ export default function Game({difficulty, onLose}: GameProps){
         { trueRating: 0, displayedRating: 0, status: "secret" },
         { trueRating: 0, displayedRating: 0, status: "secret" },
     ]);
+    const [shouldPulse, setShouldPulse] = useState<boolean>(true);
     const {user, userHighscores, setUserHighscores} = useAuth();
     const [choice, setChoice] = useState<number>(-1);
     const isLoading = films.length !== 2;
@@ -177,7 +178,7 @@ export default function Game({difficulty, onLose}: GameProps){
                 if (checkGuessData?.highscores) {
                     console.log("user highscores", checkGuessData.highscores);
                     setUserHighscores(checkGuessData.highscores);
-                    }
+                }
             }
             setRatingColor("none");
             //setAnimationIsPlaying(false); // Reset for next round
@@ -237,7 +238,16 @@ export default function Game({difficulty, onLose}: GameProps){
 
 
     async function onTimeout() {
-        handleGuess(-1);
+        //setAnimationIsPlaying(true);
+        //setIsTimeout(true);
+        //handleGuess(-1);
+        // setTimeout(() => {
+        //     onLose(score, prevHighscore);
+        //     if (checkGuessData?.highscores) {
+        //         console.log("user highscores", checkGuessData.highscores);
+        //         setUserHighscores(checkGuessData.highscores);
+        //     }
+        // });
     }
 
     async function checkGuessBackend(choice: number){
@@ -284,9 +294,10 @@ export default function Game({difficulty, onLose}: GameProps){
     }
     //console.log(showRatings);
     return (
-        <div className="flex h-screen w-screen relative bg-letterboxd-background">
+        <div className={`h-screen w-screen transition-all duration-300 ${shouldPulse ? 'breathe' : ''} p-[20px] box-border`}>
+        <div className="flex w-full h-full bg-letterboxd-background box-border">
             {/* Left Image Container */}
-            <div className="w-1/2 h-full relative">
+            <div className="w-1/2 h-full flex justify-end items-center">
                 {isLoading ? (
                 <Spinner />
                 ) : (
@@ -298,7 +309,7 @@ export default function Game({difficulty, onLose}: GameProps){
             </div>
 
             {/* Right Image Container */}
-            <div className="w-1/2 h-full relative">
+            <div className="w-1/2 h-full flex justify-start items-center">
                 {isLoading ? (
                 <Spinner />
                 ) : (
@@ -310,18 +321,26 @@ export default function Game({difficulty, onLose}: GameProps){
             <WrongOrRight films={films} onTimeout={onTimeout} ratingColor={ratingColor} animationIsPlaying={animationIsPlaying} />
             {/* Score Display (floating above everything) #00ac1c */}
             <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 px-6 py-2 rounded-full border-solid-black shadow-md text-black text-lg font-semibold border-4 border-black z-50">
-                Score: {score}
+                <span>
+                    Score: {score} <span className="relative -top-0.5">{user && userHighscores && (score > prevHighscore!) &&` 👑`}</span>
+                </span>
+                {user && userHighscores && userHighscores[difficulty] && (
+                <div>
+                    Highscore: {prevHighscore}
+                </div>
+                )}
             </div>
-            <div className="absolute left-0 bottom-0 ">
-                <a className= "underline cursor-pointer text-white hover:text-blue-300 "href={`https://letterboxd.com/film/${film1.slug}/`}
+            <div className="absolute left-0 bottom-0 m-1 ">
+                <a className= "underline cursor-pointer text-black bg-white hover:text-blue-900 "href={`https://letterboxd.com/film/${film1.slug}/`}
                    target="_blank"
                     rel="noopener noreferrer">{film1.title}</a>
             </div>
-            <div className="absolute right-0 bottom-0 ">
-                <a className= "underline cursor-pointer text-white hover:text-blue-300 "href={`https://letterboxd.com/film/${film2.slug}/`}
+            <div className="absolute right-0 bottom-0 m-1">
+                <a className= "underline cursor-pointer text-black bg-white hover:text-blue-900  "href={`https://letterboxd.com/film/${film2.slug}/`}
                    target="_blank"
                     rel="noopener noreferrer">{film2.title}</a>
             </div>
+        </div>
         </div>
     );
 }

@@ -30,6 +30,7 @@ export default function WrongOrRight({ratingColor, animationIsPlaying, films, on
                     fill="white"
                     viewBox="0 0 24 24"
                     className="w-full h-full"
+                    preserveAspectRatio="xMidYMid meet"
                 >
                     <path d="M9 16.2l-3.5-3.5L4 14.2l5 5 12-12-1.4-1.4z" />
                 </svg>
@@ -46,6 +47,7 @@ export default function WrongOrRight({ratingColor, animationIsPlaying, films, on
                     fill="white"
                     xmlns="http://www.w3.org/2000/svg"
                     className="w-full h-full"
+                    preserveAspectRatio="xMidYMid meet"
                 >
                     <line
                     x1="18"

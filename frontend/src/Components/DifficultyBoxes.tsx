@@ -41,7 +41,9 @@ export default function DifficultyBoxes({difficultyPicked, onDifficultyChoice}: 
               >
                 <span className="text-lg font-semibold">{capitalizeFirst(difficulty)}</span>
                 {userHighscores && (
-                  <span className="text-xl font-bold">{`👑 ${userHighscores[difficulty]}`}</span>
+                  <span className="text-xl font-bold">
+                    <span className="relative -top-0.5">👑</span> {userHighscores[difficulty]}
+                  </span>
                 )}
               </div>
             </TooltipTrigger>

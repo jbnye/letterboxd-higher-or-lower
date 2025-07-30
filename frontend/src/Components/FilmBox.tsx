@@ -35,6 +35,7 @@ export default function FilmBox({ film, index, handleGuess, filmDisplayState, an
      : 
     "text-[#f5eeec]";
   //console.log(`Film index: ${index}, choice: ${choice}, ratingColor: ${ratingColor}, colorClass: ${colorClass}`);
+  //w-full h-full p-0 border-none bg-none flex items-center justify-center
     
   return( 
     <>
@@ -84,3 +85,18 @@ export default function FilmBox({ film, index, handleGuess, filmDisplayState, an
 }
 
 
+/*
+      <button value={1}  onClick={() => handleGuess(index)} className=" relative w-auto h-full p-0 border-none bg-none flex items-center justify-center">
+        <img
+          src={film.inHouseURL}
+          className={`h-screen w-auto max-w-full p-0 m-0 object-contain block hover:brightness-75 transform transition-transform duration-500 ${
+            index === 0 ? "animate-slide-in-down" : "animate-slide-in-up"
+          }`}
+          alt={film.title}
+        />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-1 text-center text-black shadow-[8px_8px_15px_rgba(0,0,0,0.5)]">
+          <h2 className="text-xl font-bold">{`${film.title} (${film.year})`}</h2>
+        </div>
+
+
+*/

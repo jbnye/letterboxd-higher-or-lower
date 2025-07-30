@@ -1,6 +1,7 @@
 import {useState} from "react";
 import DifficultyBoxes from "./DifficultyBoxes";
 import type { Difficulty} from "../types/types";
+import GoogleSignInButton from "./SignInButton";
 
 interface LostageProps {
     onStartGame: (difficulty: Difficulty) => void,
@@ -52,6 +53,7 @@ export default function LostPage({onStartGame, finalScore, prevHighscore, diffic
             >
                 Play Again
             </button>
+            <GoogleSignInButton />
         </div>
     );
 }

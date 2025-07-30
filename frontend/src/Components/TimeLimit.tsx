@@ -15,7 +15,7 @@ interface TimeLimitProps {
     animationIsPlaying: boolean,
 }
     const TOTAL_TIME = 10.5;
-export default function TimeLimit({ films, onTimeout, animationIsPlaying }: TimeLimitProps) {
+export default function TimeLimit({ films, onTimeout, animationIsPlaying}: TimeLimitProps) {
     const [time, setTime] = useState<number>(TOTAL_TIME)
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const radius = 50;
@@ -26,11 +26,11 @@ export default function TimeLimit({ films, onTimeout, animationIsPlaying }: Time
 
     useEffect(() => {
         if (animationIsPlaying) return;
-        setTime(10.5);
+        //setTime(10.5);
 
         if (intervalRef.current) clearInterval(intervalRef.current);
         intervalRef.current = setInterval(() => {
-            if (animationIsPlaying) return;
+            //if (animationIsPlaying) return;
             setTime(prev => {
                 if (prev <= 0.032) {
                 clearInterval(intervalRef.current!);
@@ -46,14 +46,8 @@ export default function TimeLimit({ films, onTimeout, animationIsPlaying }: Time
         };
     }, [films, animationIsPlaying]);
 
-    useEffect(() => {
-        if (time <= 0) {
-            onTimeout();
-        }
-    }, [time]);
-
     return (
-        <div className="p-0 m-0">
+        <div className={`p-1 m-0 `}>
             <svg height={radius * 2} width={radius *2}>
                 {/* Background circle */}
                 <circle
@@ -82,16 +76,17 @@ export default function TimeLimit({ films, onTimeout, animationIsPlaying }: Time
                     transformOrigin: "center",
                     }}
                 />
-                      {/* Countdown number in center */}
+                {/* Countdown number in center */}
                 <text
                     x="50%"
                     y="50%"
                     textAnchor="middle"
                     dominantBaseline="middle"
                     fontSize="20"
-                    fill="#111827" // Tailwind gray-900
+                    fill="#111827"
                 >
-                    {Math.floor(time)}
+                    
+                    {(animationIsPlaying && time <= 0.0) ? "TIME OUT" : Math.floor(time) }
                 </text>
             </svg>
         </div>
