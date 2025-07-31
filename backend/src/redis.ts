@@ -68,13 +68,14 @@ async function loadLeaderboard() {
 
         for (const row of rows) {
             groupedByDifficulty[row.difficulty as Difficulty].push(row);
-            await redisClient.hSet(`userData:${row.googleSub}`,{
+            await redisClient.hSet(`userData:${row.googlesub}`,{
                 name: row.name,
                 picture: row.picture,
                 email: row.email,
             });
-            console.log(await redisClient.hGetAll(`userData:${row.googleSub}`));
-            await redisClient.expire(`userData:${row.googleSub}`, 60 * 60 * 24);
+            // console.log("Writing user data key:", `userData:${row.googlesub}`);
+            // console.log(await redisClient.hGetAll(`userData:${row.googlesub}`));
+            //await redisClient.expire(`userData:${row.googleSub}`, 60 * 60 * 24);
         }
 
         for(const difficulty of Object.keys(groupedByDifficulty) as Difficulty[]){

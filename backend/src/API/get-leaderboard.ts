@@ -10,10 +10,11 @@ export const getLeaderboard: RequestHandler = async (req,res) => {
     try{
         for(const difficulty of difficulties){
             const top10 = await redisClient.zRangeWithScores(`leaderboard:${difficulty}`, 0, 9, { REV: true });
+            //console.log(`Top10 for difficulty ${difficulty}:`, top10);
             const userData = await Promise.all(
                 top10.map(async (user)=> {
                     const data = await redisClient.hGetAll(`userData:${user.value.toString()}`);
-                    console.log(`Redis data for userData:${user.value}`, data);
+                    // console.log(`Redis data for userData:${user.value}`, data);
                     return {
                         googleSub: user.value,
                         score: user.score,
