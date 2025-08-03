@@ -51,6 +51,7 @@ interface CheckGuessResponse {
     score: number;
     highscore?: number;
     highscores?: Highscores;
+    timeout?: boolean;
 }
 
 
@@ -66,7 +67,7 @@ export default function Game({difficulty, onLose}: GameProps){
         { trueRating: 0, displayedRating: 0, status: "secret" },
         { trueRating: 0, displayedRating: 0, status: "secret" },
     ]);
-    const [shouldPulse, setShouldPulse] = useState<boolean>(true);
+    const [shouldPulse, setShouldPulse] = useState<boolean>(false);
     const {user, userHighscores, setUserHighscores} = useAuth();
     const [choice, setChoice] = useState<number>(-1);
     const isLoading = films.length !== 2;
@@ -77,9 +78,9 @@ export default function Game({difficulty, onLose}: GameProps){
     //console.log(gameId);
     const film1 = films[0];
     const film2 = films[1];
-    // let classColor;
-    // ratingColor === "correct" ? classColor = "bg-green-600" : ratingColor === "incorrect" ? classColor="bg-red-600" : classColor = "bg-white";
-
+    let classColor;
+    ratingColor === "correct" ? classColor = "bg-green-600" : ratingColor === "incorrect" ? classColor="bg-red-600" : classColor = "bg-letterboxd-background";
+    checkGuessData?.timeout === true && classColor === "bg-red-600"
     useEffect(() => {
         async function fetchTwoFilms(){
             try {
@@ -227,6 +228,7 @@ export default function Game({difficulty, onLose}: GameProps){
             return;
         }
         setAnimationIsPlaying(true);
+        setShouldPulse(false);
         // setFilmDisplayStates((prev) =>
         //     prev.map((state) =>
         //     state.status === "secret" ? { ...state, status: "animating" } : state
@@ -240,14 +242,14 @@ export default function Game({difficulty, onLose}: GameProps){
     async function onTimeout() {
         //setAnimationIsPlaying(true);
         //setIsTimeout(true);
-        //handleGuess(-1);
-        // setTimeout(() => {
-        //     onLose(score, prevHighscore);
-        //     if (checkGuessData?.highscores) {
-        //         console.log("user highscores", checkGuessData.highscores);
-        //         setUserHighscores(checkGuessData.highscores);
-        //     }
-        // });
+        handleGuess(-1);
+        setTimeout(() => {
+            onLose(score, prevHighscore);
+            if (checkGuessData?.highscores) {
+                console.log("user highscores", checkGuessData.highscores);
+                setUserHighscores(checkGuessData.highscores);
+            }
+        }, 5000);
     }
 
     async function checkGuessBackend(choice: number){
@@ -294,10 +296,10 @@ export default function Game({difficulty, onLose}: GameProps){
     }
     //console.log(showRatings);
     return (
-        <div className={`h-screen w-screen transition-all duration-300 ${shouldPulse ? 'breathe' : ''} p-[20px] box-border`}>
-        <div className="flex w-full h-full bg-letterboxd-background box-border">
+        <div className={`h-screen w-screen transition-all duration-300 ${shouldPulse ? 'breathe' : ''} ${classColor} p-[10px] box-border`}>
+        <div className="flex relative h-full w-full px-4 bg-letterboxd-background box-border">
             {/* Left Image Container */}
-            <div className="w-1/2 h-full flex justify-end items-center">
+            <div className="w-1/2 h-full flex justify-end items-center ">
                 {isLoading ? (
                 <Spinner />
                 ) : (
@@ -318,9 +320,9 @@ export default function Game({difficulty, onLose}: GameProps){
                 </>
                 )}
             </div>
-            <WrongOrRight films={films} onTimeout={onTimeout} ratingColor={ratingColor} animationIsPlaying={animationIsPlaying} />
+            <WrongOrRight films={films} onTimeout={onTimeout} ratingColor={ratingColor} animationIsPlaying={animationIsPlaying} setShouldPulse={setShouldPulse}/>
             {/* Score Display (floating above everything) #00ac1c */}
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 px-6 py-2 rounded-full border-solid-black shadow-md text-black text-lg font-semibold border-4 border-black z-50">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-white/90 px-6 py-2 rounded-full border-solid-black shadow-md text-black text-lg font-semibold border-4 border-black z-50">
                 <span>
                     Score: {score} <span className="relative -top-0.5">{user && userHighscores && (score > prevHighscore!) &&` 👑`}</span>
                 </span>
@@ -330,13 +332,13 @@ export default function Game({difficulty, onLose}: GameProps){
                 </div>
                 )}
             </div>
-            <div className="absolute left-0 bottom-0 m-1 ">
-                <a className= "underline cursor-pointer text-black bg-white hover:text-blue-900 "href={`https://letterboxd.com/film/${film1.slug}/`}
+            <div className="absolute left-0 bottom-0 m-1 z-20">
+                <a className= "underline cursor-pointer text-white hover:text-blue-400 "href={`https://letterboxd.com/film/${film1.slug}/`}
                    target="_blank"
                     rel="noopener noreferrer">{film1.title}</a>
             </div>
-            <div className="absolute right-0 bottom-0 m-1">
-                <a className= "underline cursor-pointer text-black bg-white hover:text-blue-900  "href={`https://letterboxd.com/film/${film2.slug}/`}
+            <div className="absolute right-0 bottom-0 m-1 z-20">
+                <a className= "underline cursor-pointer text-white hover:text-blue-400  "href={`https://letterboxd.com/film/${film2.slug}/`}
                    target="_blank"
                     rel="noopener noreferrer">{film2.title}</a>
             </div>

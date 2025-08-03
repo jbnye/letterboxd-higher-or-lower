@@ -15,9 +15,10 @@ interface WrongOrRightProps {
     animationIsPlaying: boolean;
     films: getFilmsResponse[],
     onTimeout: () => void,
+    setShouldPulse: (shouldPulse: boolean) => void,
 }
 
-export default function WrongOrRight({ratingColor, animationIsPlaying, films, onTimeout}: WrongOrRightProps ) {
+export default function WrongOrRight({ratingColor, animationIsPlaying, films, onTimeout, setShouldPulse}: WrongOrRightProps ) {
     return (
         <>
             {ratingColor === "correct" ? (
@@ -78,6 +79,7 @@ export default function WrongOrRight({ratingColor, animationIsPlaying, films, on
                     films={films}
                     animationIsPlaying={animationIsPlaying}
                     onTimeout={onTimeout}
+                    setShouldPulse={setShouldPulse}
                 />
                 </div>
             ) : null}

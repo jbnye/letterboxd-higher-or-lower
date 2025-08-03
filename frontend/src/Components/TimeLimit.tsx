@@ -13,16 +13,17 @@ interface TimeLimitProps {
     films: getFilmsResponse[],
     onTimeout: () => void,
     animationIsPlaying: boolean,
+    setShouldPulse: (shouldPulse: boolean)=> void,
 }
     const TOTAL_TIME = 10.5;
-export default function TimeLimit({ films, onTimeout, animationIsPlaying}: TimeLimitProps) {
+export default function TimeLimit({ films, onTimeout, animationIsPlaying, setShouldPulse}: TimeLimitProps) {
     const [time, setTime] = useState<number>(TOTAL_TIME)
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const radius = 50;
     const stroke = 8
     const normalizedRadius = radius - stroke / 2;
     const circumferance = normalizedRadius * 2 * Math.PI;
-    const strokeColor = time >= 7.0 ? "#40bcf4": (time >= 3 && time < 7) ? "#ff8000" : "#f70000";
+    const strokeColor = time >= 7.0 ? "#40bcf4": (time >= 4 && time < 7) ? "#ff8000" : "#f70000";
 
     useEffect(() => {
         if (animationIsPlaying) return;
@@ -36,6 +37,9 @@ export default function TimeLimit({ films, onTimeout, animationIsPlaying}: TimeL
                 clearInterval(intervalRef.current!);
                 onTimeout?.();
                 return 0;
+                }
+                if(prev <= 4.00){
+                    setShouldPulse(true);
                 }
                 return parseFloat((prev - 0.032).toFixed(3));
             });

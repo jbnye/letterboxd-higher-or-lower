@@ -39,10 +39,10 @@ export default function FilmBox({ film, index, handleGuess, filmDisplayState, an
     
   return( 
     <>
-      <button value={1}  onClick={() => handleGuess(index)} className="w-full h-full p-0 border-none bg-none">
+      <button value={1}  onClick={() => handleGuess(index)} className="p-0 border-none bg-none h-full flex items-center relative">
         <img
           src={film.inHouseURL}
-          className={`w-full h-full z-10 hover:brightness-75 transform transition-transform duration-500 ${
+          className={`h-full object-contain max-w-full hover:brightness-75 transform transition-transform duration-500 ${
             index === 0 ? "animate-slide-in-down" : "animate-slide-in-up"
           }`}
           alt={film.title}
