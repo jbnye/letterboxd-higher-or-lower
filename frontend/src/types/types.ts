@@ -1,4 +1,4 @@
-export type GameStatus = "Welcome" | "Playing" | "Lost";
+export type GameStatus = "Welcome" | "Playing" | "Lost" | "Leaderboard" | "About" | "Error";
 export type Difficulty = "easy" | "medium" | "hard" | "impossible";
 export type AuthStatus = "checking" | "authenticated" | "not-authenticated";
 export type ServerStatus = 'checking' | 'online' | 'offline';
@@ -11,9 +11,3 @@ export type Highscores = {
   impossible: number;
 };
 
-export interface Highscores {
-    easy: number,
-    medium: number,
-    hard: number,
-    impossible: number,
-}
