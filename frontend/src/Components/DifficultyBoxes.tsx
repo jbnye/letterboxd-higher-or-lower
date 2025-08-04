@@ -35,7 +35,7 @@ export default function DifficultyBoxes({difficultyPicked, onDifficultyChoice}: 
               <div
                 key={difficulty}
                 onClick={() => onDifficultyChoice(difficulty)}
-                className={`w-32 h-32 flex flex-col items-center justify-center rounded-xl shadow-md cursor-pointer 
+                className={`w-full h-full flex flex-col items-center justify-center rounded-xl shadow-md cursor-pointer 
                             transition-all select-none
                             ${difficultyPicked === difficulty ? "bg-letterboxd-green hover:opacity-85 text-white" : "bg-white hover:bg-gray-300"}`}
               >
