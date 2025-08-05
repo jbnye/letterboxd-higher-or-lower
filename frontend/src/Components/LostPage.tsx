@@ -36,7 +36,7 @@ export default function LostPage({onStartGame, finalScore, prevHighscore, diffic
     }
 
     return (
-        <div className="bg-letterboxd-background min-h-screen w-full flex flex-col items-center justify-center">
+        <div className=" min-h-screen w-full flex flex-col items-center justify-center">
             <div className="text-2xl text-letterboxd-orange justify-self-center text-center">
                 <div>{title}</div>
                 <div>{subtitle}</div>
@@ -45,6 +45,7 @@ export default function LostPage({onStartGame, finalScore, prevHighscore, diffic
             <DifficultyBoxes
                 onDifficultyChoice={(difficulty) => setDifficultyPicked(difficulty)}
                 difficultyPicked={difficultyPicked}
+                style="w-32 h-32"
             />
 
             <button

@@ -7,6 +7,7 @@ import {Spinner} from "../UI/spinner.tsx";
 import type { GameStatus, Difficulty} from "../types/types.ts";
 import { useAuth } from "@/Context/UserContext.tsx";
 import LeaderboardPage from "./LeaderboardPage.tsx";
+import Navbar from "./Navbar.tsx";
 // to do import PlayAgainButton from "./PlayAgain.tsx";
 
 
@@ -27,58 +28,46 @@ export default function GameWrapper(){
         setGameStatus('Playing');
     }
 
-    if(status === 'checking'){
-        return (
-            <div className="flex flex-col items-center mt-5">
-                <Spinner /> 
-            </div>
-        )
-    }
-    if(gameStatus === 'Welcome'){
-        return (
-            <WelcomePage 
-                onStartGame={(chosenDifficulty) => {
-                    setDifficultyPicked(chosenDifficulty);
-                    setGameStatus("Playing");
-                }}
-                onLeaderboard={() => {setGameStatus("Leaderboard")}}
-            />
-        )
+    return (
+        <div className="bg-gradient-to-b from-letterboxd-background to-letterboxd-dark-background-blue min-h-screen w-full">
+            {gameStatus !== "Playing" && <Navbar setGameStatus={setGameStatus} />}
 
-    } else if(gameStatus === "Lost"){
-        return (
-            <LostPage 
+            {status === "checking" ? (
+            <div className="flex flex-col items-center mt-5">
+                <Spinner />
+            </div>
+            ) : gameStatus === "Welcome" ? (
+            <WelcomePage
                 onStartGame={(chosenDifficulty) => {
-                    setDifficultyPicked(chosenDifficulty);
-                    setGameStatus("Playing");
+                setDifficultyPicked(chosenDifficulty);
+                setGameStatus("Playing");
+                }}
+                onLeaderboard={() => setGameStatus("Leaderboard")}
+            />
+            ) : gameStatus === "Lost" ? (
+            <LostPage
+                onStartGame={(chosenDifficulty) => {
+                setDifficultyPicked(chosenDifficulty);
+                setGameStatus("Playing");
                 }}
                 finalScore={finalScore}
                 difficultyLastPlayed={difficultyPicked}
                 prevHighscore={prevHighscore}
-
             />
-        )
-    } else if(gameStatus === "Leaderboard"){
-        return(
-            <LeaderboardPage 
-                welcomePage={() =>{
-                    setGameStatus("Welcome");
+            ) : gameStatus === "Leaderboard" ? (
+            <LeaderboardPage
+                welcomePage={() => setGameStatus("Welcome")}
+            />
+            ) : (
+            <Game
+                key={gameKey}
+                difficulty={difficultyPicked}
+                onLose={(score: number) => {
+                setFinalScore(score);
+                setGameStatus("Lost");
                 }}
             />
-        )
-    }
-
-    return (
-        <>
-            <Game 
-                key={gameKey} 
-                difficulty = {difficultyPicked} 
-                onLose={(score: number) => {
-                    setFinalScore(score);
-                    setGameStatus("Lost");
-                }} 
-            />
-        </>
+            )}
+        </div>
     );
-
 }

@@ -18,7 +18,7 @@ export default function WelcomePage({onStartGame, onLeaderboard}: WelcomePagePro
     console.log(authStatus);
 
     return(
-        <div className="bg-letterboxd-background min-h-screen w-full flex flex-col items-center px-4">
+        <div className=" min-h-screen w-full flex flex-col items-center px-4">
             <h1 className="text-letterboxd-orange text-4xl mt-12 mb-4 text-center">Letterboxd Higher or Lower Game</h1>
             <h2 className="text-xl text-letterboxd-orange mb-4">Select a difficulty</h2>
             <div className="flex ">

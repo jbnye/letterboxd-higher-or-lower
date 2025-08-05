@@ -6,6 +6,7 @@ import FilmBox from "./FilmBox.tsx";
 import { AuthProvider, useAuth } from "../Context/UserContext.tsx";
 import TimeLimit from "./TimeLimit.tsx";
 import WrongOrRight from "./WrongOrRight.tsx";
+import { playDefeatSound, playTimeoutSound } from "@/Util/utilityFunctions.ts";
 
 
 interface GameProps{
@@ -171,6 +172,11 @@ export default function Game({difficulty, onLose}: GameProps){
         let choiceAnswer: ColorState = "none";
         choice === checkGuessData?.correctChoice ? choiceAnswer = "correct" : choiceAnswer = "incorrect";
         setRatingColor(choiceAnswer);
+            if ((choiceAnswer === "incorrect") && (choice !== -1))  {
+                setTimeout(() => {
+                    playDefeatSound();
+                }, 100);
+            }
         const timer = setTimeout(() => {
             if (checkGuessData?.success) {
                 handleReplaceFilm();
@@ -242,6 +248,7 @@ export default function Game({difficulty, onLose}: GameProps){
     async function onTimeout() {
         //setAnimationIsPlaying(true);
         //setIsTimeout(true);
+        playTimeoutSound();
         handleGuess(-1);
         setTimeout(() => {
             onLose(score, prevHighscore);
@@ -310,7 +317,7 @@ export default function Game({difficulty, onLose}: GameProps){
                 )}
             </div>
 
-            {/* Right Image Container */}
+            {/* Right Image*/}
             <div className="w-1/2 h-full flex justify-start items-center">
                 {isLoading ? (
                 <Spinner />
@@ -321,8 +328,9 @@ export default function Game({difficulty, onLose}: GameProps){
                 )}
             </div>
             <WrongOrRight films={films} onTimeout={onTimeout} ratingColor={ratingColor} animationIsPlaying={animationIsPlaying} setShouldPulse={setShouldPulse}/>
-            {/* Score Display (floating above everything) #00ac1c */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-white/90 px-6 py-2 rounded-full border-solid-black shadow-md text-black text-lg font-semibold border-4 border-black z-50">
+            {/* Score Display*/}
+            <div className="absolute top-1 left-1/2 -translate-x-1/2 bg-white/90 px-6 py-2 rounded-full border-solid-black shadow-md
+             text-black text-lg font-semibold border-4 border-black flex flex-col items-center justify-centerz-50">
                 <span>
                     Score: {score} <span className="relative -top-0.5">{user && userHighscores && (score > prevHighscore!) &&` 👑`}</span>
                 </span>
