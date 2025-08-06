@@ -8,6 +8,7 @@ import type { GameStatus, Difficulty} from "../types/types.ts";
 import { useAuth } from "@/Context/UserContext.tsx";
 import LeaderboardPage from "./LeaderboardPage.tsx";
 import Navbar from "./Navbar.tsx";
+import Footer from "./Footer.tsx";
 // to do import PlayAgainButton from "./PlayAgain.tsx";
 
 
@@ -68,6 +69,7 @@ export default function GameWrapper(){
                 }}
             />
             )}
+            {gameStatus !== "Playing" && <Footer/>}
         </div>
     );
 }
