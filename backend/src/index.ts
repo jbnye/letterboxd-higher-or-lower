@@ -8,6 +8,7 @@ import logoutRouter from "./API/logout";
 import highscoreRouter from "./API/get-highscores";
 import timeoutRouter from "./API/timeout";
 import leaderboardRouter from "./API/get-leaderboard";
+import moviesLastUpdatedRouter from "./API/movies-last-updated";
 import path from "path";
 import cors from "cors";
 import {connectRedisAndLoad} from './redis';
@@ -31,6 +32,7 @@ app.use("/api", logoutRouter);
 app.use("/api", highscoreRouter);
 app.use("/api", timeoutRouter);
 app.use("/api", leaderboardRouter);
+app.use("/api/", moviesLastUpdatedRouter)
 app.use('/posters', express.static(path.resolve(__dirname, '..', 'posters')));
 
 (async () =>  (

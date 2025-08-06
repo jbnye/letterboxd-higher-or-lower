@@ -1,5 +1,6 @@
 import pool from "./db";
 import path from "path";
+import fs from "fs";
 import {parseCSVToMap, filmData} from "../helperFunctions";
 
 async function PopulateFilmsDatabaseFromCSV(){
@@ -11,7 +12,7 @@ async function PopulateFilmsDatabaseFromCSV(){
         films.push(film);
     });
     try{
-            const insertFilmQuery: string = 
+        const insertFilmQuery: string = 
             `INSERT INTO films (slug, averageRating, watchedNumber, title, year, category, posterURL, isTop250)
                 VALUES ($1,$2,$3,$4,$5,$6,$7, $8)
             `;
@@ -70,4 +71,6 @@ async function PopulateTop250List(){
 
 
 PopulateFilmsDatabaseFromCSV(); 
-//PopulateTop250List();  
+const timestamp = new Date().toISOString();
+fs.writeFileSync(path.join(__dirname, "..", "data", "lastUpdated.json"), JSON.stringify({ dateLastUpdated: timestamp }, null, 2));
+//PopulateTop250List(); 
