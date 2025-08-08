@@ -122,7 +122,7 @@ export default function LeaderboardPage({welcomePage}: LeaderboardPageProps) {
 
     return (
         
-        <div className="bg-letterboxd-background min-h-screen w-full flex flex-col items-center px-4">
+        <div className="flex flex-col items-center px-4">
             <h1 className="text-letterboxd-orange text-4xl mt-12 mb-4 text-center">Hall of Fame</h1>
             <div className="flex">
                 <DifficultyBoxes             

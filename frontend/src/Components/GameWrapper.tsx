@@ -10,6 +10,7 @@ import LeaderboardPage from "./LeaderboardPage.tsx";
 import AboutPage from "./AboutPage.tsx";
 import Navbar from "./Navbar.tsx";
 import Footer from "./Footer.tsx";
+import ErrorPage from "./ErrorPage.tsx";
 // to do import PlayAgainButton from "./PlayAgain.tsx";
 
 
@@ -18,7 +19,7 @@ import Footer from "./Footer.tsx";
 export default function GameWrapper(){
     const {status} = useServerStatus();
     const [finalScore, setFinalScore] = useState<number>(0);
-    const [gameStatus, setGameStatus] = useState<GameStatus>('Welcome');
+    const [gameStatus, setGameStatus] = useState<GameStatus>('Error');
     const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>("easy");
     const [gameKey, setGameKey] = useState(0);
     const {userHighscores} = useAuth();
@@ -31,52 +32,57 @@ export default function GameWrapper(){
     }
 
     return (
-        <div className="bg-gradient-to-b from-letterboxd-background to-letterboxd-dark-background-blue min-h-screen w-full">
+        <div className="bg-gradient-to-b flex flex-col from-letterboxd-background to-letterboxd-dark-background-blue min-h-screen w-full">
             {gameStatus !== "Playing" && <Navbar setGameStatus={setGameStatus} />}
 
-            {status === "checking" && (
-            <div className="flex flex-col items-center mt-5">
-                <Spinner />
-            </div>
-            )}
-            {gameStatus === "Welcome" && (
-                <WelcomePage
-                    onStartGame={(chosenDifficulty) => {
-                    setDifficultyPicked(chosenDifficulty);
-                    setGameStatus("Playing");
+            <main className="flex-grow ">
+                {status === "checking" && (
+                <div className="flex flex-col items-center mt-5">
+                    <Spinner />
+                </div>
+                )}
+                {gameStatus === "Welcome" && (
+                    <WelcomePage
+                        onStartGame={(chosenDifficulty) => {
+                        setDifficultyPicked(chosenDifficulty);
+                        setGameStatus("Playing");
+                        }}
+                        onLeaderboard={() => setGameStatus("Leaderboard")}
+                    />
+                )}
+                {gameStatus === "Lost" && (
+                    <LostPage
+                        onStartGame={(chosenDifficulty) => {
+                        setDifficultyPicked(chosenDifficulty);
+                        setGameStatus("Playing");
+                        }}
+                        finalScore={finalScore}
+                        difficultyLastPlayed={difficultyPicked}
+                        prevHighscore={prevHighscore}
+                    />
+                )}
+                {gameStatus === "Leaderboard" && (
+                    <LeaderboardPage
+                        welcomePage={() => setGameStatus("Welcome")}
+                    />
+                )}
+                {gameStatus === "Playing" && (
+                    <Game
+                    key={gameKey}
+                    difficulty={difficultyPicked}
+                    onLose={(score: number) => {
+                    setFinalScore(score);
+                    setGameStatus("Lost");
                     }}
-                    onLeaderboard={() => setGameStatus("Leaderboard")}
                 />
-            )}
-            {gameStatus === "Lost" && (
-                <LostPage
-                    onStartGame={(chosenDifficulty) => {
-                    setDifficultyPicked(chosenDifficulty);
-                    setGameStatus("Playing");
-                    }}
-                    finalScore={finalScore}
-                    difficultyLastPlayed={difficultyPicked}
-                    prevHighscore={prevHighscore}
-                />
-            )}
-            {gameStatus === "Leaderboard" && (
-                <LeaderboardPage
-                    welcomePage={() => setGameStatus("Welcome")}
-                />
-            )}
-            {gameStatus === "Playing" && (
-                <Game
-                key={gameKey}
-                difficulty={difficultyPicked}
-                onLose={(score: number) => {
-                setFinalScore(score);
-                setGameStatus("Lost");
-                }}
-            />
-            )}
-            {gameStatus === "About" && (
-                <AboutPage />
-            )}
+                )}
+                {gameStatus === "About" && (
+                    <AboutPage />
+                )}
+                {gameStatus === "Error" && (
+                    <ErrorPage />
+                )}
+            </main>
             {gameStatus !== "Playing" && <Footer/>}
         </div>
     );
