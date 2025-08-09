@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useState, useContext, useEffect, useMemo } from "react";
 import type { AuthStatus } from "../types/types";
 
 interface User {
@@ -104,10 +104,18 @@ export const AuthProvider = ({children }: {children: React.ReactNode}) => {
         }
         fetchHighscores();
     },[user]);
-
+    const value = useMemo(() => ({
+    user,
+    authStatus,
+    setUser,
+    setAuthStatus,
+    userHighscores,
+    setUserHighscores,
+    logout
+    }), [user, authStatus, userHighscores]);
 
     return (
-        <AuthContext.Provider value={{user, authStatus, setUser, setAuthStatus, userHighscores, setUserHighscores, logout}}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     )
