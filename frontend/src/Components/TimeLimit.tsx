@@ -35,11 +35,7 @@ export default function TimeLimit({ films, onTimeout, animationIsPlaying, setSho
             setTime(prev => {
                 if (prev <= 0.032) {
                 clearInterval(intervalRef.current!);
-                onTimeout?.();
                 return 0;
-                }
-                if(prev <= 4.00){
-                    setShouldPulse(true);
                 }
                 return parseFloat((prev - 0.032).toFixed(3));
             });
@@ -49,6 +45,19 @@ export default function TimeLimit({ films, onTimeout, animationIsPlaying, setSho
             if (intervalRef.current) clearInterval(intervalRef.current);
         };
     }, [films, animationIsPlaying]);
+
+    useEffect(() => {
+        if (time <= 4.0) {
+            setShouldPulse(true);
+        }
+    }, [time, setShouldPulse]);
+    
+    useEffect(() => {
+        if (time === 0) {
+            onTimeout();
+        }
+    }, [time]);
+
 
     return (
         <div className={`p-1 m-0 `}>

@@ -11,6 +11,7 @@ import AboutPage from "./AboutPage.tsx";
 import Navbar from "./Navbar.tsx";
 import Footer from "./Footer.tsx";
 import ErrorPage from "./ErrorPage.tsx";
+import { useGameStatus } from "@/Context/GameStatus.tsx";
 // to do import PlayAgainButton from "./PlayAgain.tsx";
 
 
@@ -19,10 +20,10 @@ import ErrorPage from "./ErrorPage.tsx";
 export default function GameWrapper(){
     const {status} = useServerStatus();
     const [finalScore, setFinalScore] = useState<number>(0);
-    const [gameStatus, setGameStatus] = useState<GameStatus>('Error');
     const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>("easy");
     const [gameKey, setGameKey] = useState(0);
     const {userHighscores} = useAuth();
+    const {gameStatus, setGameStatus} = useGameStatus();
     const prevHighscore: number | undefined = userHighscores ? userHighscores[difficultyPicked] : undefined;
     console.log("gameStatus", gameStatus);
 
@@ -33,7 +34,7 @@ export default function GameWrapper(){
 
     return (
         <div className="bg-gradient-to-b flex flex-col from-letterboxd-background to-letterboxd-dark-background-blue min-h-screen w-full">
-            {gameStatus !== "Playing" && <Navbar setGameStatus={setGameStatus} />}
+            {gameStatus !== "Playing" && <Navbar />}
 
             <main className="flex-grow ">
                 {status === "checking" && (
@@ -47,7 +48,6 @@ export default function GameWrapper(){
                         setDifficultyPicked(chosenDifficulty);
                         setGameStatus("Playing");
                         }}
-                        onLeaderboard={() => setGameStatus("Leaderboard")}
                     />
                 )}
                 {gameStatus === "Lost" && (
@@ -62,9 +62,7 @@ export default function GameWrapper(){
                     />
                 )}
                 {gameStatus === "Leaderboard" && (
-                    <LeaderboardPage
-                        welcomePage={() => setGameStatus("Welcome")}
-                    />
+                    <LeaderboardPage />
                 )}
                 {gameStatus === "Playing" && (
                     <Game

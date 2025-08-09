@@ -4,17 +4,18 @@ import type { Difficulty } from "../types/types";
 import {useAuth} from '../Context/UserContext';
 import GoogleSignInButton from "./SignInButton";
 import LeaderboardPage from "./LeaderboardPage";
+import { useGameStatus } from "@/Context/GameStatus";
 interface WelcomePageProps {
     onStartGame: (difficulty: Difficulty) => void;
-    onLeaderboard: () => void;
 }
 
 
 
 
-export default function WelcomePage({onStartGame, onLeaderboard}: WelcomePageProps){
+export default function WelcomePage({onStartGame}: WelcomePageProps){
     const {authStatus} = useAuth();
     const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>("easy");
+    const {setGameStatus} = useGameStatus();
     console.log(authStatus);
 
     return(
@@ -36,7 +37,7 @@ export default function WelcomePage({onStartGame, onLeaderboard}: WelcomePagePro
                     Play
                 </button>
                 <button
-                    onClick={onLeaderboard}
+                    onClick={() => setGameStatus("Leaderboard")}
                     className="px-6 py-2 bg-letterboxd-blue text-white rounded hover:bg-[#1093ef]"
                 >
                     Leaderboard

@@ -39,7 +39,7 @@ export default function FilmBox({ film, index, handleGuess, filmDisplayState, an
     
   return( 
     <>
-      <button value={1}  onClick={() => handleGuess(index)} className="p-0 border-none bg-none h-full flex items-center relative">
+      <button value={1}  onClick={() => handleGuess(index)} className="p-0 border-none bg-none h-full flex items-center relative ">
         <img
           src={film.inHouseURL}
           className={`h-full object-contain max-w-full hover:brightness-75 transform transition-transform duration-500 ${
@@ -78,6 +78,12 @@ export default function FilmBox({ film, index, handleGuess, filmDisplayState, an
                 )}
           </div>
           )}
+        <div className={`absolute left-0 bottom-0 m-1 z-20 transform transition-transform duration-500 transition-transform duration-500 ${
+            index === 0 ? "animate-slide-in-down" : "animate-slide-in-up"}`}>
+          <a className= "underline cursor-pointer text-white hover:text-blue-400 "href={`https://letterboxd.com/film/${film.slug}/`}
+          target="_blank"
+          rel="noopener noreferrer">{film.title}</a>
+        </div>
       </button>
     </>
   )

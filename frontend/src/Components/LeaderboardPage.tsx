@@ -1,6 +1,7 @@
 import type { Difficulty } from "@/types/types";
 import { useState, useEffect } from "react";
 import DifficultyBoxes from "./DifficultyBoxes";
+import { useGameStatus } from "@/Context/GameStatus";
 
 
 interface leaderboardEntry {
@@ -18,9 +19,7 @@ interface leaderboardResponse {
     impossible: leaderboardEntry[],
 }
 
-interface LeaderboardPageProps {
-    welcomePage: () => void,
-}
+
 // const mockTop10 = [
 //   {
 //     googleSub: "101131547715102025945",
@@ -93,9 +92,10 @@ interface LeaderboardPageProps {
 //     picture: "https://randomuser.me/api/portraits/women/8.jpg"
 //   }
 // ];
-export default function LeaderboardPage({welcomePage}: LeaderboardPageProps) {
+export default function LeaderboardPage() {
     const [difficultySelected, setDifficultySelected] = useState<Difficulty>("easy");
     const [leaderboardResponseData, setLeaderboardResponseData] = useState<leaderboardResponse>()
+    const {setGameStatus} = useGameStatus();
     let top10;
     if(leaderboardResponseData){
         top10 = leaderboardResponseData[difficultySelected];
@@ -111,6 +111,7 @@ export default function LeaderboardPage({welcomePage}: LeaderboardPageProps) {
                 }
                 else{
                     console.error("FAILED TO FETCH LEADERBOARD", response);
+                    setGameStatus("Error");
                 }
             } catch(error){
                 console.error("Error in leaderboard request", error);

@@ -4,6 +4,7 @@ import './index.css'
 import { ServerStatusProvider } from './Context/ServerStatusContext.tsx';
 import {AuthProvider} from './Context/UserContext.tsx';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { GameStatusProvider } from './Context/GameStatus.tsx';
 import GameWrapper from "./Components/GameWrapper.tsx";
 
 
@@ -15,7 +16,9 @@ createRoot(document.getElementById('root')!).render(
     <GoogleOAuthProvider clientId={clientId}>
       <ServerStatusProvider>
         <AuthProvider>
+          <GameStatusProvider>
             <GameWrapper />
+          </GameStatusProvider>
         </AuthProvider>
       </ServerStatusProvider>
     </GoogleOAuthProvider>

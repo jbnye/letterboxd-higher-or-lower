@@ -1,12 +1,12 @@
 import {useState, useEffect} from "react";
 import type { Difficulty, RatingStatus, ColorState, Highscores} from "../types/types";
 import {Spinner} from "../UI/spinner.tsx";
-import { symbols } from "../UI/symbols.tsx";
 import FilmBox from "./FilmBox.tsx";
-import { AuthProvider, useAuth } from "../Context/UserContext.tsx";
+import { useAuth } from "../Context/UserContext.tsx";
 import TimeLimit from "./TimeLimit.tsx";
 import WrongOrRight from "./WrongOrRight.tsx";
 import { playDefeatSound, playTimeoutSound } from "@/Util/utilityFunctions.ts";
+import { useGameStatus } from "@/Context/GameStatus.tsx";
 
 
 interface GameProps{
@@ -64,6 +64,7 @@ export default function Game({difficulty, onLose}: GameProps){
     const [checkGuessData, setCheckGuessData] = useState<CheckGuessResponse | null>(null);
     const [gameId, setGameId] = useState<string>("");
     const [ratingColor, setRatingColor] = useState<ColorState>("none");
+    const {setGameStatus} = useGameStatus();
     const [filmDisplayStates, setFilmDisplayStates] = useState<FilmDisplayState[]>([
         { trueRating: 0, displayedRating: 0, status: "secret" },
         { trueRating: 0, displayedRating: 0, status: "secret" },
@@ -82,30 +83,31 @@ export default function Game({difficulty, onLose}: GameProps){
     let classColor;
     ratingColor === "correct" ? classColor = "bg-green-600" : ratingColor === "incorrect" ? classColor="bg-red-600" : classColor = "bg-letterboxd-background";
     checkGuessData?.timeout === true && classColor === "bg-red-600"
+    
     useEffect(() => {
+        const controller = new AbortController();
         async function fetchTwoFilms(){
             try {
-                const response = await fetch(`http://localhost:3000/api/get-films`, {
+                const response = await fetch("http://localhost:3000/api/get-films", {
                     method: "POST",
-                    headers: {
-                        "content-type": "application/json",
-                    },
-                    body: JSON.stringify({difficulty, user}),
+                    headers: { "content-type": "application/json" },
+                    body: JSON.stringify({ difficulty, user }),
                     credentials: "include",
+                    signal: controller.signal
                 });
-                if(response.status === 200){
-                    const data = await response.json();
-                    console.log(data);
-                    setFilms(data.newFilms);
-                    setGameId(data.gameId);
-
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                setFilms(data.newFilms);
+                setGameId(data.gameId);
+            } catch (error: any) {
+                if (error.name !== "AbortError") {
+                    console.error("Failed to fetch initial films", error);
+                    setGameStatus("Error");
                 }
-            } catch (error) {
-                console.error("Failed to fetch initial films", error);
-                throw error;
             }
         }
         fetchTwoFilms();
+        return () => controller.abort(); 
     }, [difficulty]);
 
 
@@ -172,11 +174,9 @@ export default function Game({difficulty, onLose}: GameProps){
         let choiceAnswer: ColorState = "none";
         choice === checkGuessData?.correctChoice ? choiceAnswer = "correct" : choiceAnswer = "incorrect";
         setRatingColor(choiceAnswer);
-            if ((choiceAnswer === "incorrect") && (choice !== -1))  {
-                setTimeout(() => {
-                    playDefeatSound();
-                }, 100);
-            }
+        if((choiceAnswer === "incorrect") && (choice !== -1)){
+            playDefeatSound();
+        }
         const timer = setTimeout(() => {
             if (checkGuessData?.success) {
                 handleReplaceFilm();
@@ -193,6 +193,7 @@ export default function Game({difficulty, onLose}: GameProps){
 
         return () => clearTimeout(timer);
     }, [filmDisplayStates]);
+
 
 
     function handleReplaceFilm(){
@@ -260,7 +261,7 @@ export default function Game({difficulty, onLose}: GameProps){
     }
 
     async function checkGuessBackend(choice: number){
-        
+        const controller = new AbortController();
         try{
             console.log("SENDING CHOICE TO BACKEND");
             const filmIds = [film1.id, film2.id];
@@ -287,12 +288,16 @@ export default function Game({difficulty, onLose}: GameProps){
                 }
             }
             else{
+                setGameStatus("Error");
                 console.log("ERROR CHECKING GUESS", response.status);
             }
-        } catch (error){
-            console.error("ERROR FETCHING CHECK GUESS");
-            throw error;
+        } catch (error: any) {
+            if (error.name !== "AbortError") {
+                console.error("Failed to check backend for guess", error);
+                setGameStatus("Error");
+            }
         }
+        return() => controller.abort;
     }
 
 
@@ -339,16 +344,6 @@ export default function Game({difficulty, onLose}: GameProps){
                     Highscore: {prevHighscore}
                 </div>
                 )}
-            </div>
-            <div className="absolute left-0 bottom-0 m-1 z-20">
-                <a className= "underline cursor-pointer text-white hover:text-blue-400 "href={`https://letterboxd.com/film/${film1.slug}/`}
-                   target="_blank"
-                    rel="noopener noreferrer">{film1.title}</a>
-            </div>
-            <div className="absolute right-0 bottom-0 m-1 z-20">
-                <a className= "underline cursor-pointer text-white hover:text-blue-400  "href={`https://letterboxd.com/film/${film2.slug}/`}
-                   target="_blank"
-                    rel="noopener noreferrer">{film2.title}</a>
             </div>
         </div>
         </div>

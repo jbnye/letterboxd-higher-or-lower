@@ -1,11 +1,10 @@
+import { useGameStatus } from "@/Context/GameStatus"
 import type { GameStatus } from "@/types/types"
 
-interface NavbarProps {
-    setGameStatus: (gameStatus: GameStatus) => void
-}
 
 
-export default function Navbar({setGameStatus}: NavbarProps) {
+export default function Navbar() {
+    const {setGameStatus} = useGameStatus();
 
     return(
         <div className="flex gap-6 justify-center bg-letterboxd-dark-blue text-bold text-white ">
