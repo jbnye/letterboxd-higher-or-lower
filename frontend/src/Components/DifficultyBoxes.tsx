@@ -29,7 +29,7 @@ export default function DifficultyBoxes({difficultyPicked, onDifficultyChoice, s
     } 
 
  return (
-    <div className="flex gap-4 justify-center mt-8 flex-wrap">
+    <div className="flex gap-4 justify-center mt-8 flex-wrap ">
       {difficulties.map((difficulty) => (
         <Tooltip key={difficulty}>
           <TooltipTrigger asChild>
@@ -39,7 +39,7 @@ export default function DifficultyBoxes({difficultyPicked, onDifficultyChoice, s
                           transition-all select-none
                           ${difficultyPicked === difficulty 
                             ? "bg-letterboxd-green hover:opacity-85 text-white" 
-                            : "bg-white hover:bg-gray-300"}`}
+                            : "bg-white dark:text-black hover:bg-gray-300"}`}
             >
               <span className="text-lg font-semibold">{capitalizeFirst(difficulty)}</span>
               {userHighscores && (

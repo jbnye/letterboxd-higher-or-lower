@@ -3,7 +3,6 @@ import type { Difficulty, RatingStatus, ColorState, Highscores} from "../types/t
 import {Spinner} from "../UI/spinner.tsx";
 import FilmBox from "./FilmBox.tsx";
 import { useAuth } from "../Context/UserContext.tsx";
-import TimeLimit from "./TimeLimit.tsx";
 import WrongOrRight from "./WrongOrRight.tsx";
 import { playDefeatSound, playTimeoutSound } from "@/Util/utilityFunctions.ts";
 import { useGameStatus } from "@/Context/GameStatus.tsx";
@@ -81,7 +80,7 @@ export default function Game({difficulty, onLose}: GameProps){
     const film1 = films[0];
     const film2 = films[1];
     let classColor;
-    ratingColor === "correct" ? classColor = "bg-green-600" : ratingColor === "incorrect" ? classColor="bg-red-600" : classColor = "bg-letterboxd-background";
+    ratingColor === "correct" ? classColor = "bg-green-600" : ratingColor === "incorrect" ? classColor="bg-red-600" : classColor = "";
     checkGuessData?.timeout === true && classColor === "bg-red-600"
     
     useEffect(() => {
@@ -247,7 +246,7 @@ export default function Game({difficulty, onLose}: GameProps){
 
 
     async function onTimeout() {
-        //setAnimationIsPlaying(true);
+        setAnimationIsPlaying(true);
         //setIsTimeout(true);
         playTimeoutSound();
         handleGuess(-1);
@@ -309,7 +308,8 @@ export default function Game({difficulty, onLose}: GameProps){
     //console.log(showRatings);
     return (
         <div className={`h-screen w-screen transition-all duration-300 ${shouldPulse ? 'breathe' : ''} ${classColor} p-[10px] box-border`}>
-        <div className="flex relative h-full w-full px-4 bg-letterboxd-background box-border">
+        <div className="flex relative h-full w-full px-4 bg-gradient-to-b from-letterboxd-lighter-gray to-letterboxd-light-gray box-border
+        dark:from-letterboxd-background dark:to-letterboxd-dark-background-blue">
             {/* Left Image Container */}
             <div className="w-1/2 h-full flex justify-end items-center ">
                 {isLoading ? (

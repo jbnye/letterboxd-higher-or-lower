@@ -102,6 +102,7 @@ export default function LeaderboardPage() {
     }
     console.log(top10);
     useEffect(()=>{
+        const controller = new AbortController();
         const getLeaderboard = async () => {
             try{
                 const response = await fetch("http://localhost:3000/api/get-leaderboard");
@@ -118,12 +119,15 @@ export default function LeaderboardPage() {
             }
         }
         getLeaderboard();
+        return () => {
+            controller.abort();
+        };
     },[])
 
 
     return (
         
-        <div className="flex flex-col items-center px-4">
+        <div className="flex flex-col items-center px-4 text-black dark:text-white">
             <h1 className="text-letterboxd-orange text-4xl mt-12 mb-4 text-center">Hall of Fame</h1>
             <div className="flex">
                 <DifficultyBoxes             
@@ -137,11 +141,11 @@ export default function LeaderboardPage() {
             <div className="flex flex-col mt-5 w-[30%]">
                 {top10 && (
                     top10.map((entry, index) => (
-                    <div key={index} className="flex items-center gap-4 p-2 border-b border-letterboxd-blue">
-                        <span className="w-6 text-right text-white font-bold">{index + 1}.</span>
+                    <div key={index} className="flex items-center gap-4 p-2 border-b border-letterboxd-dark-blue dark:border-letterboxd-blue">
+                        <span className="w-6 text-right  font-bold">{index + 1}.</span>
                         <img src={entry.picture} alt={entry.name} className="w-10 h-10 rounded-full" referrerPolicy="no-referrer"/>
-                        <span className="text-white font-bold">{entry.name}</span>
-                        <span className="ml-auto text-letterboxd-orange font-bold">{entry.score}</span>
+                        <span className="font-bold">{entry.name}</span>
+                        <span className="ml-auto text-black dark:text-letterboxd-blue font-bold">{entry.score}</span>
                     </div>
                     ))
                 )}

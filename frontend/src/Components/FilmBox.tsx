@@ -1,4 +1,3 @@
-import {useState} from "react";
 import AniamatedNumber from './AnimatedNumber';
 
 type RatingStatus = "secret" | "animating" | "revealed";
@@ -78,7 +77,7 @@ export default function FilmBox({ film, index, handleGuess, filmDisplayState, an
                 )}
           </div>
           )}
-        <div className={`absolute left-0 bottom-0 m-1 z-20 transform transition-transform duration-500 transition-transform duration-500 ${
+        <div className={`absolute left-0 bottom-0 m-1 z-20 transform transition-transform duration-500  ${
             index === 0 ? "animate-slide-in-down" : "animate-slide-in-up"}`}>
           <a className= "underline cursor-pointer text-white hover:text-blue-400 "href={`https://letterboxd.com/film/${film.slug}/`}
           target="_blank"

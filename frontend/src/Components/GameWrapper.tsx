@@ -4,7 +4,7 @@ import LostPage from "./LostPage.tsx";
 import WelcomePage from "./WelcomePage.tsx";
 import { useServerStatus } from '../Context/ServerStatusContext';
 import {Spinner} from "../UI/spinner.tsx";
-import type { GameStatus, Difficulty} from "../types/types.ts";
+import type { Difficulty} from "../types/types.ts";
 import { useAuth } from "@/Context/UserContext.tsx";
 import LeaderboardPage from "./LeaderboardPage.tsx";
 import AboutPage from "./AboutPage.tsx";
@@ -12,9 +12,6 @@ import Navbar from "./Navbar.tsx";
 import Footer from "./Footer.tsx";
 import ErrorPage from "./ErrorPage.tsx";
 import { useGameStatus } from "@/Context/GameStatus.tsx";
-// to do import PlayAgainButton from "./PlayAgain.tsx";
-
-
 
 
 export default function GameWrapper(){
@@ -26,14 +23,20 @@ export default function GameWrapper(){
     const {gameStatus, setGameStatus} = useGameStatus();
     const prevHighscore: number | undefined = userHighscores ? userHighscores[difficultyPicked] : undefined;
     console.log("gameStatus", gameStatus);
-
-    const startNewGame = () => {
-        setGameKey(prev=>prev + 1);
-        setGameStatus('Playing');
+    const validStatuses = ["Playing", "Error", "Lost", "Leaderboard", "Welcome", "About"];
+    if (!validStatuses.includes(gameStatus)) {
+        setGameStatus("Error");
+    }
+    const startNewGame = (chosenDifficulty: Difficulty) => {
+    setDifficultyPicked(chosenDifficulty);
+    setGameStatus("Playing");
+    setGameKey(prev => prev + 1); 
     }
 
     return (
-        <div className="bg-gradient-to-b flex flex-col from-letterboxd-background to-letterboxd-dark-background-blue min-h-screen w-full">
+        <div className="flex flex-col bg-gradient-to-b from-letterboxd-lighter-gray to-letterboxd-light-gray
+        dark:bg-gradient-to-b dark:from-letterboxd-background dark:to-letterboxd-dark-background-blue 
+        min-h-screen w-full">
             {gameStatus !== "Playing" && <Navbar />}
 
             <main className="flex-grow ">
@@ -52,10 +55,7 @@ export default function GameWrapper(){
                 )}
                 {gameStatus === "Lost" && (
                     <LostPage
-                        onStartGame={(chosenDifficulty) => {
-                        setDifficultyPicked(chosenDifficulty);
-                        setGameStatus("Playing");
-                        }}
+                        onStartGame={startNewGame}
                         finalScore={finalScore}
                         difficultyLastPlayed={difficultyPicked}
                         prevHighscore={prevHighscore}
@@ -80,6 +80,7 @@ export default function GameWrapper(){
                 {gameStatus === "Error" && (
                     <ErrorPage />
                 )}
+                
             </main>
             {gameStatus !== "Playing" && <Footer/>}
         </div>

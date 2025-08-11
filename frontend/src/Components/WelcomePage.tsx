@@ -3,7 +3,6 @@ import DifficultyBoxes from "./DifficultyBoxes";
 import type { Difficulty } from "../types/types";
 import {useAuth} from '../Context/UserContext';
 import GoogleSignInButton from "./SignInButton";
-import LeaderboardPage from "./LeaderboardPage";
 import { useGameStatus } from "@/Context/GameStatus";
 interface WelcomePageProps {
     onStartGame: (difficulty: Difficulty) => void;
