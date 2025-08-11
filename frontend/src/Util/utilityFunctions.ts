@@ -1,4 +1,3 @@
-
 const timeoutAudio = new Audio("/Audio/lichess-beep.mp3");
 timeoutAudio.volume = 0.3;
 timeoutAudio.preload = "auto";
