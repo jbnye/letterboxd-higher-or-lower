@@ -80,8 +80,8 @@ export default function Game({difficulty, onLose}: GameProps){
     const film1 = films[0];
     const film2 = films[1];
     let classColor;
-    ratingColor === "correct" ? classColor = "bg-green-600" : ratingColor === "incorrect" ? classColor="bg-red-600" : classColor = "";
-    checkGuessData?.timeout === true && classColor === "bg-red-600"
+    ratingColor === "correct" ? classColor = "border-green-600" : ratingColor === "incorrect" ? classColor="border-red-600" : classColor = "";
+    checkGuessData?.timeout === true && classColor === "border-red-600"
     
     useEffect(() => {
         const controller = new AbortController();
@@ -307,11 +307,12 @@ export default function Game({difficulty, onLose}: GameProps){
     }
     //console.log(showRatings);
     return (
-        <div className={`h-screen w-screen transition-all duration-300 ${shouldPulse ? 'breathe' : ''} ${classColor} p-[10px] box-border`}>
-        <div className="flex relative h-full w-full px-4 bg-gradient-to-b from-letterboxd-lighter-gray to-letterboxd-light-gray box-border
+        <div className="flex flex-col md:flex-row relative w-full h-screen  bg-gradient-to-b from-letterboxd-lighter-gray to-letterboxd-light-gray
         dark:from-letterboxd-background dark:to-letterboxd-dark-background-blue">
+            <div className={`absolute w-full h-screen  pointer-events-none transition-all duration-300 ${shouldPulse ? 'breathe' : ''} ${classColor} p-[10px] border-5 box-border z-60`}>
+            </div>
             {/* Left Image Container */}
-            <div className="w-1/2 h-full flex justify-end items-center ">
+            <div className="w-full md:w-1/2 h-1/2 md:h-full flex justify-center md:justify-end items-center">
                 {isLoading ? (
                 <Spinner />
                 ) : (
@@ -323,7 +324,7 @@ export default function Game({difficulty, onLose}: GameProps){
             </div>
 
             {/* Right Image*/}
-            <div className="w-1/2 h-full flex justify-start items-center">
+            <div className="w-full md:w-1/2 h-1/2 md:h-full flex justify-center md:justify-start items-center">
                 {isLoading ? (
                 <Spinner />
                 ) : (
@@ -334,8 +335,8 @@ export default function Game({difficulty, onLose}: GameProps){
             </div>
             <WrongOrRight films={films} onTimeout={onTimeout} ratingColor={ratingColor} animationIsPlaying={animationIsPlaying} setShouldPulse={setShouldPulse}/>
             {/* Score Display*/}
-            <div className="absolute top-1 left-1/2 -translate-x-1/2 bg-white/90 px-6 py-2 rounded-full border-solid-black shadow-md
-             text-black text-lg font-semibold border-4 border-black flex flex-col items-center justify-centerz-50">
+            <div className="absolute top-1 left-1/2 -translate-x-1/2 bg-white/90  px-3 md:px-6 md:py-2 rounded-full border-solid-black shadow-md
+             text-black text-[14px] md:text-lg font-semibold border-4 border-black flex flex-col items-center justify-centerz-50">
                 <span>
                     Score: {score} <span className="relative -top-0.5">{user && userHighscores && (score > prevHighscore!) &&` 👑`}</span>
                 </span>
@@ -345,7 +346,6 @@ export default function Game({difficulty, onLose}: GameProps){
                 </div>
                 )}
             </div>
-        </div>
         </div>
     );
 }

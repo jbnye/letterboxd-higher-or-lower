@@ -14,7 +14,7 @@ function Switch({ className, ...props }: React.ComponentProps<typeof SwitchPrimi
     >
       <SwitchPrimitive.Thumb
         className={cn(
-          "block rounded-full ring-0 transition-transform overflow-hidden",
+          "block rounded-full ring-0 transition-transform overflow-hidden cursor-pointer",
           "w-[1.15rem] h-[1.15rem]",
           "data-[state=unchecked]:translate-x-0",
           "data-[state=checked]:translate-x-[calc(4rem-1.15rem)]", 

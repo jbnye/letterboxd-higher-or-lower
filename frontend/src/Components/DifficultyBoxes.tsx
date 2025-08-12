@@ -23,23 +23,23 @@ export default function DifficultyBoxes({difficultyPicked, onDifficultyChoice, s
       } else if(difficulty === "hard"){
         difficultyDescription = "Top 2,500 most popular movies on letterboxd";
       } else {
-        difficultyDescription = "Top 10,000 most popular ENTRIES on letterboxd. This includes all categories (movies, documentaries, short-films, and tv shows). Only for letterboxd masters. BE WARNED 💀"
+        difficultyDescription = "Top 10,000 most popular ENTRIES on letterboxd. This includes all categories (movies, documentaries, short-films, and tv shows). BE WARNED 💀"
       }
       return difficultyDescription
     } 
 
- return (
-    <div className="flex gap-4 justify-center mt-8 flex-wrap ">
+  return (
+    <div className="grid grid-cols-2 md:flex md:flex-row md:gap-6 gap-4 justify-center mt-8">
       {difficulties.map((difficulty) => (
         <Tooltip key={difficulty}>
           <TooltipTrigger asChild>
             <div
               onClick={() => onDifficultyChoice(difficulty)}
               className={`${style} flex flex-col items-center justify-center rounded-xl shadow-md cursor-pointer 
-                          transition-all select-none
-                          ${difficultyPicked === difficulty 
-                            ? "bg-letterboxd-green hover:opacity-85 text-white" 
-                            : "bg-white dark:text-black hover:bg-gray-300"}`}
+                transition-all select-none
+                ${difficultyPicked === difficulty 
+                  ? "bg-letterboxd-green hover:opacity-85 text-white" 
+                  : "bg-white dark:text-black hover:bg-gray-300"}`}
             >
               <span className="text-lg font-semibold">{capitalizeFirst(difficulty)}</span>
               {userHighscores && (
@@ -62,4 +62,3 @@ export default function DifficultyBoxes({difficultyPicked, onDifficultyChoice, s
     </div>
   );
 }
-

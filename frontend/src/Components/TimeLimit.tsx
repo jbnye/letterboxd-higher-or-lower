@@ -1,3 +1,4 @@
+import { useThemeContext } from "@/Context/ThemeStatus";
 import { useState, useEffect, useRef } from "react";
 
 interface getFilmsResponse {
@@ -17,10 +18,11 @@ interface TimeLimitProps {
 }
     const TOTAL_TIME = 10.5;
 export default function TimeLimit({ films, onTimeout, animationIsPlaying, setShouldPulse}: TimeLimitProps) {
-    const [time, setTime] = useState<number>(TOTAL_TIME)
+    const [time, setTime] = useState<number>(TOTAL_TIME);
+    const {breakpoint} = useThemeContext();
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
-    const radius = 50;
-    const stroke = 8
+    const radius = breakpoint === "mobile" ? 32 : 50;
+    const stroke = breakpoint === "mobile" ? 6 : 8;
     const normalizedRadius = radius - stroke / 2;
     const circumferance = normalizedRadius * 2 * Math.PI;
     const strokeColor = time >= 7.0 ? "#40bcf4": (time >= 4 && time < 7) ? "#ff8000" : "#f70000";
@@ -62,17 +64,13 @@ export default function TimeLimit({ films, onTimeout, animationIsPlaying, setSho
     return (
         <div className={`p-1 m-0 `}>
             <svg height={radius * 2} width={radius *2}>
-                {/* Background circle */}
                 <circle
-                    
                     fill="transparent"
                     strokeWidth="stroke"
                     r={normalizedRadius}
                     cx={radius}
                     cy={radius}
                 />
-
-                {/* Animated progress circle */}
                 <circle
                     stroke={strokeColor}
                     fill="transparent"
@@ -89,18 +87,23 @@ export default function TimeLimit({ films, onTimeout, animationIsPlaying, setSho
                     transformOrigin: "center",
                     }}
                 />
-                {/* Countdown number in center */}
-                <text
+
+                {<text
                     x="50%"
                     y="50%"
+                    dy="0.2em"  
                     textAnchor="middle"
                     dominantBaseline="middle"
-                    fontSize="20"
+                    fontSize={
+                        (animationIsPlaying && time <= 0.0) && (breakpoint === "mobile") ? 12 : 
+                        (animationIsPlaying && time <= 0.0) && (breakpoint !== "mobile") ? 18 :
+                        (breakpoint === "mobile") ? 18 : 26
+                    }
                     fill="#111827"
-                >
+                    >
                     
                     {(animationIsPlaying && time <= 0.0) ? "TIME OUT" : Math.floor(time) }
-                </text>
+                </text>}
             </svg>
         </div>
     );

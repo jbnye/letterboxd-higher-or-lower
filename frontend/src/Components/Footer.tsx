@@ -1,3 +1,4 @@
+import { useThemeContext } from "@/Context/ThemeStatus";
 import {useState, useEffect} from "react";
 
 interface lastDateResponse {
@@ -6,6 +7,7 @@ interface lastDateResponse {
 
 export default function Footer({}){
     const [dateLastUpdated, setDateLasteUpdated] = useState<string | null>();
+    const {breakpoint} = useThemeContext();
     useEffect(()=> {
         const getLastDateUpdated = async () => {
             try{
@@ -24,24 +26,14 @@ export default function Footer({}){
     },[]);
 
     return(
-        <footer className="bg-letterboxd-lighter-gray dark:bg-letterboxd-background flex w-full gap-3 text-center text-sm items-center justify-center min-h-[42px]
-        text-medium-gray dark:text-white mt-4 p-2">
+        <footer className=" bg-letterboxd-lighter-gray dark:bg-letterboxd-background  flex-wrap w-full  text-center text-sm items-center justify-center min-h-[42px] text-medium-gray dark:text-white
+        flex flex-col mt-4 p-2 gap-1
+        md:gap-3 md:flex-row ">
             {dateLastUpdated && (
-                <span className="pr-4 border-r border-medium-gray dark:border-white">Movie stats last updated: {dateLastUpdated}.</span>
+                <span className="md:pr-4 md:border-r md:border-medium-gray md:dark:border-white">Movie stats last updated: {dateLastUpdated}.</span>
             )}
-            <span className="pr-4 border-r border-medium-gray dark:border-white">Not affiliated with or endorsed by Letterboxd.</span>
-            <span><a href="mailto:jn3268@gmail.com">jn3268@gmail.com</a></span>
-            {/* <div className="flex gap-6 justify-center items-center">
-                <div className="border-black bg-white dark:bg-white border rounded-2xl">
-                    <a 
-                        href="https://github.com/jbnye" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                    >
-                    <img src="/Images/github_icon.png" alt="GitHub" width="32" height="32" className="w-8 h-8" loading="eager" />
-                    </a>
-                </div>
-            </div> */}
-    </footer>
+            <span className="md:pr-4 md:border-r md:border-medium-gray md:dark:border-white">Not affiliated with or endorsed by Letterboxd.</span>
+            {breakpoint !== "mobile" && <span><a href="mailto:jn3268@gmail.com">jn3268@gmail.com</a></span>}
+        </footer>
     )
 }

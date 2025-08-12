@@ -12,7 +12,7 @@ export default function AboutPage() {
                 Hello, my name is Jacob and I'm an aspiring software developer. One of my passions is watching and rating movies. I first came accross this game, 
                 <a 
                     href="https://www.higherorlowergame.com/imdb/ratings-movies/" 
-                    className=" inline-block text-blue-500 underline ml-1 hover:scale-105 duration-200 transition-all" 
+                    className=" md:inline-block text-blue-500 underline ml-1 hover:scale-105 duration-200 transition-all" 
                     target="_blank" 
                     rel="noopener noreferrer"
                 >
@@ -30,16 +30,15 @@ export default function AboutPage() {
             before the timer runs out.  
             <br /><br />
             A wrong guess or running out of time ends the game.  
-            <br /><br />
+            </p>
             <span className="font-semibold">Difficulties:</span>
             <ul className="list-disc list-inside mt-2 space-y-1">
-                <li><strong>Easy</strong> - Top 500 most popular movies</li>
-                <li><strong>Medium</strong> - Top 1,200 most popular movies</li>
-                <li><strong>Hard</strong> - Top 2,500 most popular movies</li>
-                <li><strong>Impossible</strong> - Top 10,000 entries (including short films, documentaries, and TV shows)</li>
+                <li><strong>Easy</strong> - Top 500 most popular movies.</li>
+                <li><strong>Medium</strong> - Top 1,200 most popular movies.</li>
+                <li><strong>Hard</strong> - Top 2,500 most popular movies.</li>
+                <li><strong>Impossible</strong> - Top 10,000 <u><strong>entries</strong></u> (including short films, documentaries, and TV shows).</li>
             </ul>
-            </p>
-            
+            <br /><br />
             <p className="mb-4">
                 Check out my own letterboxd profile and my github. Give a follow if you like the site: 
             </p>

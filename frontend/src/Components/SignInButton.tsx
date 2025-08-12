@@ -55,7 +55,7 @@ export default function GoogleSignInButton() {
                         referrerPolicy="no-referrer"
                         className="w-8 h-8 rounded-full"
                         />
-                        <div className="text-black text-sm">
+                        <div className="text-black text-[12px] md:text-sm">
                         Signed in as <strong>{user?.email}</strong>
                         </div>
                         <button

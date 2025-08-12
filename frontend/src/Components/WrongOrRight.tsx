@@ -23,7 +23,7 @@ export default function WrongOrRight({ratingColor, animationIsPlaying, films, on
         <>
             {ratingColor === "correct" ? (
                 <div
-                className={`w-24 h-24 bg-letterboxd-green absolute bottom-1/2 left-1/2 -translate-x-1/2 translate-y-1/2 
+                className={`h-16 w-16 md:h-24 md:w-24 bg-letterboxd-green absolute bottom-1/2 left-1/2 -translate-x-1/2 translate-y-1/2 
                     rounded-full border-4 border-black z-50 flex items-center justify-center`}
                 >
                 <svg
@@ -38,7 +38,7 @@ export default function WrongOrRight({ratingColor, animationIsPlaying, films, on
                 </div>
             ) : ratingColor === "incorrect" ? (
                 <div
-                className={`w-24 h-24 bg-red-500 absolute bottom-1/2 left-1/2 -translate-x-1/2 translate-y-1/2 
+                className={`h-16 w-16 md:h-24 md:w-24 bg-red-500 absolute bottom-1/2 left-1/2 -translate-x-1/2 translate-y-1/2 
                     rounded-full border-4 border-black z-50 flex items-center justify-center`}
                 >
                 <svg
@@ -72,7 +72,7 @@ export default function WrongOrRight({ratingColor, animationIsPlaying, films, on
                 </div>
             ) : ratingColor === "none" ? (
                 <div
-                className={`w-24 h-24 bg-white absolute bottom-1/2 left-1/2 -translate-x-1/2 translate-y-1/2 
+                className={`h-16 w-16 md:h-24 md:w-24 p-4 bg-white absolute bottom-1/2 left-1/2 -translate-x-1/2 translate-y-1/2 
                     rounded-full border-4 border-black z-50 flex items-center justify-center`}
                 >
                 <TimeLimit
