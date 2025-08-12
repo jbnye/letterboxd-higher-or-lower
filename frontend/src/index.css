@@ -35,10 +35,10 @@
 }
 @keyframes breathe {
   0%, 100% {
-    background-color: rgba(255, 0, 0, 0.1);
+    border-color: rgba(255, 0, 0, 0.1);
   }
   50% {
-    background-color: rgba(255, 0, 0, 0.5);
+    border-color: rgba(255, 0, 0, 0.5);
   }
 }
 
