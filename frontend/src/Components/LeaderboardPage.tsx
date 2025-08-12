@@ -105,7 +105,8 @@ export default function LeaderboardPage() {
         const controller = new AbortController();
         const getLeaderboard = async () => {
             try{
-                const response = await fetch("http://localhost:3000/api/get-leaderboard");
+                const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+                const response = await fetch(`${API_BASE}/api/get-leaderboard`);
                 if(response.ok){
                     const data = await response.json();
                     setLeaderboardResponseData(data)

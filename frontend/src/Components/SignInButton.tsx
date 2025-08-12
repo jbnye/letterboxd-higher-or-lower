@@ -10,7 +10,8 @@ export default function GoogleSignInButton() {
         const token = credentialResponse.credential;
         if(!token) return;
         try{
-            const response = await fetch("http://localhost:3000/api/google-auth", {
+            const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+            const response = await fetch(`${API_BASE}/api/google-auth`, {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json",

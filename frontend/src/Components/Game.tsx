@@ -81,13 +81,15 @@ export default function Game({difficulty, onLose}: GameProps){
     const film2 = films[1];
     let classColor;
     ratingColor === "correct" ? classColor = "border-green-600" : ratingColor === "incorrect" ? classColor="border-red-600" : classColor = "";
+    const showBorder = shouldPulse || classColor !== "";
     checkGuessData?.timeout === true && classColor === "border-red-600"
     
     useEffect(() => {
         const controller = new AbortController();
         async function fetchTwoFilms(){
             try {
-                const response = await fetch("http://localhost:3000/api/get-films", {
+                const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+                const response = await fetch(`${API_BASE}/api/get-films`, {
                     method: "POST",
                     headers: { "content-type": "application/json" },
                     body: JSON.stringify({ difficulty, user }),
@@ -248,15 +250,15 @@ export default function Game({difficulty, onLose}: GameProps){
     async function onTimeout() {
         setAnimationIsPlaying(true);
         //setIsTimeout(true);
-        playTimeoutSound();
-        handleGuess(-1);
-        setTimeout(() => {
-            onLose(score, prevHighscore);
-            if (checkGuessData?.highscores) {
-                console.log("user highscores", checkGuessData.highscores);
-                setUserHighscores(checkGuessData.highscores);
-            }
-        }, 5000);
+        // playTimeoutSound();
+        // handleGuess(-1);
+        // setTimeout(() => {
+        //     onLose(score, prevHighscore);
+        //     if (checkGuessData?.highscores) {
+        //         console.log("user highscores", checkGuessData.highscores);
+        //         setUserHighscores(checkGuessData.highscores);
+        //     }
+        // }, 5000);
     }
 
     async function checkGuessBackend(choice: number){
@@ -264,7 +266,8 @@ export default function Game({difficulty, onLose}: GameProps){
         try{
             console.log("SENDING CHOICE TO BACKEND");
             const filmIds = [film1.id, film2.id];
-            const response = await fetch(`http://localhost:3000/api/check-guess`, {
+                const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+                const response = await fetch(`${API_BASE}/api/check-guess`, {
                 method: "POST",
                 headers: {
                     "content-type": "application/json",
@@ -309,8 +312,10 @@ export default function Game({difficulty, onLose}: GameProps){
     return (
         <div className="flex flex-col md:flex-row relative w-full h-screen  bg-gradient-to-b from-letterboxd-lighter-gray to-letterboxd-light-gray
         dark:from-letterboxd-background dark:to-letterboxd-dark-background-blue">
-            <div className={`absolute w-full h-screen  pointer-events-none transition-all duration-300 ${shouldPulse ? 'breathe' : ''} ${classColor} p-[10px] border-5 box-border z-60`}>
-            </div>
+        <div
+            className={`absolute w-full h-screen pointer-events-none transition-all duration-300
+                ${shouldPulse ? 'breathe' : ''} ${showBorder ? `border-8 ${classColor}` : ''} p-[10px] z-60`}>   
+                </div>
             {/* Left Image Container */}
             <div className="w-full md:w-1/2 h-1/2 md:h-full flex justify-center md:justify-end items-center">
                 {isLoading ? (

@@ -11,7 +11,8 @@ export default function Footer({}){
     useEffect(()=> {
         const getLastDateUpdated = async () => {
             try{
-                const response = await fetch("http://localhost:3000/api/movies-last-updated");
+                const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+                const response = await fetch(`${API_BASE}/api/movies-last-updated`);
                 if(!response.ok){
                     throw new Error("Failure from server getting movies last updated");
                 }
