@@ -2,11 +2,13 @@ import {symbols} from './helperFunctions'
 import { createClient } from 'redis';
 import pool from './database/db';
 import type {Difficulty} from "./helperFunctions";
-
-const redisClient = createClient();
+console.log("REDIS URL ENV", process.env.REDIS_URL)
+const redisClient = createClient({
+    url: process.env.REDIS_URL,
+});
 
 redisClient.on('error', (err) => {
-  console.error('Redis Client Error:', err);
+    console.error('Redis Client Error:', err);
 });
 
 async function loadFilms(){

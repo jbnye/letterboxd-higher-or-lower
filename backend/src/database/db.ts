@@ -1,16 +1,10 @@
 import {Pool} from "pg";
 import dotenv from 'dotenv';
 import path from "path";
-dotenv.config();
-
-const pool = new Pool ({
-    host: "localhost",
-    port: 5432,
-    user: "postgres",
-    password: process.env.DB_PASSWORD,
-    database: 'LetterboxdGame'
+console.log(process.env.DATABASE_URL, "database");
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
 });
-
 pool.connect()
     .then(client => {
         console.log('connected to Postgres');

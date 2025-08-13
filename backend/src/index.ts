@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config(); 
 import express, {RequestHandler, Express, Request, Response} from "express";
 import filmRouter from "./API/get-film";
 import checkGuessRouter from "./API/check-guess";
@@ -12,8 +14,23 @@ import moviesLastUpdatedRouter from "./API/movies-last-updated";
 import path from "path";
 import cors from "cors";
 import {connectRedisAndLoad} from './redis';
-import dotenv from 'dotenv';
-dotenv.config();
+
+// const envFile = process.env.NODE_ENV === 'docker' ? '.env.docker' : '.env.local';
+// dotenv.config({
+//   path: path.resolve(__dirname, '..', envFile),
+//   override: true,
+// });
+
+// console.log('Loaded env file:', envFile);
+// console.log('DATABASE_URL:', process.env.DATABASE_URL);
+// console.log('REDIS_URL:', process.env.REDIS_URL);
+
+// console.log('NODE_ENV:', process.env.NODE_ENV);
+// console.log('Loaded env file:', envFile);
+// console.log('DATABASE_URL:', process.env.DATABASE_URL);
+// console.log('REDIS_URL:', process.env.REDIS_URL);
+
+
 
 const port: number = parseInt(process.env.PORT || "3000");
 
@@ -44,15 +61,17 @@ app.get('/', (_req: Request, res: Response) => {
   res.send('Hello World!');
 });
 
-app.get("/ping", (_req,res)=> {
+app.get("/api/ping", (_req,res)=> {
     res.send("Server is online");
 });
 
 
-app.listen(port, () => {
+// app.listen(port, '0.0.0.0', () => {
+//   console.log(`Server running on http://0.0.0.0:${port}`);
+// });
+app.listen(port,() => {
   console.log(`Server running on http://localhost:${port}`);
 });
-
 
 app.get("/mock-lb-test", (_req: Request, res: Response) => {
     const mockHtml = `

@@ -2,10 +2,19 @@ import { parse } from 'csv-parse/sync';
 import * as fs from 'fs/promises';
 import path from 'path';
 
+interface CsvRow {
+  Slug: string;
+  "Average Rating": string;  // still string because CSV fields are parsed as strings
+  "Watched Number": string;
+  Title: string;
+  Year: string;
+  Category: string;
+  "Poster URL": string;
+}
 export async function validateCSV(filePath: string): Promise<string[]> {
     const content = await fs.readFile(filePath, 'utf-8');
 
-    const records = parse(content, {
+    const records: CsvRow[] = parse(content, {
         columns: true,
         skip_empty_lines: true,
         trim: true
