@@ -46,7 +46,7 @@ export const AuthProvider = ({children }: {children: React.ReactNode}) => {
     const logout = async () => {
         try {
             const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
-            const response = await fetch(`${API_BASE}/api/logout`, {
+            await fetch(`${API_BASE}/api/logout`, {
             method: "POST",
             credentials: "include", 
             });

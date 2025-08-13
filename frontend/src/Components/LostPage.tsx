@@ -15,21 +15,21 @@ interface LostageProps {
 export default function LostPage({onStartGame, finalScore, prevHighscore, difficultyLastPlayed, }: LostageProps){
     const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>(difficultyLastPlayed);
     const {setGameStatus} = useGameStatus(); 
-    let isHighScore: "true" | "false" | "tied" | null = null;
+    //let isHighScore: "true" | "false" | "tied" | null = null;
     let title: string = "";
     const textFinalScore = `Final Score: ${finalScore}`
     let subtitle: string;
     if(prevHighscore !== undefined){
         if(prevHighscore > finalScore) {
-            isHighScore = "false";
+            //isHighScore = "false";
             title = "Nice try!";
             subtitle = `Current highscore for ${difficultyLastPlayed} is ${prevHighscore}.`;
         } else if (prevHighscore === finalScore) {
-            isHighScore = "tied";
+            //isHighScore = "tied";
             title = "So Close!";
             subtitle = `Tied high score.`;
         } else {
-            isHighScore = "true";
+            //isHighScore = "true";
             title = `Great Job!`;
             subtitle = `You have a new high score for ${difficultyLastPlayed}! (Previous was ${prevHighscore}).`;
         }
