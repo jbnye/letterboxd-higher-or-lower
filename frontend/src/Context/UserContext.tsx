@@ -45,7 +45,8 @@ export const AuthProvider = ({children }: {children: React.ReactNode}) => {
 
     const logout = async () => {
         try {
-            await fetch("http://localhost:3000/api/logout", {
+            const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+            const response = await fetch(`${API_BASE}/api/logout`, {
             method: "POST",
             credentials: "include", 
             });
@@ -61,7 +62,8 @@ export const AuthProvider = ({children }: {children: React.ReactNode}) => {
     useEffect(() => {
         const checkCookieLogin = async () => {
             try {
-                const response = await fetch("http://localhost:3000/api/auth-status", {
+                const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+                const response = await fetch(`${API_BASE}/api/auth-status`, {
                     method: "GET",
                     credentials: "include",
                 });
@@ -92,7 +94,8 @@ export const AuthProvider = ({children }: {children: React.ReactNode}) => {
                 return;
             }
             try{
-                const response = await fetch(`http://localhost:3000/api/get-highscores?userSub=${user?.sub}`, {
+                const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+                const response = await fetch(`${API_BASE}/api/get-highscores?userSub=${user?.sub}`, {
                     method: "GET",
                     credentials: "include",
                     });
