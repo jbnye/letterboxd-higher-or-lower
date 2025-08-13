@@ -250,15 +250,15 @@ export default function Game({difficulty, onLose}: GameProps){
     async function onTimeout() {
         setAnimationIsPlaying(true);
         //setIsTimeout(true);
-        // playTimeoutSound();
-        // handleGuess(-1);
-        // setTimeout(() => {
-        //     onLose(score, prevHighscore);
-        //     if (checkGuessData?.highscores) {
-        //         console.log("user highscores", checkGuessData.highscores);
-        //         setUserHighscores(checkGuessData.highscores);
-        //     }
-        // }, 5000);
+        playTimeoutSound();
+        handleGuess(-1);
+        setTimeout(() => {
+            onLose(score, prevHighscore);
+            if (checkGuessData?.highscores) {
+                console.log("user highscores", checkGuessData.highscores);
+                setUserHighscores(checkGuessData.highscores);
+            }
+        }, 5000);
     }
 
     async function checkGuessBackend(choice: number){
