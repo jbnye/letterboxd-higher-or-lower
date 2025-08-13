@@ -59,7 +59,7 @@ export default function Game({difficulty, onLose}: GameProps){
     const [score, setScore] = useState<number>(0);
     const [animationIsPlaying, setAnimationIsPlaying] = useState<boolean>(false);
     const [films, setFilms] = useState<getFilmsResponse[]>([]);
-    const [filmRatings, setFilmRatings] = useState<number[]>([0,0]);
+    // const [filmRatings, setFilmRatings] = useState<number[]>([0,0]);
     const [checkGuessData, setCheckGuessData] = useState<CheckGuessResponse | null>(null);
     const [gameId, setGameId] = useState<string>("");
     const [ratingColor, setRatingColor] = useState<ColorState>("none");
@@ -208,11 +208,11 @@ export default function Game({difficulty, onLose}: GameProps){
             return updatedList;
         })
 
-        setFilmRatings((prev) => {
-            const updatedList = [...prev];
-            updatedList[replacedIndex] = 0;
-            return updatedList;
-        })
+        // setFilmRatings((prev) => {
+        //     const updatedList = [...prev];
+        //     updatedList[replacedIndex] = 0;
+        //     return updatedList;
+        // })
 
         setFilmDisplayStates((prev) => {
             const updatedList = [...prev];
@@ -281,7 +281,7 @@ export default function Game({difficulty, onLose}: GameProps){
                 const data = await response.json();
                 if(data.success === true){
                     console.log("RECIEVED  RIGHT CHOICE RESPONSE: ", data);
-                    setFilmRatings([data.filmRatings.film1[1], data.filmRatings.film2[1]]);
+                    //setFilmRatings([data.filmRatings.film1[1], data.filmRatings.film2[1]]);
                     setCheckGuessData(data);
                 }
                 else{
