@@ -19,28 +19,30 @@ interface TimeLimitProps {
     const TOTAL_TIME = 10.5;
 export default function TimeLimit({ films, onTimeout, animationIsPlaying, setShouldPulse}: TimeLimitProps) {
     const [time, setTime] = useState<number>(TOTAL_TIME);
-    const {breakpoint} = useThemeContext();
+    const { breakpoint } = useThemeContext();
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const startTimeRef = useRef<number>(0);
+
     const radius = breakpoint === "mobile" ? 32 : 50;
     const stroke = breakpoint === "mobile" ? 6 : 8;
     const normalizedRadius = radius - stroke / 2;
     const circumferance = normalizedRadius * 2 * Math.PI;
-    const strokeColor = time >= 7.0 ? "#40bcf4": (time >= 4 && time < 7) ? "#ff8000" : "#f70000";
+    const strokeColor = time >= 7.0 ? "#40bcf4" : time >= 4 ? "#ff8000" : "#f70000";
 
     useEffect(() => {
         if (animationIsPlaying) return;
-        //setTime(10.5);
-
         if (intervalRef.current) clearInterval(intervalRef.current);
+        startTimeRef.current = Date.now();
+
         intervalRef.current = setInterval(() => {
-            //if (animationIsPlaying) return;
-            setTime(prev => {
-                if (prev <= 0.032) {
+            const elapsedSeconds = (Date.now() - startTimeRef.current) / 1000;
+            const remaining = Math.max(0, TOTAL_TIME - elapsedSeconds);
+
+            setTime(parseFloat(remaining.toFixed(3)));
+
+            if (remaining <= 0) {
                 clearInterval(intervalRef.current!);
-                return 0;
-                }
-                return parseFloat((prev - 0.032).toFixed(3));
-            });
+            }
         }, 32);
 
         return () => {
@@ -53,7 +55,7 @@ export default function TimeLimit({ films, onTimeout, animationIsPlaying, setSho
             setShouldPulse(true);
         }
     }, [time, setShouldPulse]);
-    
+
     useEffect(() => {
         if (time === 0) {
             onTimeout();
