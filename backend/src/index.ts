@@ -36,7 +36,7 @@ const port: number = parseInt(process.env.PORT || "3000");
 
 const app: Express = express();
 app.use(cors({
-  origin: "http://localhost:5173", 
+  origin: process.env.FRONTEND_URL || "http://localhost:5173", 
   credentials: true, 
 }));
 app.use(cookieParser());
@@ -49,8 +49,8 @@ app.use("/api", logoutRouter);
 app.use("/api", highscoreRouter);
 app.use("/api", timeoutRouter);
 app.use("/api", leaderboardRouter);
-app.use("/api/", moviesLastUpdatedRouter)
-app.use('/posters', express.static(path.resolve(__dirname, '..', 'posters')));
+app.use("/api/", moviesLastUpdatedRouter);
+//app.use('/posters', express.static(path.resolve(__dirname, '..', 'posters')));
 
 (async () =>  (
     await connectRedisAndLoad()
@@ -70,7 +70,7 @@ app.get("/api/ping", (_req,res)=> {
 //   console.log(`Server running on http://0.0.0.0:${port}`);
 // });
 app.listen(port,() => {
-  console.log(`Server running on http://localhost:${port}`);
+  console.log(`Server running on port ${port}`);
 });
 
 app.get("/mock-lb-test", (_req: Request, res: Response) => {
