@@ -31,7 +31,7 @@ export default function WelcomePage({ onStartGame }: WelcomePageProps) {
 
     return (
         <div className="h-full w-full flex flex-col items-center px-4">
-            <h1 className="text-letterboxd-orange text-2xl md:text-4xl mt-5 md:mt-12 mb-4 text-center">
+            <h1 className="text-letterboxd-orange text-2xl md:text-4xl mt-5 md:mt-4 mb-4 text-center">
                 Letterboxd Higher or Lower
             </h1>
 
@@ -46,19 +46,19 @@ export default function WelcomePage({ onStartGame }: WelcomePageProps) {
                         <DifficultyBoxes
                             onDifficultyChoice={(difficulty) => setDifficultyPicked(difficulty)}
                             difficultyPicked={difficultyPicked}
-                            style="w-24 h-24 p-3 md:w-32 md:h-32"
+                            style="w-24 h-24 p-3 md:w-28 md:h-28 l:w-32 l:h-32"
                         />
                     </div>
                     <div className="flex flex-col w-full md:w-auto gap-4 mt-12 md:mt-6">
                         <button
                             onClick={() => onStartGame(difficultyPicked)}
-                            className="px-6 py-2 h-16 md:h-auto bg-letterboxd-blue text-white rounded hover:bg-[#1093ef]"
+                            className="px-12 py-4 h-16 md:h-auto bg-letterboxd-blue text-white rounded hover:bg-[#1093ef]"
                         >
                             Play
                         </button>
                         <button
                             onClick={() => setGameStatus("Leaderboard")}
-                            className="px-6 py-2 h-16 md:h-auto bg-letterboxd-blue text-white rounded hover:bg-[#1093ef]"
+                            className="px-12 py-4 h-16 md:h-auto bg-letterboxd-blue text-white rounded hover:bg-[#1093ef]"
                         >
                             Leaderboard
                         </button>

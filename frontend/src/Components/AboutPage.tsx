@@ -5,8 +5,8 @@ export default function AboutPage() {
     const {darkMode} = useThemeContext();
     return (
 
-        <div className="max-w-2xl mx-auto px-4 py-10 text-black dark:text-white">
-            <h1 className="text-3xl font-bold text-letterboxd-orange mb-4">About This Project</h1>
+        <div className="max-w-2xl mx-auto px-4  text-black dark:text-white">
+            <h1 className="text-letterboxd-orange text-2xl md:text-4xl mt-4 md:mt-4 mb-4 text-center">About This Project</h1>
 
             <p className="mb-4">
                 Hello, my name is Jacob and I'm an aspiring software developer. One of my passions is watching and rating movies. I first came accross this game, 
