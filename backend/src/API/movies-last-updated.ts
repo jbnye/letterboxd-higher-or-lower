@@ -5,7 +5,7 @@ const router = Router();
 
 
 const getDateLastUpdated: RequestHandler = (req, res) => {
-    const filePath = path.join(__dirname, "../data/lastUpdated.json");
+    const filePath = path.resolve(__dirname, "data", "lastUpdated.json");
     try {
         const data = fs.readFileSync(filePath, "utf8");
         const { dateLastUpdated } = JSON.parse(data);
