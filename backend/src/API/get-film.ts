@@ -96,7 +96,8 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
                 title: film1Row.title,
                 year: film1Row.year,
                 posterurl: film1Row.posterurl,
-                inHouseURL: `${baseURL}/posters/${film1Row.slug}.jpg`
+                //inHouseURL: `${baseURL}/posters/${film1Row.slug}.jpg`
+                inHouseURL: `${process.env.POSTER_BASE_URL}/${film1Row.slug}.jpg`
                 // isTop250: film1Row.istop2501
             }
 

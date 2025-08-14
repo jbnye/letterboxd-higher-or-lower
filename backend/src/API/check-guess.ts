@@ -80,7 +80,8 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
                     title: newFilmData.title,
                     year: newFilmData.year,
                     posterurl: newFilmData.posterurl,
-                    inHouseURL: `${baseURL}/posters/${newFilmData.slug}.jpg`
+                    //inHouseURL: `${baseURL}/posters/${newFilmData.slug}.jpg`
+                    inHouseURL: `${process.env.POSTER_BASE_URL}/${newFilmData.slug}.jpg`
                 }
                 const score: number = await handleGameId(gameId, true, filmIds, newFilm.id, ranSelectedToRemove);
                 res.status(200).json({
