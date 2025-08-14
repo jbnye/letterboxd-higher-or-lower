@@ -1,6 +1,7 @@
 import {GoogleLogin } from "@react-oauth/google";
 import {useAuth} from "../Context/UserContext";
 
+
 export default function GoogleSignInButton() {
     const { setUser, setAuthStatus, authStatus, user, logout} = useAuth(); 
 
@@ -41,14 +42,14 @@ export default function GoogleSignInButton() {
     return (
         <>
             <div>
-                {authStatus !== "authenticated" || !user ? (
+                {authStatus ==="not-authenticated" || !user ? (
                     <GoogleLogin
                         onSuccess={handleLoginSuccess}
                         onError={() => {
                             console.error("Login Failed");
                         }}
                     />
-                ) : (
+                    ) : (
                     <div className="flex items-center gap-2 bg-white p-2 rounded shadow">
                         <img
                         src={user.picture}

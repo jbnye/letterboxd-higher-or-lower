@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120">
+  <!-- First L -->
+  <text x="0" y="120" font-size="150" font-family="Arial, sans-serif" font-weight="bold"
+        fill="oklch(0.7319 0.1858 52.98)">L</text>
+  <!-- H -->
+  <text x="95" y="120" font-size="150" font-family="Arial, sans-serif" font-weight="bold"
+        fill="oklch(0.7899 0.2343 147.07)">H</text>
+  <!-- Second L -->
+  <text x="200" y="120" font-size="150" font-family="Arial, sans-serif" font-weight="bold"
+        fill="oklch(0.7512 0.1332 232.35)">L</text>
+</svg>

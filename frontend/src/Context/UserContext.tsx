@@ -22,6 +22,7 @@ interface AuthConextProps {
     userHighscores: Highscores | null;
     setUserHighscores: (scores: Highscores | null) => void;
     logout: () => void;
+    userHasBeenChecked: boolean;
 }
 
 
@@ -31,7 +32,7 @@ export const AuthProvider = ({children }: {children: React.ReactNode}) => {
     const [user, setUserState] = useState <User | null> (null);
     const [authStatus, setAuthStatusState] = useState<AuthStatus>("not-authenticated");
     const [userHighscores, setUserHighscoresState] = useState<Highscores | null>(null);
-
+    const [userHasBeenChecked, setUserHasBeenChecked] = useState<boolean>(false);
     const setUser = (user: User | null) => {
         setUserState(user);
     };
@@ -61,6 +62,8 @@ export const AuthProvider = ({children }: {children: React.ReactNode}) => {
 
     useEffect(() => {
         const checkCookieLogin = async () => {
+            setAuthStatus("checking"); 
+            setUserHasBeenChecked(true);
             try {
                 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
                 const response = await fetch(`${API_BASE}/api/auth-status`, {
@@ -73,14 +76,15 @@ export const AuthProvider = ({children }: {children: React.ReactNode}) => {
                     setUser(data.user);
                     setAuthStatus("authenticated");
                 } else if (response.status === 401) {
-                    console.log("HEREEEEEE");
                     setUser(null);
                     setAuthStatus("not-authenticated");
                 } else {
                     console.warn("Unexpected auth check status:", response.status);
+                    setAuthStatus("not-authenticated");
                 }
             } catch (error) {
                 console.error("Network error checking auth status", error);
+                setAuthStatus("not-authenticated");
             }
         };
 
@@ -107,14 +111,16 @@ export const AuthProvider = ({children }: {children: React.ReactNode}) => {
         }
         fetchHighscores();
     },[user]);
+
     const value = useMemo(() => ({
-    user,
-    authStatus,
-    setUser,
-    setAuthStatus,
-    userHighscores,
-    setUserHighscores,
-    logout
+        user,
+        authStatus,
+        setUser,
+        setAuthStatus,
+        userHighscores,
+        setUserHighscores,
+        logout,
+        userHasBeenChecked,
     }), [user, authStatus, userHighscores]);
 
     return (

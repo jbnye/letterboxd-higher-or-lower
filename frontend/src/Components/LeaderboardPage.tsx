@@ -2,7 +2,7 @@ import type { Difficulty } from "@/types/types";
 import { useState, useEffect } from "react";
 import DifficultyBoxes from "./DifficultyBoxes";
 import { useGameStatus } from "@/Context/GameStatus";
-
+import { useServerStatus } from "@/Context/ServerStatusContext";
 
 interface leaderboardEntry {
     name: string,
@@ -95,9 +95,11 @@ interface leaderboardResponse {
 
 
 export default function LeaderboardPage() {
+    const {status, serverHasBeenChecked} = useServerStatus();
     const [difficultySelected, setDifficultySelected] = useState<Difficulty>("easy");
     const [leaderboardResponseData, setLeaderboardResponseData] = useState<leaderboardResponse>()
     const {setGameStatus} = useGameStatus();
+    const isServerOffline = status === "offline" && serverHasBeenChecked;
     let top10;
     if(leaderboardResponseData){
         top10 = leaderboardResponseData[difficultySelected];
@@ -132,31 +134,40 @@ export default function LeaderboardPage() {
         
         <div className="flex flex-col items-center px-4 text-black dark:text-white">
             <h1 className="text-letterboxd-orange text-2xl md:text-4xl mt-4 md:mt-4 mb-4 text-center">Hall of Fame</h1>
-                <DifficultyBoxes             
-                    onDifficultyChoice={(difficulty) => {
-                        setDifficultySelected(difficulty);
-                    }} 
-                    difficultyPicked={difficultySelected} 
-                    style={"w-24 h-24"}
-                />
-            <div className="flex flex-col my-3 w-full sm:w-3/5 md:w-2/5 lg:w-1/3 mx-auto">
-                { top10 &&  top10.map((entry, index) => (
-                    <div
-                    key={index}
-                    className="flex flex-nowrap items-center gap-4 p-2 border-b border-letterboxd-dark-blue dark:border-letterboxd-blue w-full"
-                    >
-                    <span className="w-6 text-right font-bold">{index + 1}.</span>
-                    <img
-                        src={entry.picture}
-                        alt={entry.name}
-                        className="w-10 h-10 rounded-full flex-shrink-0"
-                        referrerPolicy="no-referrer"
+
+            {isServerOffline ? (
+                <p className="text-xl text-red-500 text-center">
+                    Sorry, the server is currently offline. Please try again later.
+                </p>
+            ) : (
+                <>
+                    <DifficultyBoxes             
+                        onDifficultyChoice={(difficulty) => {
+                            setDifficultySelected(difficulty);
+                        }} 
+                        difficultyPicked={difficultySelected} 
+                        style={"w-24 h-24"}
                     />
-                    <span className="font-bold truncate max-w-[120px]">{entry.name}</span>
-                    <span className="ml-auto text-black dark:text-letterboxd-blue font-bold">{entry.score}</span>
+                    <div className="flex flex-col my-3 w-full sm:w-3/5 md:w-2/5 lg:w-1/3 mx-auto">
+                        {top10 && top10.map((entry, index) => (
+                            <div
+                                key={index}
+                                className="flex flex-nowrap items-center gap-4 p-2 border-b border-letterboxd-dark-blue dark:border-letterboxd-blue w-full"
+                            >
+                                <span className="w-6 text-right font-bold">{index + 1}.</span>
+                                <img
+                                    src={entry.picture}
+                                    alt={entry.name}
+                                    className="w-10 h-10 rounded-full flex-shrink-0"
+                                    referrerPolicy="no-referrer"
+                                />
+                                <span className="font-bold truncate max-w-[120px]">{entry.name}</span>
+                                <span className="ml-auto text-black dark:text-letterboxd-blue font-bold">{entry.score}</span>
+                            </div>
+                        ))}
                     </div>
-                ))}
-                </div>
-            </div>
+                </>
+            )}
+        </div>
     )
 }

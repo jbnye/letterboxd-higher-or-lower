@@ -1,29 +1,36 @@
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useState, useEffect, useContext, useMemo } from "react";
 import type { ServerStatus } from "../types/types";
 
 
 interface ServerStatusContextType {
   status: ServerStatus;
+  serverHasBeenChecked: boolean;
 }
+
 const ServerStatusContext = createContext<ServerStatusContextType | undefined>(undefined);
 export const ServerStatusProvider = ({ children }: { children: React.ReactNode }) => {
-  const [status, setStatus] = useState<ServerStatus>('checking');
-  console.log(status);
+    const [status, setStatus] = useState<ServerStatus>('checking');
+    const [serverHasBeenChecked, setServerHasBeenChecked] = useState(false);
+    console.log(status);
 
-  const pingServer = async () => {
-    try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
-      const response = await fetch(`${API_BASE}/api/ping`);
-      if(response.ok){
-        setStatus('online');
-      }
-      else {
-        setStatus('offline');
+    const pingServer = async () => {
+      try {
+
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+        const response = await fetch(`${API_BASE}/api/ping`);
+        if(response.ok){
+          setStatus('online');
         }
-    } catch (error) {
-      setStatus('offline');
-      throw error;
-    }
+        else {
+          setStatus('offline');
+          }
+      } catch (error) {
+        setStatus('offline');
+        throw error;
+      }
+      finally{
+        setServerHasBeenChecked(true);
+      }
   };
 
 
@@ -33,8 +40,17 @@ export const ServerStatusProvider = ({ children }: { children: React.ReactNode }
     // return () => clearInterval(interval);
   }, []);
 
+  const value = useMemo(()=> {
+    return (
+      {
+      status,
+      serverHasBeenChecked,
+      }
+    )
+  },[status, serverHasBeenChecked])
+
   return (
-    <ServerStatusContext.Provider value={{ status }}>
+    <ServerStatusContext.Provider value={value}>
       {children}
     </ServerStatusContext.Provider>
   );

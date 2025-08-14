@@ -2,8 +2,6 @@ import {useState} from "react";
 import Game from "./Game.tsx";
 import LostPage from "./LostPage.tsx";
 import WelcomePage from "./WelcomePage.tsx";
-import { useServerStatus } from '../Context/ServerStatusContext';
-import {Spinner} from "../UI/spinner.tsx";
 import type { Difficulty} from "../types/types.ts";
 import { useAuth } from "@/Context/UserContext.tsx";
 import LeaderboardPage from "./LeaderboardPage.tsx";
@@ -15,7 +13,6 @@ import { useGameStatus } from "@/Context/GameStatus.tsx";
 
 
 export default function GameWrapper(){
-    const {status} = useServerStatus();
     const [finalScore, setFinalScore] = useState<number>(0);
     const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>("easy");
     const [gameKey, setGameKey] = useState(0);
@@ -40,11 +37,6 @@ export default function GameWrapper(){
             {gameStatus !== "Playing" && <Navbar />}
 
             <main className="flex-grow ">
-                {status === "checking" && (
-                <div className="flex flex-col items-center mt-5">
-                    <Spinner />
-                </div>
-                )}
                 {gameStatus === "Welcome" && (
                     <WelcomePage
                         onStartGame={(chosenDifficulty) => {
