@@ -136,7 +136,7 @@ export default function LeaderboardPage() {
             <h1 className="text-letterboxd-orange text-2xl md:text-4xl mt-4 md:mt-4 mb-4 text-center">Hall of Fame</h1>
 
             {isServerOffline ? (
-                <p className="text-xl text-red-500 text-center">
+                <p className="text-xl text-black dark:text-red-500 text-center">
                     Sorry, the server is currently offline. Please try again later.
                 </p>
             ) : (

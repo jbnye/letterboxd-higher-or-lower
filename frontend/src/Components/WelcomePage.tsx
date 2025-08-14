@@ -31,12 +31,12 @@ export default function WelcomePage({ onStartGame }: WelcomePageProps) {
 
     return (
         <div className="h-full w-full flex flex-col items-center px-4">
-            <h1 className="text-letterboxd-orange text-2xl md:text-4xl mt-5 md:mt-4 mb-4 text-center">
+            <h1 className=" text-letterboxd-orange text-2xl md:text-4xl mt-5 md:mt-4 mb-4 text-center">
                 Letterboxd Higher or Lower
             </h1>
 
             {isServerOffline ? (
-                <p className="text-xl text-red-500 text-center">
+                <p className="text-xl text-black dark:text-red-500 text-center">
                     Sorry, the server is currently offline. Please try again later.
                 </p>
             ) : (

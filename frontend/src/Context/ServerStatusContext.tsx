@@ -17,6 +17,8 @@ export const ServerStatusProvider = ({ children }: { children: React.ReactNode }
       try {
 
         const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+        console.log("API BASE IS: ", API_BASE);
+        console.log("FETCHING: ", `${API_BASE}/api/ping`);
         const response = await fetch(`${API_BASE}/api/ping`);
         if(response.ok){
           setStatus('online');
