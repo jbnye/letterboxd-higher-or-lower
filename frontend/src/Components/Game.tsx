@@ -98,6 +98,16 @@ export default function Game({difficulty, onLose}: GameProps){
                 });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
+                await Promise.all(
+                    data.newFilms.map((film: any) => {
+                        return new Promise<void>((resolve) => {
+                            const img = new Image();
+                            img.src = film.inHouseURL;
+                            img.onload = () => resolve();
+                            img.onerror = () => resolve(); // still resolve so the game can start even if an image fails
+                        });
+                    })
+                );
                 setFilms(data.newFilms);
                 setGameId(data.gameId);
             } catch (error: any) {
@@ -279,8 +289,12 @@ export default function Game({difficulty, onLose}: GameProps){
             if(response.status === 200){
                 //setAnimationIsPlaying(true);
                 const data = await response.json();
-                if(data.success === true){
+                if(data.success === true && data.newFilm?.inHouseURL){
                     console.log("RECIEVED  RIGHT CHOICE RESPONSE: ", data);
+                    if (data.success && data.newFilm?.inHouseURL) {
+                        const img = new Image();
+                        img.src = data.newFilm.inHouseURL;
+                    }
                     //setFilmRatings([data.filmRatings.film1[1], data.filmRatings.film2[1]]);
                     setCheckGuessData(data);
                 }
@@ -306,7 +320,11 @@ export default function Game({difficulty, onLose}: GameProps){
 
 
     if (isLoading) {
-        return <Spinner />;
+        return( 
+            <div className="flex items-center justify-center h-screen">
+                <Spinner />
+            </div>
+        );
     }
     //console.log(showRatings);
     return (

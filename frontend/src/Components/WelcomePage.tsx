@@ -56,12 +56,6 @@ export default function WelcomePage({ onStartGame }: WelcomePageProps) {
                         >
                             Play
                         </button>
-                        <button
-                            onClick={() => setGameStatus("Leaderboard")}
-                            className="px-12 py-4 h-16 md:h-auto bg-letterboxd-blue text-white rounded hover:bg-[#1093ef]"
-                        >
-                            Leaderboard
-                        </button>
                     </div>
                     <div className="mt-10">
                         {userHasBeenChecked === false ? <Spinner /> : (<GoogleSignInButton />)}
