@@ -17,7 +17,6 @@ export default function WelcomePage({ onStartGame }: WelcomePageProps) {
     const { userHasBeenChecked } = useAuth();
     const { status, serverHasBeenChecked } = useServerStatus();
     const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>("easy");
-    const { setGameStatus } = useGameStatus();
 
     if (status === "checking") {
         return (
