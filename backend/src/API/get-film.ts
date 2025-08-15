@@ -67,7 +67,7 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
                 year: film2Data.year,
                 posterurl: film2Data.posterurl,
                 //inHouseURL: `${baseURL}/posters/${film2Data.slug}.jpg`  
-                inHouseURL: `${process.env.POSTER_BASE_URL}/${film1Data.slug}.jpg`
+                inHouseURL: `${process.env.POSTER_BASE_URL}/${film2Data.slug}.jpg`
             }
             const gameId: string = await createGameToRedis(userSub, diff, film1.id, film2.id);
             console.log("Fetched two films from cache: ", film1, film2);

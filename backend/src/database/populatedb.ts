@@ -13,21 +13,23 @@ async function PopulateFilmsDatabaseFromCSV(){
     });
     try{
         const insertFilmQuery: string = 
-            `INSERT INTO films (slug, averageRating, watchedNumber, title, year, category, posterURL, isTop250)
-                VALUES ($1,$2,$3,$4,$5,$6,$7, $8)
+            `INSERT INTO films (slug, averageRating, watchedNumber, title, year, category, posterurl)
+                VALUES ($1,$2,$3,$4,$5,$6,$7)
             `;
         for (const film of films.slice(1)) {
             const parsedYear = parseInt(film.year);
             const releaseYear = Number.isNaN(parsedYear) ? null : parsedYear;
+            const avgRaw = parseFloat(film.averageRating); 
+            const averageRating = parseFloat((Math.round(avgRaw * 10) / 10).toFixed(1));
             await client.query(insertFilmQuery,[
                 film.slug, 
-                parseFloat((Math.round(film.averageRating * 10) / 10).toFixed(1)),
+                averageRating,
                 film.watchedNumber,
                 film.title,
                 releaseYear,
                 film.category,
-                film.posterUrl,
-                false]);
+                film.posterURL,
+            ]);
             console.log("Adding film: ", film.slug);
         };
 

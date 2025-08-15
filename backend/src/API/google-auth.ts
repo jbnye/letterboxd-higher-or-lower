@@ -58,7 +58,7 @@ const googleAuthHandler: RequestHandler = async (req,res) => {
 
         res.cookie('token', JWTtoken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: true, 
             maxAge: ONE_DAY * 1000,
             sameSite: 'lax',
         });

@@ -62,15 +62,15 @@ export async function LBPosterScraper(slugsAndRatings: slugsAndRatings[]){
             }
 
             const $ = cheerio.load(response.data);
-            const posterUrl = $('img.image:not(.-empty-poster-image)').attr('src') || '';
+            const posterURL = $('img.image:not(.-empty-poster-image)').attr('src') || '';
             const postersPath = path.join(__dirname, "..", "posters", `${film.slug}.jpg`);
             try {
                 await fs.access(postersPath); // Checks if file exists
                 console.log(`✅ Poster already exists for ${film.slug}, skipping download.`);
             } catch {
-                    await downloadImage(posterUrl, postersPath, userAgent, film.slug);
+                    await downloadImage(posterURL, postersPath, userAgent, film.slug);
             }
-            postersMap.set(film.slug, posterUrl);
+            postersMap.set(film.slug, posterURL);
             //const delayTimer: number = Math.floor((Math.random() * 1000) + 0);
             //await setTimeout(delayTimer);
         }

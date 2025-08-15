@@ -5,19 +5,19 @@ import * as fs from "fs/promises";
 
 export interface filmData {
     slug: string,
-    averageRating: number,
-    watchedNumber: number, 
+    averageRating: string,
+    watchedNumber: string, 
     title: string,
     year: string,
-    category: string
-    posterUrl: string
+    category: string,
+    posterURL: string,
 
 }
 export interface user {
     sub: string,
     name: string,
     email: string,
-    picture: string
+    picture: string,
 }
 export interface Highscores {
     easy: number,
@@ -40,13 +40,13 @@ export function createLetterboxdCsvWriter(outputPath: string, append: boolean = 
     return createObjectCsvWriter({
         path: outputPath,
         header: [
-            { id: 'slug', title: 'Slug'},
-            { id: 'averageRating', title: 'Average Rating'},
-            { id: 'watchedNumber', title: 'Watched Number'},
-            { id: 'title', title: 'Title'} ,
-            { id: 'year', title: 'Year'},
-            { id: 'category', title: 'Category'},
-            { id: 'posterUrl', title: 'Poster URL'}
+            { id: 'slug', title: 'slug'},
+            { id: 'averageRating', title: 'averageRating'},
+            { id: 'watchedNumber', title: 'watchedNumber'},
+            { id: 'title', title: 'title'} ,
+            { id: 'year', title: 'year'},
+            { id: 'category', title: 'category'},
+            { id: 'posterURL', title: 'posterURL'}
         ],
         append
     });
@@ -59,27 +59,26 @@ export async function parseCSVToMap(filePath: string): Promise<Map<string, filmD
         columns: true,
         skip_empty_lines: true,
         trim: true
-    }) as filmData[];;
+    }) as filmData[];
 
     const map = new Map<string, filmData>();
 
     for (const row of records) {
         const slug = row.slug?.trim();
-        const averageRating = parseFloat((Math.round(row.averageRating * 10) / 10).toFixed(1));
 
-        if (!slug || isNaN(averageRating)) {
+        if (!slug) {
             console.warn(`${symbols.fail} Skipping invalid row: ${JSON.stringify(row)}`);
             continue;
         }
 
         map.set(slug, {
             slug,
-            averageRating,
+            averageRating: row.averageRating,
             watchedNumber: row.watchedNumber,
             title: row.title,
             year: row.year,
             category: row.category,
-            posterUrl: row.posterUrl
+            posterURL: row.posterURL
         });
     }
 

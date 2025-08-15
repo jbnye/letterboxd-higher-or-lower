@@ -6,12 +6,13 @@ import pool from './db';
         await pool.query(`
             CREATE TABLE IF NOT EXISTS films (
                 id SERIAL PRIMARY KEY,
-                slug VARCHAR(64) UNIQUE NOT NULL,
+                slug VARCHAR(128) UNIQUE NOT NULL,
                 averageRating NUMERIC(3, 2) NOT NULL,
-                title VARCHAR(64),
-                posterURL TEXT,
-                isTop250 BOOLEAN NOT NULL,
-                popularityRank INTEGER UNIQUE NOT NULL
+                watchedNumber INTEGER,
+                title VARCHAR(128),
+                year INTEGER,
+                category VARCHAR(20) CHECK (category IN ('movie', 'other')),
+                posterURL TEXT
             )
         `);
         await pool.query(`
@@ -29,7 +30,7 @@ import pool from './db';
                 googleSub TEXT REFERENCES users(googleSub),
                 difficulty VARCHAR(20) CHECK (difficulty IN ('easy', 'medium', 'hard', 'impossible')),
                 score INTEGER NOT NULL,
-                createdate TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+                createdat TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
                 PRIMARY KEY (googleSub, difficulty)
             );
         `);
