@@ -3,7 +3,6 @@ import DifficultyBoxes from "./DifficultyBoxes";
 import type { Difficulty } from "../types/types";
 import {useAuth} from '../Context/UserContext';
 import GoogleSignInButton from "./SignInButton";
-import { useGameStatus } from "@/Context/GameStatus";
 import {Spinner} from "../UI/spinner.tsx";
 import { useServerStatus } from "@/Context/ServerStatusContext";
 interface WelcomePageProps {
