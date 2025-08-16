@@ -2,7 +2,7 @@ import {useState} from "react";
 import DifficultyBoxes from "./DifficultyBoxes";
 import type { Difficulty} from "../types/types";
 import GoogleSignInButton from "./SignInButton";
-import { useGameStatus } from "@/Context/GameStatus";
+
 
 interface LostageProps {
     onStartGame: (difficulty: Difficulty) => void,
@@ -14,7 +14,6 @@ interface LostageProps {
 
 export default function LostPage({onStartGame, finalScore, prevHighscore, difficultyLastPlayed, }: LostageProps){
     const [difficultyPicked, setDifficultyPicked] = useState<Difficulty>(difficultyLastPlayed);
-    const {setGameStatus} = useGameStatus(); 
     //let isHighScore: "true" | "false" | "tied" | null = null;
     let title: string = "";
     const textFinalScore = `Final Score: ${finalScore}`
@@ -57,12 +56,6 @@ export default function LostPage({onStartGame, finalScore, prevHighscore, diffic
                         className="px-12 py-4 h-16 font-bold md:h-auto bg-letterboxd-blue text-white rounded hover:bg-[#1093ef]"
                     >
                         Play
-                    </button>
-                    <button
-                        onClick={() => setGameStatus("Leaderboard")}
-                        className="px-12 py-4 h-16 md:h-auto font-bold bg-letterboxd-blue text-white rounded hover:bg-[#1093ef]"
-                    >
-                        Leaderboard
                     </button>
                 </div>
             <div className="mt-10">
