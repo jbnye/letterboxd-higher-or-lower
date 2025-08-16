@@ -98,11 +98,11 @@ async function LBPosterScraper(slugsAndRatings: slugsAndRatings[]){
             // Extract the title by removing " (YYYY)" from the end
             const title = frameTitle.slice(0, -7).trim(); // Remove space + (YYYY)
 
-            const posterUrl = $('img.image:not(.-empty-poster-image)').attr('src') || '';
+            const posterURL = $('img.image:not(.-empty-poster-image)').attr('src') || '';
 
-            if(posterUrl){
+            if(posterURL){
                 const imagePath = path.join(postersDir,  `${film.slug}.jpg`);
-                await downloadImage(posterUrl, imagePath, userAgent, film.slug);
+                await downloadImage(posterURL, imagePath, userAgent, film.slug);
             }
 
             const filmDataHelper = {
@@ -110,7 +110,7 @@ async function LBPosterScraper(slugsAndRatings: slugsAndRatings[]){
                 averageRating: film.averageRating,
                 title: title.trim(),
                 year: year,
-                posterUrl: posterUrl
+                posterURL: posterURL
             }
           
             filmResults.push(filmDataHelper);

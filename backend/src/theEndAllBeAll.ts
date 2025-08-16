@@ -47,13 +47,13 @@ async function main(){
     const correctFilms = new Map<string, filmData>();
 
     for (const [slug, film] of filmsNoPoster.entries()) {
-        const posterUrl = filmPosters.get(slug);
+        const posterURL = filmPosters.get(slug);
         const updatedFilm: filmData = {
             ...film,
-            posterUrl: posterUrl ?? ""  
+            posterURL: posterURL ?? ""  
         };
 
-        if (!posterUrl) {
+        if (!posterURL) {
             console.log(`------------------------NO POSTER FOR FILM: ${slug}----------------------------`);
         }
 

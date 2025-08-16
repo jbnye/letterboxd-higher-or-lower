@@ -33,7 +33,7 @@ export async function validateCSV(filePath: string): Promise<string[]> {
         const title = row["Title"];
         const year = row["Year"];
         const category = row["Category"];
-        const posterUrl = row["Poster URL"];
+        const posterURL = row["Poster URL"];
 
         // Slug check found 3 films that have their slug set to their film id actually in letterboxd
         if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
@@ -66,8 +66,8 @@ export async function validateCSV(filePath: string): Promise<string[]> {
         }
 
         // Poster URL check
-        if (!posterUrl || !posterUrl.includes(".jpg")) {
-            errors.push(`Invalid poster URL: "${posterUrl}"`);
+        if (!posterURL || !posterURL.includes(".jpg")) {
+            errors.push(`Invalid poster URL: "${posterURL}"`);
         }
 
         if (errors.length > 0) {
