@@ -7,7 +7,7 @@ import path from "path";
 
 export interface slugsAndRatings{
     slug: string,
-    averageRating: number,
+    averageRating: string,
     category?: string
 }
 
@@ -21,7 +21,7 @@ export async function extractSlugsAndRatingsFromFiles(dirPath:string): Promise<s
             const html = await fs.readFile(fullPath, "utf-8");
             const $ = cheerio.load(html);
             $('li.listitem.poster-container[data-average-rating]').each((i, element) => {
-                const averageRating: number = parseFloat($(element).attr("data-average-rating") || '0');
+                const averageRating: string = $(element).attr("data-average-rating") || '0';
                 const slug: string = $(element).find(("div[data-film-slug]")).attr('data-film-slug') || 'empty';
                 //console.log(slug,averageRating);
                 slugsAndRatings.push({

@@ -63,12 +63,12 @@ export async function scrapePopularityFromCache(slugsAndRatings: slugsAndRatings
             const title = rawTitleAndYear.slice(0, -7).trim();
             const newFilm: filmData = {
                 slug: film.slug,
-                averageRating: parseFloat((Math.round(film.averageRating * 10) / 10).toFixed(1)),
+                averageRating: film.averageRating,
                 watchedNumber: watchedCount, 
                 title: title,
                 year: year,
                 category: film.category || "",
-                posterUrl: ""
+                posterURL: ""
             };
             films.set(film.slug, newFilm);
             num++;
