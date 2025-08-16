@@ -20,7 +20,7 @@ export default function Footer({}){
                 const date = new Date(data.dateLastUpdated);
                 setDateLasteUpdated(date.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }));
             } catch (error){
-                console.error("Failed to fetch get last updated api");
+                //console.error("Failed to fetch get last updated api");
             }
         }
         getLastDateUpdated();
