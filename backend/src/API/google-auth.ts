@@ -60,7 +60,7 @@ const googleAuthHandler: RequestHandler = async (req,res) => {
             httpOnly: true,
             secure: true, 
             maxAge: ONE_DAY * 1000,
-            sameSite: 'lax',
+            sameSite: 'none',
         });
 
 
