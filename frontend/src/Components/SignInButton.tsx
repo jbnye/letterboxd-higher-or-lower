@@ -7,7 +7,7 @@ export default function GoogleSignInButton() {
 
 
     const handleLoginSuccess = async (credentialResponse: any) => {
-        console.log(credentialResponse);
+        //console.log(credentialResponse);
         const token = credentialResponse.credential;
         if(!token) return;
         try{
@@ -22,21 +22,21 @@ export default function GoogleSignInButton() {
             });
 
             const data = await response.json();
-            console.log(data);
+            //console.log(data);
 
             if(data.user) {
                 setUser(data.user);
                 setAuthStatus("authenticated");
             }
             else{
-                console.log("No response from backend for user credentials");
+                //console.log("No response from backend for user credentials");
             }
 
         } catch (error){
-            console.log("Login Failure:", error);
+            //console.log("Login Failure:", error);
         }
     }
-    console.log("RENDERING", authStatus, user);
+    //console.log("RENDERING", authStatus, user);
 
 
     return (
@@ -46,7 +46,7 @@ export default function GoogleSignInButton() {
                     <GoogleLogin
                         onSuccess={handleLoginSuccess}
                         onError={() => {
-                            console.error("Login Failed");
+                            //console.error("Login Failed");
                         }}
                     />
                     ) : (

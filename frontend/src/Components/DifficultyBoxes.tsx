@@ -12,7 +12,7 @@ interface DifficultyBoxesProps{
 }
 export default function DifficultyBoxes({difficultyPicked, onDifficultyChoice, style}: DifficultyBoxesProps){
     const {userHighscores} = useAuth();
-    console.log(userHighscores);
+    //console.log(userHighscores);
     const difficulties: Difficulty[] = ['easy', 'medium', 'hard', 'impossible'];
     const getDifficultyDescription = (difficulty: keyof Highscores ): string => {
       let difficultyDescription;

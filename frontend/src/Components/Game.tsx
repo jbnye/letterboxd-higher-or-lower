@@ -194,7 +194,7 @@ export default function Game({difficulty, onLose}: GameProps){
             } else {
                 onLose(score, prevHighscore);
                 if (checkGuessData?.highscores) {
-                    console.log("user highscores", checkGuessData.highscores);
+                    //console.log("user highscores", checkGuessData.highscores);
                     setUserHighscores(checkGuessData.highscores);
                 }
             }
@@ -260,21 +260,21 @@ export default function Game({difficulty, onLose}: GameProps){
     async function onTimeout() {
         setAnimationIsPlaying(true);
         //setIsTimeout(true);
-        playTimeoutSound();
-        handleGuess(-1);
-        setTimeout(() => {
-            onLose(score, prevHighscore);
-            if (checkGuessData?.highscores) {
-                console.log("user highscores", checkGuessData.highscores);
-                setUserHighscores(checkGuessData.highscores);
-            }
-        }, 5000);
+        // playTimeoutSound();
+        // handleGuess(-1);
+        // setTimeout(() => {
+        //     onLose(score, prevHighscore);
+        //     if (checkGuessData?.highscores) {
+        //         console.log("user highscores", checkGuessData.highscores);
+        //         setUserHighscores(checkGuessData.highscores);
+        //     }
+        // }, 5000);
     }
 
     async function checkGuessBackend(choice: number){
         const controller = new AbortController();
         try{
-            console.log("SENDING CHOICE TO BACKEND");
+           // console.log("SENDING CHOICE TO BACKEND");
             const filmIds = [film1.id, film2.id];
                 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
                 const response = await fetch(`${API_BASE}/api/check-guess`, {
@@ -290,7 +290,7 @@ export default function Game({difficulty, onLose}: GameProps){
                 //setAnimationIsPlaying(true);
                 const data = await response.json();
                 if(data.success === true && data.newFilm?.inHouseURL){
-                    console.log("RECIEVED  RIGHT CHOICE RESPONSE: ", data);
+                    //console.log("RECIEVED  RIGHT CHOICE RESPONSE: ", data);
                     if (data.success && data.newFilm?.inHouseURL) {
                         const img = new Image();
                         img.src = data.newFilm.inHouseURL;
@@ -299,17 +299,17 @@ export default function Game({difficulty, onLose}: GameProps){
                     setCheckGuessData(data);
                 }
                 else{
-                    console.log("RECIEVED WRONG CHOICE RESPONSE: ", data);
+                    //console.log("RECIEVED WRONG CHOICE RESPONSE: ", data);
                     setCheckGuessData(data);
                 }
             }
             else{
                 setGameStatus("Error");
-                console.log("ERROR CHECKING GUESS", response.status);
+                //console.log("ERROR CHECKING GUESS", response.status);
             }
         } catch (error: any) {
             if (error.name !== "AbortError") {
-                console.error("Failed to check backend for guess", error);
+                //console.error("Failed to check backend for guess", error);
                 setGameStatus("Error");
             }
         }
@@ -328,7 +328,7 @@ export default function Game({difficulty, onLose}: GameProps){
     }
     //console.log(showRatings);
     return (
-        <div className="flex flex-col md:flex-row relative w-full h-screen  bg-gradient-to-b from-letterboxd-lighter-gray to-letterboxd-light-gray
+        <div className="flex flex-col md:flex-row relative w-full h-screen bg-gradient-to-b from-letterboxd-lighter-gray to-letterboxd-light-gray
         dark:from-letterboxd-background dark:to-letterboxd-dark-background-blue">
         <div
             className={`absolute w-full h-screen pointer-events-none transition-all duration-300
@@ -358,8 +358,9 @@ export default function Game({difficulty, onLose}: GameProps){
             </div>
             <WrongOrRight films={films} onTimeout={onTimeout} ratingColor={ratingColor} animationIsPlaying={animationIsPlaying} setShouldPulse={setShouldPulse}/>
             {/* Score Display*/}
-            <div className="absolute top-1 left-1/2 -translate-x-1/2 bg-white/90  px-3 md:px-6 md:py-2 rounded-full border-solid-black shadow-md
-             text-black text-[14px] md:text-lg font-semibold border-4 border-black flex flex-col items-center justify-centerz-50">
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 border-solid-black text-black text-[12px] md:text-[14px]
+            font-semibold border-4 flex flex-col items-center justify-center z-50 bg-white
+             text-center shadow-[8px_8px_15px_rgba(0,0,0,0.5)] sm:max-w-[70vw] md:max-w-[50vw] rounded">
                 <span>
                     Score: {score} <span className="relative -top-0.5">{user && userHighscores && (score > prevHighscore!) &&` 👑`}</span>
                 </span>

@@ -1,5 +1,6 @@
 import type { ColorState } from "../types/types";
 import TimeLimit from "./TimeLimit";
+import { useThemeContext } from "@/Context/ThemeStatus";
 
 
 interface getFilmsResponse {
@@ -19,6 +20,7 @@ interface WrongOrRightProps {
 }
 
 export default function WrongOrRight({ratingColor, animationIsPlaying, films, onTimeout, setShouldPulse}: WrongOrRightProps ) {
+    const {breakpoint} = useThemeContext();
     return (
         <>
             {ratingColor === "correct" ? (
@@ -72,7 +74,7 @@ export default function WrongOrRight({ratingColor, animationIsPlaying, films, on
                 </div>
             ) : ratingColor === "none" ? (
                 <div
-                className={`h-16 w-16 md:h-24 md:w-24 p-4 bg-white absolute bottom-1/2 left-1/2 -translate-x-1/2 translate-y-1/2 
+                className={`${breakpoint==="mobile" ? "h-16 w-16" : "h-24 w-24"} p-4 bg-white absolute bottom-1/2 left-1/2 -translate-x-1/2 translate-y-1/2 
                     rounded-full border-4 border-black z-50 flex items-center justify-center`}
                 >
                 <TimeLimit

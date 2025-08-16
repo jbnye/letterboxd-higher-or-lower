@@ -104,7 +104,7 @@ export default function LeaderboardPage() {
     if(leaderboardResponseData){
         top10 = leaderboardResponseData[difficultySelected];
     }
-    console.log(top10);
+    //console.log(top10);
     useEffect(()=>{
         const controller = new AbortController();
         const getLeaderboard = async () => {
@@ -116,11 +116,11 @@ export default function LeaderboardPage() {
                     setLeaderboardResponseData(data)
                 }
                 else{
-                    console.error("FAILED TO FETCH LEADERBOARD", response);
+                    //console.error("FAILED TO FETCH LEADERBOARD", response);
                     setGameStatus("Error");
                 }
             } catch(error){
-                console.error("Error in leaderboard request", error);
+                //console.error("Error in leaderboard request", error);
             }
         }
         getLeaderboard();

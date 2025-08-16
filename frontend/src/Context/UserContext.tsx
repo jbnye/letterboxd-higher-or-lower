@@ -52,7 +52,7 @@ export const AuthProvider = ({children }: {children: React.ReactNode}) => {
             credentials: "include", 
             });
         } catch (error) {
-            console.error("Logout request failed", error);
+            //console.error("Logout request failed", error);
         }
 
         setUserState(null);
@@ -79,11 +79,11 @@ export const AuthProvider = ({children }: {children: React.ReactNode}) => {
                     setUser(null);
                     setAuthStatus("not-authenticated");
                 } else {
-                    console.warn("Unexpected auth check status:", response.status);
+                    //console.warn("Unexpected auth check status:", response.status);
                     setAuthStatus("not-authenticated");
                 }
             } catch (error) {
-                console.error("Network error checking auth status", error);
+                //console.error("Network error checking auth status", error);
                 setAuthStatus("not-authenticated");
             }
         };
@@ -106,7 +106,7 @@ export const AuthProvider = ({children }: {children: React.ReactNode}) => {
                 const data = await response.json();
                 setUserHighscores(data.highscores);
             } catch (error){
-                console.error("Failed to fetch get-highscores",error)
+                //console.error("Failed to fetch get-highscores",error)
             }
         }
         fetchHighscores();

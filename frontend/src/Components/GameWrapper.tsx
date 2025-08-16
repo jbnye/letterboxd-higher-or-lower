@@ -19,7 +19,7 @@ export default function GameWrapper(){
     const {userHighscores} = useAuth();
     const {gameStatus, setGameStatus} = useGameStatus();
     const prevHighscore: number | undefined = userHighscores ? userHighscores[difficultyPicked] : undefined;
-    console.log("gameStatus", gameStatus);
+    //console.log("gameStatus", gameStatus);
     const validStatuses = ["Playing", "Error", "Lost", "Leaderboard", "Welcome", "About"];
     if (!validStatuses.includes(gameStatus)) {
         setGameStatus("Error");
