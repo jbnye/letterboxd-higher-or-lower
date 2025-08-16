@@ -51,12 +51,22 @@ async function loadLeaderboard() {
         const leaderboardQuery = `
         SELECT * FROM
         (
-            SELECT l.googleSub, l.difficulty, l.score, u.name, u.picture, u.email,
-            ROW_NUMBER() OVER (Partition BY l.difficulty ORDER BY l.score DESC) as rank
+            SELECT 
+                l.googleSub, 
+                l.difficulty, 
+                l.score, 
+                u.name, 
+                u.picture, 
+                u.email,
+                ROW_NUMBER() OVER (
+                    PARTITION BY l.difficulty 
+                    ORDER BY l.score DESC, l.createdat ASC
+                ) as rank
             FROM leaderboard l
-            join users u ON l.googleSub = u.googleSub WHERE l.score > 0
-        )AS ranked
-        WHERE rank<= 10`;
+            JOIN users u ON l.googleSub = u.googleSub 
+            WHERE l.score > 0
+        ) AS ranked
+        WHERE rank <= 10;`;
         const leaderboardResults = await client.query(leaderboardQuery);
         //console.log(leaderboardResults.rows);
         const rows = leaderboardResults.rows;
