@@ -18,7 +18,7 @@ export const ThemeStatusProvider = ({children}: ({children: React.ReactNode})) =
         return window.matchMedia('(prefers-color-scheme: dark)').matches;
     });
     const [breakpoint, setBreakpoint] = useState<"mobile" | "tablet" | "desktop">("desktop");
-    console.log(breakpoint);
+    //console.log(breakpoint);
     useEffect(()=> {
         const checkBreakpoint = () => {
             const width = window.innerWidth;

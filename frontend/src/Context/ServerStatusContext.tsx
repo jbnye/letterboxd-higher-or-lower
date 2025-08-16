@@ -11,14 +11,14 @@ const ServerStatusContext = createContext<ServerStatusContextType | undefined>(u
 export const ServerStatusProvider = ({ children }: { children: React.ReactNode }) => {
     const [status, setStatus] = useState<ServerStatus>('checking');
     const [serverHasBeenChecked, setServerHasBeenChecked] = useState(false);
-    console.log(status);
+    //console.log(status);
 
     const pingServer = async () => {
       try {
 
         const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
-        console.log("API BASE IS: ", API_BASE);
-        console.log("FETCHING: ", `${API_BASE}/api/ping`);
+        //console.log("API BASE IS: ", API_BASE);
+        //console.log("FETCHING: ", `${API_BASE}/api/ping`);
         const response = await fetch(`${API_BASE}/api/ping`);
         if(response.ok){
           setStatus('online');
