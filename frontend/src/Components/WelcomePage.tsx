@@ -50,7 +50,7 @@ export default function WelcomePage({ onStartGame }: WelcomePageProps) {
                     <div className="flex flex-col w-full md:w-auto gap-4 mt-12  md:mt-6">
                         <button
                             onClick={() => onStartGame(difficultyPicked)}
-                            className="px-12 py-4 h-16 md:h-auto bg-letterboxd-blue text-white rounded hover:bg-[#1093ef]"
+                            className="px-12 py-4 h-16 font-bold md:h-auto bg-letterboxd-blue text-white rounded hover:bg-[#1093ef]"
                         >
                             Play
                         </button>

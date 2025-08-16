@@ -1,16 +1,13 @@
 import { RequestHandler,Router} from "express";
-import fs from "fs";
-import path from "path";
+import lastUpdated from "../data/lastUpdated.json";
 const router = Router();
 
 
 const getDateLastUpdated: RequestHandler = (req, res) => {
-    const filePath = path.resolve( __dirname, ".." , "data", "lastUpdated.json");
     try {
-        const data = fs.readFileSync(filePath, "utf8");
-        const { dateLastUpdated } = JSON.parse(data);
-        res.json({ dateLastUpdated });
-    } catch (err) {
+        return res.status(200).json({ dateLastUpdated: lastUpdated.dateLastUpdated });
+    }
+     catch (err) {
         console.error("Error reading last updated file", err);
         res.status(500).json({ error: "Could not fetch last updated timestamp" });
     }
