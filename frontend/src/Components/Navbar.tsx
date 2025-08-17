@@ -2,6 +2,7 @@ import { useGameStatus } from "@/Context/GameStatus"
 import type { GameStatus } from "@/types/types"
 import DarkModeSwitch from "./DarkModeSwitch";
 import { useThemeContext } from "@/Context/ThemeStatus";
+import MuteButton from "./ui/muteButton";
 
 type ButtonConfig = {
     label: string;
@@ -17,18 +18,19 @@ export default function Navbar() {
     { label: "About", status: "About" }
     ];
     return (
-    <div className={`flex gap-6 p-1 justify-center md:justify-end xl:mr-3 text-bold text-slate-gray dark:text-white`}>
-        {buttons.map(({ label, status }) => (
-        <button
-            key={label}
-            onClick={() => setGameStatus(status as GameStatus)}
-            className="relative group p-2 hover:cursor-pointer"
-        >
-            {label}
-            <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-slate-gray dark:bg-letterboxd-light-gray transition-all duration-300 group-hover:w-full" />
-        </button>
-        ))}
-        {breakpoint === "desktop" && <DarkModeSwitch />}
-    </div>
+        <div className={`flex gap-6 p-1 justify-center md:justify-end xl:mr-3 text-bold text-slate-gray dark:text-white`}>
+            {buttons.map(({ label, status }) => (
+            <button
+                key={label}
+                onClick={() => setGameStatus(status as GameStatus)}
+                className="relative group p-2 hover:cursor-pointer"
+            >
+                {label}
+                <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-slate-gray dark:bg-letterboxd-light-gray transition-all duration-300 group-hover:w-full" />
+            </button>
+            ))}
+            {(breakpoint === "tablet" || breakpoint === "desktop") && <MuteButton /> }
+            {(breakpoint === "tablet" || breakpoint === "desktop") && <DarkModeSwitch />}
+        </div>
     );
 }

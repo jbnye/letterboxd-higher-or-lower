@@ -51,13 +51,7 @@ async function loadLeaderboard() {
         const leaderboardQuery = `
         SELECT * FROM
         (
-            SELECT 
-                l.googleSub, 
-                l.difficulty, 
-                l.score, 
-                u.name, 
-                u.picture, 
-                u.email,
+            SELECT l.googleSub, l.difficulty, l.score, u.name, u.picture, u.email,
                 ROW_NUMBER() OVER (
                     PARTITION BY l.difficulty 
                     ORDER BY l.score DESC, l.createdat ASC
