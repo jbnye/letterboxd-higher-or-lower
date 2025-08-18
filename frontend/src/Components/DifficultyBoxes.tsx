@@ -12,7 +12,7 @@ interface DifficultyBoxesProps{
 }
 export default function DifficultyBoxes({difficultyPicked, onDifficultyChoice, style}: DifficultyBoxesProps){
     const {userHighscores} = useAuth();
-    //console.log(userHighscores);
+    console.log("user highscores in difficulty boxes", userHighscores);
     const difficulties: Difficulty[] = ['easy', 'medium', 'hard', 'impossible'];
     const getDifficultyDescription = (difficulty: keyof Highscores ): string => {
       let difficultyDescription;
@@ -29,22 +29,25 @@ export default function DifficultyBoxes({difficultyPicked, onDifficultyChoice, s
     } 
 
   return (
-    <div className="grid grid-cols-2 md:flex md:flex-row md:gap-6 gap-4 justify-center mt-8">
+    <div className="flex flex-row md:gap-6 gap-4 justify-center mt-8">
       {difficulties.map((difficulty) => (
         <Tooltip key={difficulty}>
           <TooltipTrigger asChild>
             <div
               onClick={() => onDifficultyChoice(difficulty)}
               className={`${style} flex flex-col items-center justify-center rounded-xl shadow-md cursor-pointer 
-                transition-all select-none
+                transition-all select-none text-center
                 ${difficultyPicked === difficulty 
                   ? "bg-letterboxd-green hover:opacity-85 text-white" 
-                  : "bg-white dark:text-black hover:bg-gray-300"}`}
+                  : "bg-white dark:text-black dark:hover:bg-gray-300 hover:bg-gray-400"
+                                                                       
+                }`} 
             >
-              <span className="text-lg font-semibold">{capitalizeFirst(difficulty)}</span>
-              {userHighscores && (
-                <span className="text-xl font-bold">
-                  <span className="relative -top-0.5">👑</span> {userHighscores[difficulty]}
+              <span className="text-[clamp(0.8rem,2vw,1.2rem)] font-semibold">{capitalizeFirst(difficulty)}</span>
+              {userHighscores !== null && (
+                <span className="flex items-center justify-center gap-1 font-bold sm:text-[clamp(0.9rem, 2.5vw, 1.3rem)] md:text-xl">
+                  <span>👑</span>
+                  <span>{userHighscores[difficulty]}</span>
                 </span>
               )}
             </div>
