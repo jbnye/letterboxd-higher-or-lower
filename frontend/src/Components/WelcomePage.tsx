@@ -44,19 +44,19 @@ export default function WelcomePage({ onStartGame }: WelcomePageProps) {
                         <DifficultyBoxes
                             onDifficultyChoice={(difficulty) => setDifficultyPicked(difficulty)}
                             difficultyPicked={difficultyPicked}
-                            style="w-24 h-24 p-3 md:w-28 md:h-28 l:w-32 l:h-32"
+                            style="w-17 h-17 p-3 sm:w-28 sm:h-28 l:w-32 l:h-32"
                         />
                     </div>
-                    <div className="flex flex-col w-full md:w-auto gap-4 mt-12  md:mt-6">
+                    <div className="flex flex-col w-[80%] sm:w-[15%] sm:min-w-[200px] gap-4 mt-6 sm:mt-8">
                         <button
                             onClick={() => onStartGame(difficultyPicked)}
-                            className="px-12 py-4 h-16 font-bold md:h-auto bg-letterboxd-blue text-white rounded hover:bg-[#1093ef]"
+                            className="p-2 h-12 font-bold md:h-auto text-2xl  bg-letterboxd-blue text-white rounded hover:bg-[#1093ef]"
                         >
                             Play
                         </button>
-                    </div>
-                    <div className="mt-10">
-                        {userHasBeenChecked === false ? <Spinner /> : (<GoogleSignInButton />)}
+                        <div className="mt-2">
+                            {userHasBeenChecked === false ? <Spinner /> : (<GoogleSignInButton />)}
+                        </div>
                     </div>
                 </>
             )}

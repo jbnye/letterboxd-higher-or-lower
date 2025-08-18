@@ -49,31 +49,34 @@ export default function GoogleSignInButton() {
                             //console.error("Login Failed");
                         }}
                     />
-                    ) : (
-                    <div className="flex items-center gap-2 bg-white p-2 rounded shadow">
-                        <img
+                ) : (
+                <div
+                    className="flex items-center justify-center text-sm gap-2 bg-white border border-gray-300 
+                            rounded-md px-3 py-2 shadow-sm hover:shadow-md transition"
+                >
+                    <img
                         src={user.picture}
                         alt="User avatar"
                         referrerPolicy="no-referrer"
-                        className="w-8 h-8 rounded-full"
-                        />
-                        <div className="text-black text-[12px] md:text-sm">
-                        Signed in as <strong>{user?.email}</strong>
-                        </div>
-                        <button
-                        onClick={() => {
-                            logout();
-                            setUser(null);
-                            setAuthStatus("not-authenticated");
-                        }}
-                        className="ml-2 px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
-                        >
+                        className="w-5 h-5 rounded-full"
+                    />
+                    <span className=" text-gray-700 truncate max-w-[150px]">
+                    {user?.email}
+                    </span>
+                    <div className="w-px h-4 bg-gray-300 mx-1"></div>
+                    <button
+                    onClick={() => {
+                        logout();
+                        setUser(null);
+                        setAuthStatus("not-authenticated");
+                    }}
+                    className=" text-blue-600 hover:underline cursor-pointer"
+                    >
                         Logout
-                        </button>
-                    </div>
-                    )
-                }
+                    </button>
+                </div>
+                )}
             </div>
         </>
-    )
+    );
 }

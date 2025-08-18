@@ -146,9 +146,9 @@ export default function LeaderboardPage() {
                             setDifficultySelected(difficulty);
                         }} 
                         difficultyPicked={difficultySelected} 
-                        style={"w-24 h-24"}
+                        style="w-17 h-17 p-3 sm:w-28 sm:h-28 l:w-32 l:h-32"
                     />
-                    <div className="flex flex-col my-3 w-full sm:w-3/5 md:w-2/5 lg:w-1/3 mx-auto">
+                    <div className="flex flex-col my-3 w-full sm:w-3/5 md:w-2/5 lg:w-1/3 mx-auto border-t-1 border-letterboxd-dark-blue dark:border-letterboxd-blue">
                         {top10 && top10.map((entry, index) => (
                             <div
                                 key={index}

@@ -15,9 +15,10 @@ interface TimeLimitProps {
     onTimeout: () => void,
     animationIsPlaying: boolean,
     setShouldPulse: (shouldPulse: boolean)=> void,
+    isImagesLoaded: boolean[],
 }
     const TOTAL_TIME = 10.5;
-export default function TimeLimit({ films, onTimeout, animationIsPlaying, setShouldPulse}: TimeLimitProps) {
+export default function TimeLimit({ films, onTimeout, animationIsPlaying, setShouldPulse, isImagesLoaded}: TimeLimitProps) {
     const [time, setTime] = useState<number>(TOTAL_TIME);
     const { breakpoint } = useThemeContext();
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -30,7 +31,7 @@ export default function TimeLimit({ films, onTimeout, animationIsPlaying, setSho
     const strokeColor = time >= 7.0 ? "#40bcf4" : time >= 4 ? "#ff8000" : "#f70000";
 
     useEffect(() => {
-        if (animationIsPlaying) return;
+        if (!isImagesLoaded.every(Boolean) || animationIsPlaying) return;
         if (intervalRef.current) clearInterval(intervalRef.current);
         startTimeRef.current = Date.now();
 
@@ -48,7 +49,7 @@ export default function TimeLimit({ films, onTimeout, animationIsPlaying, setSho
         return () => {
             if (intervalRef.current) clearInterval(intervalRef.current);
         };
-    }, [films, animationIsPlaying]);
+    }, [films, isImagesLoaded, animationIsPlaying]);
 
     useEffect(() => {
         if (time <= 4.0) {

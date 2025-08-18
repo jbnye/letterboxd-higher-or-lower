@@ -17,9 +17,10 @@ interface WrongOrRightProps {
     films: getFilmsResponse[],
     onTimeout: () => void,
     setShouldPulse: (shouldPulse: boolean) => void,
+    isImagesLoaded: boolean[],
 }
 
-export default function WrongOrRight({ratingColor, animationIsPlaying, films, onTimeout, setShouldPulse}: WrongOrRightProps ) {
+export default function WrongOrRight({ratingColor, animationIsPlaying, films, onTimeout, setShouldPulse, isImagesLoaded}: WrongOrRightProps ) {
     const {breakpoint} = useThemeContext();
     return (
         <>
@@ -82,6 +83,7 @@ export default function WrongOrRight({ratingColor, animationIsPlaying, films, on
                     animationIsPlaying={animationIsPlaying}
                     onTimeout={onTimeout}
                     setShouldPulse={setShouldPulse}
+                    isImagesLoaded={isImagesLoaded}
                 />
                 </div>
             ) : null}
