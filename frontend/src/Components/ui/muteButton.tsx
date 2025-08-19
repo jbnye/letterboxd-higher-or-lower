@@ -9,8 +9,21 @@ export default function MuteButton({}){
 
     return (
         <>
-        <button onClick={() => setIsSoundOn(!isSoundOn)}
-          className="p-0 m-0 border-none outline-none cursor-pointer inline-flex items-center justify-center">
+        <div
+            role="button"
+            tabIndex={0}
+            onClick={(e) => {
+                e.stopPropagation(); // prevent triggering parent FilmBox button
+                setIsSoundOn(!isSoundOn);
+            }}
+            onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setIsSoundOn(!isSoundOn);
+                }
+            }}
+            className="p-0 m-0 cursor-pointer inline-flex items-center justify-center"
+            >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 36 36"
@@ -27,7 +40,7 @@ export default function MuteButton({}){
                     />
                 )}
             </svg>
-        </button>
+        </div>
         </>
     )
 }
