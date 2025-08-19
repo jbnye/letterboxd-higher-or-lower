@@ -83,7 +83,7 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
                     //inHouseURL: `${baseURL}/posters/${newFilmData.slug}.jpg`
                     inHouseURL: `${process.env.POSTER_BASE_URL}/${newFilmData.slug}.jpg`
                 }
-                const score: number = await handleGameId(gameId, true, filmIds, newFilm.id, ranSelectedToRemove);
+                const score: number = await handleGameId(gameId, true, filmIds, newFilm.id, ranSelectedToRemove, user);
                 res.status(200).json({
                     success: true,
                     correctChoice: correctChoice,
@@ -100,12 +100,12 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
             }
             else{
                 const score: number = await handleGameId(gameId, false);
-                let highscore: boolean | undefined;
+                let isHighscore: boolean | undefined;
                 let highscores: Highscores | undefined;
                 const timeout = choice===-1 ? true: false;
                 
                 if(user){
-                    ({highscores, highscore} = await setHighScore(user, score, difficulty));
+                    ({highscores, isHighscore} = await setHighScore(user, score, difficulty));
                 }
                 console.log(
                     {success: false,
@@ -115,7 +115,7 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
                         film2: [film2Data.slug, film2Data.averagerating]
                     },
                     score: score,
-                    highscore: highscore,
+                    isHighscore: isHighscore,
                     highscores: highscores,
                     timeout: timeout
                 })
@@ -127,8 +127,8 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
                         film2: [film2Data.slug, film2Data.averagerating]
                     },
                     score: score,
-                    ...(highscore !== undefined && {highscore: highscore}),
-                    ...(highscores !== undefined && {highscores: highscore}),
+                    ...(isHighscore !== undefined && {isHighscore: isHighscore}),
+                    ...(highscores !== undefined && {highscores: highscores}),
                     ...(timeout === true && {timeout: true}),
                 })
                 return;
@@ -146,7 +146,7 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
 }
 
 
-const handleGameId = async (gameId: string, correctGuess: boolean, filmIds?: number[], newFilmId?: number, ranSelectedToRemove?: number) => {
+const handleGameId = async (gameId: string, correctGuess: boolean, filmIds?: number[], newFilmId?: number, ranSelectedToRemove?: number, user?: any ) => {
     console.log("checking redis for gameId");
     const dataRaw = await redisClient.get(`gameId:${gameId}`);
     if(!dataRaw){
@@ -156,6 +156,10 @@ const handleGameId = async (gameId: string, correctGuess: boolean, filmIds?: num
     const data = JSON.parse(dataRaw);
     const currentScore = data.score;
     if(correctGuess === true && filmIds){
+        let TLL = 600;
+        if(user) {
+            TLL = 20;
+        }
         const newGuessDeadline = Date.now() + 10700;
         const filmId1 = data.films[0];
         const filmId2 = data.films[1];
@@ -170,10 +174,9 @@ const handleGameId = async (gameId: string, correctGuess: boolean, filmIds?: num
         } else{
             data.films[1] = newFilmId;
         }
-        await redisClient.set(`gameId:${gameId}`, JSON.stringify(data), {EX: 20});
+        await redisClient.set(`gameId:${gameId}`, JSON.stringify(data), {EX: TLL});
     }
     else{
-        await redisClient.del(`gameId:${gameId}`);
         return currentScore; 
     }
 

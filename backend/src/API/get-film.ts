@@ -19,7 +19,7 @@ function getDifficulty(difficulty: string): number{
 
 const getFilmsHandler: RequestHandler = async (req, res) => {
     const {difficulty} = req.body;
-    const {userSub} = req.body;
+    const {user} = req.body;
     const baseURL = `${req.protocol}://${req.get('host')}`;
     const diff = difficulty.toLowerCase();
     const client = await pool.connect();
@@ -69,7 +69,7 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
                 //inHouseURL: `${baseURL}/posters/${film2Data.slug}.jpg`  
                 inHouseURL: `${process.env.POSTER_BASE_URL}/${film2Data.slug}.jpg`
             }
-            const gameId: string = await createGameToRedis(userSub, diff, film1.id, film2.id);
+            const gameId: string = await createGameToRedis(user?.sub, diff, film1.id, film2.id);
             console.log("Fetched two films from cache: ", film1, film2);
             res.json({ newFilms: [film1, film2], gameId});
             return;
@@ -151,7 +151,7 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
                 inHouseURL: `${baseURL}/posters/${film2Row.slug}.jpg`
                 // isTop250: film2Row.istop2502
             };
-            const gameId: string = await createGameToRedis(userSub, diff, film1.id, film2.id);
+            const gameId: string = await createGameToRedis(user?.sub, diff, film1.id, film2.id);
             console.log("Fetched two films: ", film1, film2);
             res.json({ newFilms: [film1, film2], gameId });
         } catch (error){
@@ -170,6 +170,10 @@ export default router;
 
 const createGameToRedis = async (userSub: string, difficulty: string, filmId1: number, filmId2: number) => {
     const gameId = uuidv4();
+    let TTL = 600;
+    if(userSub){
+        TTL = 20;
+    }
     console.log(`MAKING GAMEID IN REDIS: ${gameId}`);
     await redisClient.set(
         `gameId:${gameId}`,
@@ -180,7 +184,7 @@ const createGameToRedis = async (userSub: string, difficulty: string, filmId1: n
             films: [filmId1, filmId2],
             guessDeadline: Date.now() + 10700,
         }),
-        {EX: 20}
+        {EX: TTL}
     );
     return gameId;
 }

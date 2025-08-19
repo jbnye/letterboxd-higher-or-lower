@@ -18,8 +18,8 @@ export const timeout: RequestHandler = async (req,res) => {
         return res.status(400).json(`NO USER IN GAMEID`);
     }
     const {sub, score, difficulty} = gameData
-    const {highscore} = await setHighScore(sub, score, difficulty);
-    return res.json({highscore});
+    const {isHighscore} = await setHighScore(sub, score, difficulty);
+    return res.json({isHighscore});
 
 
 }

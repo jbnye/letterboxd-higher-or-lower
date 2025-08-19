@@ -1,16 +1,20 @@
 import {redisClient} from  '../../redis';
 import pool from "../../database/db";
 import { Highscores, user } from '../../helperFunctions';
+import { loadLeaderboard } from '../../redis';
 type Difficulty = keyof Highscores; 
 
-export default async function setHighScore(user: user, score: number, difficulty: Difficulty): Promise<{ highscores?: Highscores; highscore: boolean, }>{
+export default async function setHighScore(user: user, score: number, difficulty: Difficulty):
+ Promise<{ highscores?: Highscores; isHighscore: boolean, previousHighscore?: number,  }>{
 
     const highscores_raw = await redisClient.get(`user:highscores:${user.sub}`);
     let highscores: Highscores | undefined;
-    let highscore: boolean = false
+    let isHighscore: boolean = false
+    let previousHighscore: number | undefined;
     if(highscores_raw){
         try{
             highscores = JSON.parse(highscores_raw);
+            previousHighscore = highscores![difficulty]; 
             if(score > highscores![difficulty]){
                 const client = await pool.connect()
                 highscores![difficulty] = score;
@@ -26,20 +30,18 @@ export default async function setHighScore(user: user, score: number, difficulty
                         `,
                         [user.sub, difficulty.toLowerCase(), score]);
                     const updatedScore = result.rows[0]?.score;
-                    highscore = updatedScore === score;
-                    await redisClient.hSet(`userData:${user.sub}`, {
-                        name: user.name,
-                        picture: user.picture,
-                        email: user.email,
-                    });
-                    console.log(`${user.sub} highscore: ${highscore}`);
+                    isHighscore = updatedScore === score;
+                    console.log(`${user.sub} highscore: ${isHighscore}`);
                     console.log(`current score: ${score} - updatedScore? = ${updatedScore}`);
 
-                    await redisClient.zAdd(`leaderboard:${difficulty}`, {
-                        score,
-                        value: user.sub,
-                    });
-                    await redisClient.zRemRangeByRank(`leaderboard:${difficulty}`, 10, -1);
+                    const top10raw = await redisClient.get(`leaderboard:${difficulty}`);
+                    if(top10raw){
+                        const top10 = JSON.parse(top10raw);
+                        if (!top10 || top10.length < 10 || (top10.length === 10 && top10[9].score < updatedScore)) {
+                            console.log("NEED TO UPDATE ELADERBOARD");
+                            await loadLeaderboard();
+                        }
+                    }
                 } catch (error) {
                     console.error("ERROR in updateLeaderboard ", error);
                 } finally{
@@ -52,5 +54,5 @@ export default async function setHighScore(user: user, score: number, difficulty
     }else{
         console.error(`ERROR CANNOT FIND user:highscores:${user.sub}`);
     }
-    return { highscores, highscore };
+    return { highscores, isHighscore, previousHighscore };
 }

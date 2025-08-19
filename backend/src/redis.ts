@@ -45,9 +45,10 @@ async function loadFilms(){
     }
 }
 
-async function loadLeaderboard() {
+export async function loadLeaderboard() {
     const client = await pool.connect();
-    try{
+
+    try {
         const leaderboardQuery = `
         SELECT * FROM
         (
@@ -61,9 +62,15 @@ async function loadLeaderboard() {
             WHERE l.score > 0
         ) AS ranked
         WHERE rank <= 10;`;
-        const leaderboardResults = await client.query(leaderboardQuery);
-        //console.log(leaderboardResults.rows);
-        const rows = leaderboardResults.rows;
+
+        const { rows } = await client.query(leaderboardQuery);
+
+        const leaderboardMap: Record<Difficulty, any[]> = {
+            easy: [],
+            medium: [],
+            hard: [],
+            impossible: [],
+        };
 
         const groupedByDifficulty: Record<Difficulty, typeof rows> = {
             easy: [],
@@ -73,36 +80,29 @@ async function loadLeaderboard() {
         };
 
         for (const row of rows) {
-            groupedByDifficulty[row.difficulty as Difficulty].push(row);
-            await redisClient.hSet(`userData:${row.googlesub}`,{
-                name: row.name,
-                picture: row.picture,
-                email: row.email,
-            });
-            // console.log("Writing user data key:", `userData:${row.googlesub}`);
-            // console.log(await redisClient.hGetAll(`userData:${row.googlesub}`));
-            //await redisClient.expire(`userData:${row.googleSub}`, 60 * 60 * 24);
-        }
-
-        for(const difficulty of Object.keys(groupedByDifficulty) as Difficulty[]){
-            const rows = groupedByDifficulty[difficulty];
-            const entries = rows
-            .filter(row => row.googlesub != null && row.score != null)
-            .map(row => ({
-                score: row.score,
-                value: row.googlesub.toString(),
-            }));
-            
-            await redisClient.del(`leaderboard:${difficulty}`);
-            if (entries.length > 0) {
-                await redisClient.zAdd(`leaderboard:${difficulty}`, entries);
+            const diff = row.difficulty.toLowerCase() as Difficulty; // normalize
+            if (groupedByDifficulty[diff]) {
+                groupedByDifficulty[diff].push(row);
             }
         }
 
-    } catch (error){
-        console.error("Failed to load leaderboard:", error);
-    }
-    finally{
+        for (const difficulty of Object.keys(groupedByDifficulty) as Difficulty[]) {
+            const leaderboardArray = groupedByDifficulty[difficulty].map(row => ({
+                score: row.score,
+                //googleSub: row.googlesub
+                name: row.name,
+                picture: row.picture,
+                //email: row.email,
+            }));
+
+            await redisClient.set(
+                `leaderboard:${difficulty}`,
+                JSON.stringify(leaderboardArray),
+                { EX: 60 * 60 * 24 }
+            );
+        }
+         console.log("Leaderboard cached in Redis!");
+    } finally {
         client.release();
     }
 }

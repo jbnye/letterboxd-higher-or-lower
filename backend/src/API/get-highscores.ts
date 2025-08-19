@@ -6,6 +6,7 @@ const router = Router();
 
 
 export const getHighscores: RequestHandler = async (req,res) => {
+    //console.log("ENTERING GET HIGHSCORES NOW");
     const userSub = req.query.userSub as string;
     if (!userSub) {
         console.log("no userSub");
@@ -14,7 +15,7 @@ export const getHighscores: RequestHandler = async (req,res) => {
     try{
         const highscore_results_RAW = await redisClient.get(`user:highscores:${userSub}`);
         if (highscore_results_RAW) {
-            console.log(highscore_results_RAW);
+            console.log("user already in cache sending cached highscores for user", highscore_results_RAW);
             const highscore_results = JSON.parse(highscore_results_RAW);
             return res.json({ highscores: highscore_results }); 
         }
@@ -38,20 +39,16 @@ export const getHighscores: RequestHandler = async (req,res) => {
             impossible: 0,
         };
 
-        for (const row of rows) {
-            const { difficulty, score } = row;
-            if (difficulty in highscores) {
-                highscores[difficulty as keyof Highscores] = score;
+        if (rows.length > 0) {
+            for (const row of rows) {
+                const { difficulty, score } = row;
+                if (difficulty in highscores) {
+                    highscores[difficulty as keyof Highscores] = score;
+                }
             }
         }
-
-        if (rows.length > 0) {
-            await redisClient.set(
-                `user:highscores:${userSub}`,
-                JSON.stringify(highscores),
-                { EX: 86400} 
-            );
-        }
+        console.log(`setting user highscores in redis->user:highscores:${userSub}`);
+        await redisClient.set(`user:highscores:${userSub}`, JSON.stringify(highscores), { EX: 86400} )
         return res.json({highscores});
     } catch (error){
         console.error("Failed to retrieve highscores form user with DB", error);
