@@ -26,7 +26,7 @@ export const ThemeStatusProvider = ({children}: {children: React.ReactNode}) => 
     useEffect(()=> {
         const checkBreakpoint = () => {
             const width = window.innerWidth;
-            if(width <= 640) setBreakpoint("mobile");
+            if(width <= 767) setBreakpoint("mobile");
             else if(width<=1024) setBreakpoint("tablet");
             else setBreakpoint("desktop");
         }

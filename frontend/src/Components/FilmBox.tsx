@@ -55,8 +55,8 @@ export default function FilmBox({ film, index, handleGuess, filmDisplayState, an
   //w-full h-full p-0 border-none bg-none flex items-center justify-center
     
   return( 
-    <div className='h-screen'>
-      <button value={1} onClick={() => handleGuess(index)} className="p-0 flex border-none bg-none h-full w-full md:w-auto items-center relative ">
+    <>
+    <button value={1} onClick={() => handleGuess(index)} className="p-0 flex border-none bg-none h-full w-full md:w-auto items-center relative ">
       {!isImageLoaded ? (
         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
           <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -66,9 +66,8 @@ export default function FilmBox({ film, index, handleGuess, filmDisplayState, an
           <img
             src={imgSrc}
             onError={() => setImgSrc(film.posterurl)}
-            className={`h-full  max-w-[620px] w-full md:w-auto hover:brightness-75 transform transition-transform duration-500 ${
-              index === 0 ? "animate-slide-in-down" : "animate-slide-in-up"
-            }`}
+            className={`h-full md:h-screen w-full md:w-auto max-w-full hover:brightness-75 transform transition-transform duration-500
+               ${index === 0 ? "animate-slide-in-down" : "animate-slide-in-up"}`}
             alt={film.title}
           />
           <div
@@ -86,7 +85,7 @@ export default function FilmBox({ film, index, handleGuess, filmDisplayState, an
               className={`
                 absolute border-1 border-white bottom-[20%] md:bottom-[30%] lg:bottom-[35%] 
                 left-1/2 translate-x-[-50%] translate-y-1/2 bg-black p-2 shadow-[8px_8px_15px_rgba(0,0,0,0.5)] 
-                transition-opacity duration-300 text-[18px] md:text-[20px] lg:text-[22px]
+                transition-opacity duration-300 text-[12px] sm:text-[16px] md:text-[20px] lg:text-[22px]
                 flex items-center justify-center text-center rounded`}
             >
               {filmDisplayState.status === "animating" && animationIsPlaying === true ? (
@@ -138,7 +137,7 @@ export default function FilmBox({ film, index, handleGuess, filmDisplayState, an
         </>
       )}
         {((index === 1) && (breakpoint !=="mobile")) ? (
-          <div className="absolute right-1 top-1 z-50 dark:bg-black rounded-full bg-white p-0 m-0 items-center w-8 h-8">
+          <div className="absolute right-2 top-2 z-50 dark:bg-black rounded-full bg-white p-0 m-0 items-center w-8 h-8">
             <MuteButton />
             </div> 
         ) :
@@ -149,7 +148,7 @@ export default function FilmBox({ film, index, handleGuess, filmDisplayState, an
         )
         }
       </button>
-    </div>
+    </>
   )
 
 }

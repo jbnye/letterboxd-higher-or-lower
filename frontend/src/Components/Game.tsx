@@ -311,7 +311,7 @@ export default function Game({difficulty, onLose}: GameProps){
         handleGuess(-1);
         setTimeout(() => {
             if (checkGuessData?.highscores) {
-                console.log("user highscores", checkGuessData.highscores);
+                //console.log("user highscores", checkGuessData.highscores);
                 setUserHighscores(checkGuessData.highscores);
                 const prevHighscoreSnapshot = userHighscores?.[difficulty]; 
                 onLose(score,  gameId, prevHighscoreSnapshot);
@@ -379,55 +379,57 @@ export default function Game({difficulty, onLose}: GameProps){
     }
     //console.log(showRatings);
     return (
-        <div className="flex flex-col md:flex-row relative w-full h-screen
-            bg-gradient-to-b from-letterboxd-lighter-gray to-letterboxd-light-gray
+
+        <div className="flex flex-col md:flex-row relative w-full h-screen bg-gradient-to-b
+            from-letterboxd-lighter-gray to-letterboxd-light-gray
             dark:from-letterboxd-background dark:to-letterboxd-dark-background-blue">
-            <div className="flex flex-col md:flex-row relative w-full h-screen">
-                <div
-                className={`absolute  w-full left-1/2 -translate-x-1/2 h-screen pointer-events-none transition-all duration-300
-                    ${shouldPulse ? 'breathe' : ''} ${showBorder ? `border-8 ${classColor}` : ''} p-[10px] z-60`}>   
+
+            <div className="relative flex flex-col md:flex-row w-full md:w-auto h-screen mx-auto my-auto">
+
+            <div className={`absolute inset-0 pointer-events-none transition-all duration-300 
+                 ${shouldPulse ? "breathe" : ""} ${showBorder ? `border-8 ${classColor}` : ""} z-50`}>
             </div>
                 {/* Left Image */}
-                <div className="w-full md:w-1/2 h-1/2 md:h-full flex justify-center md:justify-end items-center">
-                    {!isImageLoaded[1] ? (
+                <div className="w-full md:w-full h-1/2 md:h-screen flex justify-center md:justify-end items-center">
+                    {!isImageLoaded[0] ? (
                         <div className="m-15">
                             <Spinner />
                         </div>
                     ) : (
-                    <FilmBox
-                        key={film1.id}
-                        film={film1}
-                        index={0}
-                        handleGuess={handleGuess}
-                        filmDisplayState={filmDisplayStates[0]}
-                        animationIsPlaying={animationIsPlaying}
-                        setFilmDisplayStates={setFilmDisplayStates}
-                        ratingColor={ratingColor}
-                        choice={choice}
-                        isImageLoaded={isImageLoaded[0]}
-                    />
+                        <FilmBox
+                            key={film1.id}
+                            film={film1}
+                            index={0}
+                            handleGuess={handleGuess}
+                            filmDisplayState={filmDisplayStates[0]}
+                            animationIsPlaying={animationIsPlaying}
+                            setFilmDisplayStates={setFilmDisplayStates}
+                            ratingColor={ratingColor}
+                            choice={choice}
+                            isImageLoaded={isImageLoaded[0]}
+                        />
                     )}
                 </div>
             
                 {/* Right Image */}
-                <div className="w-full md:w-1/2 h-1/2 md:h-full flex justify-center md:justify-start items-center">
+                <div className="w-full md:w-full h-1/2 md:h-screen flex justify-center md:justify-start items-center">
                     {!isImageLoaded[1] ? (
                         <div className="m-15">
                             <Spinner />
                         </div>
                     ) : (
-                    <FilmBox
-                        key={film2.id}
-                        film={film2}
-                        index={1}
-                        handleGuess={handleGuess}
-                        filmDisplayState={filmDisplayStates[1]}
-                        animationIsPlaying={animationIsPlaying}
-                        setFilmDisplayStates={setFilmDisplayStates}
-                        ratingColor={ratingColor}
-                        choice={choice}
-                        isImageLoaded={isImageLoaded[1]}
-                    />
+                        <FilmBox
+                            key={film2.id}
+                            film={film2}
+                            index={1}
+                            handleGuess={handleGuess}
+                            filmDisplayState={filmDisplayStates[1]}
+                            animationIsPlaying={animationIsPlaying}
+                            setFilmDisplayStates={setFilmDisplayStates}
+                            ratingColor={ratingColor}
+                            choice={choice}
+                            isImageLoaded={isImageLoaded[1]}
+                        />
                     )}
                 </div>
             </div>
@@ -445,14 +447,14 @@ export default function Game({difficulty, onLose}: GameProps){
             <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 border-solid-black text-black text-[12px] md:text-[14px]
             font-semibold border-4 flex flex-col items-center justify-center z-50 bg-white
             text-center shadow-[8px_8px_15px_rgba(0,0,0,0.5)] sm:max-w-[70vw] md:max-w-[50vw] rounded">
-            <span>
-                Score: {score} <span className="relative -top-0.5">{user && userHighscores && (score > prevHighscore!) &&` 👑`}</span>
-            </span>
-            {((user) && (userHighscores) && (prevHighscore !== undefined)) && (
                 <span>
-                Highscore: {score < prevHighscore ? prevHighscore : score}
+                    Score: {score} <span className="relative -top-0.5">{user && userHighscores && (score > prevHighscore!) &&` 👑`}</span>
                 </span>
-            )}
+                {((user) && (userHighscores) && (prevHighscore !== undefined)) && (
+                    <span>
+                    Highscore: {score < prevHighscore ? prevHighscore : score}
+                    </span>
+                )}
             </div>
 
         </div>
