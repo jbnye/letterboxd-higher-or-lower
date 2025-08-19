@@ -48,11 +48,12 @@ export default function GoogleSignInButton() {
                         onError={() => {
                             //console.error("Login Failed");
                         }}
+                        width="100%" 
                     />
                 ) : (
                 <div
                     className="flex items-center justify-center text-sm gap-2 bg-white border border-gray-300 
-                            rounded-md px-3 py-2 shadow-sm hover:shadow-md transition"
+                            rounded-md px-3 py-2 h-12 shadow-sm hover:shadow-md transition"
                 >
                     <img
                         src={user.picture}
