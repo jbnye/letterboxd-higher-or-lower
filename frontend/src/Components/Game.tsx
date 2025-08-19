@@ -4,13 +4,19 @@ import {Spinner} from "../UI/spinner.tsx";
 import FilmBox from "./FilmBox.tsx";
 import { useAuth } from "../Context/UserContext.tsx";
 import WrongOrRight from "./WrongOrRight.tsx";
-import { playDefeatSound, playTimeoutSound } from "@/Util/utilityFunctions.ts";
+import { playDefeatSound, playTimeoutSound, playCorrectSound, playHighscoreSound } from "@/Util/utilityFunctions.ts";
 import { useGameStatus } from "@/Context/GameStatus.tsx";
+import { useThemeContext } from "@/Context/ThemeStatus.tsx";
+
 
 
 interface GameProps{
-    difficulty: Difficulty,
-    onLose: (score: number, prevHighscore: number | undefined,) => void
+    difficulty: Difficulty;
+    onLose: (
+        score: number,
+        gameId: string,
+        prevHighscoreSnapshot: number |undefined,
+    ) => void;
 }
 
 interface getFilmsResponse {
@@ -49,21 +55,23 @@ interface CheckGuessResponse {
     inHouseURL: string;
     };
     score: number;
-    highscore?: number;
+    isHighscore?: number;
     highscores?: Highscores;
     timeout?: boolean;
 }
 
 
 export default function Game({difficulty, onLose}: GameProps){
+    const {setGameStatus} = useGameStatus();
+    const {isSoundOn} = useThemeContext();
     const [score, setScore] = useState<number>(0);
     const [animationIsPlaying, setAnimationIsPlaying] = useState<boolean>(false);
+    const [isImageLoaded, setIsImageLoaded] = useState<boolean[]>([false,false]);
     const [films, setFilms] = useState<getFilmsResponse[]>([]);
     // const [filmRatings, setFilmRatings] = useState<number[]>([0,0]);
     const [checkGuessData, setCheckGuessData] = useState<CheckGuessResponse | null>(null);
     const [gameId, setGameId] = useState<string>("");
     const [ratingColor, setRatingColor] = useState<ColorState>("none");
-    const {setGameStatus} = useGameStatus();
     const [filmDisplayStates, setFilmDisplayStates] = useState<FilmDisplayState[]>([
         { trueRating: 0, displayedRating: 0, status: "secret" },
         { trueRating: 0, displayedRating: 0, status: "secret" },
@@ -73,6 +81,9 @@ export default function Game({difficulty, onLose}: GameProps){
     const [choice, setChoice] = useState<number>(-1);
     const isLoading = films.length !== 2;
     const prevHighscore = userHighscores?.[difficulty];
+
+    // console.log("prev highscore ",prevHighscore)
+    // console.log("userHighscores for easy diffuclty ",userHighscores?.[difficulty]);
     //console.log("guess data:", checkGuessData);
     //console.log("film data:",filmDisplayStates);
     //console.log("COLOR RATING", ratingColor);
@@ -98,16 +109,17 @@ export default function Game({difficulty, onLose}: GameProps){
                 });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
-                await Promise.all(
-                    data.newFilms.map((film: any) => {
-                        return new Promise<void>((resolve) => {
-                            const img = new Image();
-                            img.src = film.inHouseURL;
-                            img.onload = () => resolve();
-                            img.onerror = () => resolve(); // still resolve so the game can start even if an image fails
-                        });
-                    })
+                const loadedStates = await Promise.all(
+                data.newFilms.map((film: any) => {
+                    return new Promise<boolean>((resolve) => {
+                    const img = new Image();
+                    img.src = film.inHouseURL;
+                    img.onload = () => resolve(true);   // resolves true if image loads
+                    img.onerror = () => resolve(false); // resolves false if image fails
+                    });
+                })
                 );
+                setIsImageLoaded(loadedStates);
                 setFilms(data.newFilms);
                 setGameId(data.gameId);
             } catch (error: any) {
@@ -185,17 +197,30 @@ export default function Game({difficulty, onLose}: GameProps){
         let choiceAnswer: ColorState = "none";
         choice === checkGuessData?.correctChoice ? choiceAnswer = "correct" : choiceAnswer = "incorrect";
         setRatingColor(choiceAnswer);
-        if((choiceAnswer === "incorrect") && (choice !== -1)){
+        if((choiceAnswer === "incorrect") && (choice !== -1) && (isSoundOn)){
             playDefeatSound();
+        }
+        if(choiceAnswer === "correct" && (isSoundOn)){
+            if((user && userHighscores) && (score === prevHighscore!)){
+                playHighscoreSound();
+            }
+            else{
+                playCorrectSound();
+            }
         }
         const timer = setTimeout(() => {
             if (checkGuessData?.success) {
                 handleReplaceFilm();
             } else {
-                onLose(score, prevHighscore);
                 if (checkGuessData?.highscores) {
-                    //console.log("user highscores", checkGuessData.highscores);
+                    //console.log("highscores from backend", checkGuessData.highscores);
                     setUserHighscores(checkGuessData.highscores);
+                    const prevHighscoreSnapshot = userHighscores?.[difficulty]; 
+                    onLose(score, gameId, prevHighscoreSnapshot);
+                }
+                else{
+                    const prevHighscoreSnapshot = userHighscores?.[difficulty]; 
+                    onLose(score, gameId, prevHighscoreSnapshot);
                 }
             }
             setRatingColor("none");
@@ -216,7 +241,29 @@ export default function Game({difficulty, onLose}: GameProps){
             const updatedList = [...prev];
             updatedList[replacedIndex] = newFilm;
             return updatedList;
-        })
+        });
+        setIsImageLoaded((prev) => {
+            const updated = [...prev];
+            updated[replacedIndex] = false;
+            return updated;
+        });
+
+        const img = new Image();
+        img.src = newFilm.inHouseURL;
+        img.onload = () => {
+            setIsImageLoaded((prev) => {
+                const updated = [...prev];
+                updated[replacedIndex] = true;
+                return updated;
+            });
+        };
+        img.onerror = () => {
+            setIsImageLoaded((prev) => {
+                const updated = [...prev];
+                updated[replacedIndex] = true;
+                return updated;
+            });
+        };
 
         // setFilmRatings((prev) => {
         //     const updatedList = [...prev];
@@ -260,13 +307,17 @@ export default function Game({difficulty, onLose}: GameProps){
     async function onTimeout() {
         setAnimationIsPlaying(true);
         //setIsTimeout(true);
-        playTimeoutSound();
+        if(isSoundOn) playTimeoutSound();
         handleGuess(-1);
         setTimeout(() => {
-            onLose(score, prevHighscore);
             if (checkGuessData?.highscores) {
                 console.log("user highscores", checkGuessData.highscores);
                 setUserHighscores(checkGuessData.highscores);
+                const prevHighscoreSnapshot = userHighscores?.[difficulty]; 
+                onLose(score,  gameId, prevHighscoreSnapshot);
+            } else{
+                const prevHighscoreSnapshot = userHighscores?.[difficulty]; 
+                onLose(score, gameId, prevHighscoreSnapshot);
             }
         }, 5000);
     }
@@ -328,48 +379,82 @@ export default function Game({difficulty, onLose}: GameProps){
     }
     //console.log(showRatings);
     return (
-        <div className="flex flex-col md:flex-row relative w-full h-screen bg-gradient-to-b from-letterboxd-lighter-gray to-letterboxd-light-gray
-        dark:from-letterboxd-background dark:to-letterboxd-dark-background-blue">
-        <div
-            className={`absolute w-full h-screen pointer-events-none transition-all duration-300
-                ${shouldPulse ? 'breathe' : ''} ${showBorder ? `border-8 ${classColor}` : ''} p-[10px] z-60`}>   
+        <div className="flex flex-col md:flex-row relative w-full h-screen
+            bg-gradient-to-b from-letterboxd-lighter-gray to-letterboxd-light-gray
+            dark:from-letterboxd-background dark:to-letterboxd-dark-background-blue">
+            <div className="flex flex-col md:flex-row relative w-full h-screen">
+                <div
+                className={`absolute  w-full left-1/2 -translate-x-1/2 h-screen pointer-events-none transition-all duration-300
+                    ${shouldPulse ? 'breathe' : ''} ${showBorder ? `border-8 ${classColor}` : ''} p-[10px] z-60`}>   
+            </div>
+                {/* Left Image */}
+                <div className="w-full md:w-1/2 h-1/2 md:h-full flex justify-center md:justify-end items-center">
+                    {!isImageLoaded[1] ? (
+                        <div className="m-15">
+                            <Spinner />
+                        </div>
+                    ) : (
+                    <FilmBox
+                        key={film1.id}
+                        film={film1}
+                        index={0}
+                        handleGuess={handleGuess}
+                        filmDisplayState={filmDisplayStates[0]}
+                        animationIsPlaying={animationIsPlaying}
+                        setFilmDisplayStates={setFilmDisplayStates}
+                        ratingColor={ratingColor}
+                        choice={choice}
+                        isImageLoaded={isImageLoaded[0]}
+                    />
+                    )}
                 </div>
-            {/* Left Image Container */}
-            <div className="w-full md:w-1/2 h-1/2 md:h-full flex justify-center md:justify-end items-center">
-                {isLoading ? (
-                <Spinner />
-                ) : (
-                <>
-                    <FilmBox  key={film1.id} film={film1} index={0} handleGuess={handleGuess}  filmDisplayState={filmDisplayStates[0]} animationIsPlaying={animationIsPlaying} setFilmDisplayStates={setFilmDisplayStates} ratingColor={ratingColor} choice={choice}/>
-
-                </>
-                )}
+            
+                {/* Right Image */}
+                <div className="w-full md:w-1/2 h-1/2 md:h-full flex justify-center md:justify-start items-center">
+                    {!isImageLoaded[1] ? (
+                        <div className="m-15">
+                            <Spinner />
+                        </div>
+                    ) : (
+                    <FilmBox
+                        key={film2.id}
+                        film={film2}
+                        index={1}
+                        handleGuess={handleGuess}
+                        filmDisplayState={filmDisplayStates[1]}
+                        animationIsPlaying={animationIsPlaying}
+                        setFilmDisplayStates={setFilmDisplayStates}
+                        ratingColor={ratingColor}
+                        choice={choice}
+                        isImageLoaded={isImageLoaded[1]}
+                    />
+                    )}
+                </div>
             </div>
-
-            {/* Right Image*/}
-            <div className="w-full md:w-1/2 h-1/2 md:h-full flex justify-center md:justify-start items-center">
-                {isLoading ? (
-                <Spinner />
-                ) : (
-                <>
-                    <FilmBox  key={film2.id} film={film2} index={1} handleGuess={handleGuess}  filmDisplayState={filmDisplayStates[1]} animationIsPlaying={animationIsPlaying} setFilmDisplayStates={setFilmDisplayStates} ratingColor={ratingColor} choice={choice}/>
-                </>
-                )}
-            </div>
-            <WrongOrRight films={films} onTimeout={onTimeout} ratingColor={ratingColor} animationIsPlaying={animationIsPlaying} setShouldPulse={setShouldPulse}/>
-            {/* Score Display*/}
+            {/* Wrong/Right Overlay */}
+            <WrongOrRight
+                films={films}
+                onTimeout={onTimeout}
+                ratingColor={ratingColor}
+                animationIsPlaying={animationIsPlaying}
+                setShouldPulse={setShouldPulse}
+                isImagesLoaded={isImageLoaded}
+            />
+        
+            {/* Score Display */}
             <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 border-solid-black text-black text-[12px] md:text-[14px]
             font-semibold border-4 flex flex-col items-center justify-center z-50 bg-white
-             text-center shadow-[8px_8px_15px_rgba(0,0,0,0.5)] sm:max-w-[70vw] md:max-w-[50vw] rounded">
+            text-center shadow-[8px_8px_15px_rgba(0,0,0,0.5)] sm:max-w-[70vw] md:max-w-[50vw] rounded">
+            <span>
+                Score: {score} <span className="relative -top-0.5">{user && userHighscores && (score > prevHighscore!) &&` 👑`}</span>
+            </span>
+            {((user) && (userHighscores) && (prevHighscore !== undefined)) && (
                 <span>
-                    Score: {score} <span className="relative -top-0.5">{user && userHighscores && (score > prevHighscore!) &&` 👑`}</span>
+                Highscore: {score < prevHighscore ? prevHighscore : score}
                 </span>
-                {user && userHighscores && userHighscores[difficulty] && (
-                <div>
-                    Highscore: {prevHighscore}
-                </div>
-                )}
+            )}
             </div>
+
         </div>
     );
 }
