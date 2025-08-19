@@ -33,6 +33,7 @@ export const AuthProvider = ({children }: {children: React.ReactNode}) => {
     const [authStatus, setAuthStatusState] = useState<AuthStatus>("not-authenticated");
     const [userHighscores, setUserHighscoresState] = useState<Highscores | null>(null);
     const [userHasBeenChecked, setUserHasBeenChecked] = useState<boolean>(false);
+    //console.log("context user", user)
     const setUser = (user: User | null) => {
         setUserState(user);
     };
@@ -40,8 +41,12 @@ export const AuthProvider = ({children }: {children: React.ReactNode}) => {
     const setAuthStatus = (status: AuthStatus) => {
         setAuthStatusState(status);
     };
-    const setUserHighscores = (highscores: Highscores | null) => {
-        setUserHighscoresState(highscores);
+    const setUserHighscores = (hs: Highscores | null) => {
+        if (hs && typeof hs === "object" && "easy" in hs) {
+            setUserHighscoresState(hs);
+        } else {
+            console.error("Invalid highscores passed into context:", hs);
+        }
     }
 
     const logout = async () => {
