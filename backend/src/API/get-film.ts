@@ -70,7 +70,7 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
                 inHouseURL: `${process.env.POSTER_BASE_URL}/${film2Data.slug}.jpg`
             }
             const gameId: string = await createGameToRedis(user?.sub, diff, film1.id, film2.id);
-            console.log("Fetched two films from cache: ", film1, film2);
+            //console.log("Fetched two films from cache: ", film1, film2);
             res.json({ newFilms: [film1, film2], gameId});
             return;
             }
@@ -152,7 +152,7 @@ const getFilmsHandler: RequestHandler = async (req, res) => {
                 // isTop250: film2Row.istop2502
             };
             const gameId: string = await createGameToRedis(user?.sub, diff, film1.id, film2.id);
-            console.log("Fetched two films: ", film1, film2);
+            //console.log("Fetched two films: ", film1, film2);
             res.json({ newFilms: [film1, film2], gameId });
         } catch (error){
             console.error(error);
@@ -174,7 +174,7 @@ const createGameToRedis = async (userSub: string, difficulty: string, filmId1: n
     if(userSub){
         TTL = 20;
     }
-    console.log(`MAKING GAMEID IN REDIS: ${gameId}`);
+    //console.log(`MAKING GAMEID IN REDIS: ${gameId}`);
     await redisClient.set(
         `gameId:${gameId}`,
         JSON.stringify({

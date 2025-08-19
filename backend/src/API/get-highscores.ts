@@ -9,7 +9,7 @@ export const getHighscores: RequestHandler = async (req,res) => {
     //console.log("ENTERING GET HIGHSCORES NOW");
     const userSub = req.query.userSub as string;
     if (!userSub) {
-        console.log("no userSub");
+        //console.log("no userSub");
         return res.status(400).json({ error: "Missing userSub in query" });
     }
     try{
@@ -47,7 +47,7 @@ export const getHighscores: RequestHandler = async (req,res) => {
                 }
             }
         }
-        console.log(`setting user highscores in redis->user:highscores:${userSub}`);
+        //console.log(`setting user highscores in redis->user:highscores:${userSub}`);
         await redisClient.set(`user:highscores:${userSub}`, JSON.stringify(highscores), { EX: 86400} )
         return res.json({highscores});
     } catch (error){

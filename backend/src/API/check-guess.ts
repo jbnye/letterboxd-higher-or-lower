@@ -29,7 +29,7 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
     if (!gameId || (choice !== 0 && choice !== 1 && choice!== -1) || !filmIds) {
         return res.status(400).json({ error: "Missing required fields" });
     }
-    console.log("Made is past check if statement");
+    //.log("Made is past check if statement");
     const excludeFilms = filmIds;
     let limit = getDifficulty(difficulty.toLowerCase());
     if(limit === 0){
@@ -48,7 +48,7 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
             film1Data.averagerating > film2Data.averagerating ? correctChoice = 0: correctChoice = 1;
 
             if(choice === correctChoice){
-                console.log("Checking cache from a correct choice");
+                //console.log("Checking cache from a correct choice");
                 const bucketKey = `bucket:${difficulty.toLowerCase()}`;
                 const bucketJSON = await redisClient.get(bucketKey);
                 if(!bucketJSON){
@@ -107,18 +107,18 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
                 if(user){
                     ({highscores, isHighscore} = await setHighScore(user, score, difficulty));
                 }
-                console.log(
-                    {success: false,
-                    correctChoice: correctChoice,
-                    filmRatings: {
-                        film1: [film1Data.slug, film1Data.averagerating],
-                        film2: [film2Data.slug, film2Data.averagerating]
-                    },
-                    score: score,
-                    isHighscore: isHighscore,
-                    highscores: highscores,
-                    timeout: timeout
-                })
+                // console.log(
+                //     {success: false,
+                //     correctChoice: correctChoice,
+                //     filmRatings: {
+                //         film1: [film1Data.slug, film1Data.averagerating],
+                //         film2: [film2Data.slug, film2Data.averagerating]
+                //     },
+                //     score: score,
+                //     isHighscore: isHighscore,
+                //     highscores: highscores,
+                //     timeout: timeout
+                // })
                 res.status(200).json({
                     success: false,
                     correctChoice: correctChoice,
@@ -147,7 +147,7 @@ const checkGuessHandler: RequestHandler = async (req, res) => {
 
 
 const handleGameId = async (gameId: string, correctGuess: boolean, filmIds?: number[], newFilmId?: number, ranSelectedToRemove?: number, user?: any ) => {
-    console.log("checking redis for gameId");
+    //console.log("checking redis for gameId");
     const dataRaw = await redisClient.get(`gameId:${gameId}`);
     if(!dataRaw){
         console.error(symbols.fail, " GAMEID NOT FOUND IN CACHE");

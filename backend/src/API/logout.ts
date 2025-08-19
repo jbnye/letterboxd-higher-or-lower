@@ -4,8 +4,8 @@ const router = Router();
 
 router.post("/logout", (req: Request, res: Response) => {
     const token = req.cookies?.token;
-    console.log("Logging out user with token:", token);
-    console.log("IP Address:", req.ip);
+    //console.log("Logging out user with token:", token);
+    //console.log("IP Address:", req.ip);
 
     res.clearCookie("token", {
         httpOnly: true,

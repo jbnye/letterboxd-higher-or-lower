@@ -42,7 +42,7 @@ const googleAuthHandler: RequestHandler = async (req,res) => {
         finally{
             (await client).release()
         }
-        console.log(user);
+        //console.log(user);
 
         //payload, secret, options
         const JWTtoken = jwt.sign(

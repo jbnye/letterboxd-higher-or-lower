@@ -5,7 +5,7 @@ const router = Router();
 
 
 const findGame: RequestHandler = async (req, res) => {
-    console.log("LOSTPAGESCORE API HAS BEEN LOADED");
+    //console.log("LOSTPAGESCORE API HAS BEEN LOADED");
     const {gameId, user} = req.body;
     if(!user)return res.status(404).json({error: "no user"})
     const gameCacheRaw = await redisClient.get(`gameId:${gameId}`);
@@ -15,7 +15,7 @@ const findGame: RequestHandler = async (req, res) => {
     const gameCache = JSON.parse(gameCacheRaw);
     if(gameCache.sub)return res.status(403).json("gameId already has a user associated");
     const { highscores, isHighscore, previousHighscore}  =  await setHighScore(user, gameCache.score, gameCache.difficulty);
-    console.log(`Highscore updated after login with user: ${user.sub} gameid: ${gameId} and highscore = ${isHighscore}`);
+    //console.log(`Highscore updated after login with user: ${user.sub} gameid: ${gameId} and highscore = ${isHighscore}`);
     await redisClient.del(`gameId:${gameId}`);
     // await redisClient.set(
     //     `gameId:${gameId}`,

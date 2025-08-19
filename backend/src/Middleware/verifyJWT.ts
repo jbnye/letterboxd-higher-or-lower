@@ -12,7 +12,7 @@ export interface AuthenticatedRequest extends Request {
 
 export const verifyJWT = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const token = req.cookies?.token;
-    console.log("req.cookie is: ",token)
+    //console.log("req.cookie is: ",token)
     if (!token) {
       return res.status(401).json({ error: "Unauthorized, no token" });
     }
