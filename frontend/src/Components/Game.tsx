@@ -384,13 +384,13 @@ export default function Game({difficulty, onLose}: GameProps){
             from-letterboxd-lighter-gray to-letterboxd-light-gray
             dark:from-letterboxd-background dark:to-letterboxd-dark-background-blue">
 
-            <div className="relative flex flex-col md:flex-row w-full md:w-auto h-screen mx-auto my-auto">
+            <div className="relative flex flex-col md:flex-row w-full md:w-auto h-screen mx-auto my-auto overflow-hidden">
 
             <div className={`absolute inset-0 pointer-events-none transition-all duration-300 
                  ${shouldPulse ? "breathe" : ""} ${showBorder ? `border-8 ${classColor}` : ""} z-50`}>
             </div>
                 {/* Left Image */}
-                <div className="w-full md:w-full h-1/2 md:h-screen flex justify-center md:justify-end items-center">
+                <div className="w-full md:w-1/2 h-1/2 md:h-full flex justify-center items-center">
                     {!isImageLoaded[0] ? (
                         <div className="m-15">
                             <Spinner />
@@ -412,7 +412,7 @@ export default function Game({difficulty, onLose}: GameProps){
                 </div>
             
                 {/* Right Image */}
-                <div className="w-full md:w-full h-1/2 md:h-screen flex justify-center md:justify-start items-center">
+                <div className="w-full md:w-1/2 h-1/2 md:h-full flex justify-center items-center">
                     {!isImageLoaded[1] ? (
                         <div className="m-15">
                             <Spinner />
