@@ -1,76 +1,75 @@
 import pool from "../database/db";
-import { RequestHandler,Router} from "express";
-import { OAuth2Client } from "google-auth-library";
+import { RequestHandler, Router } from "express";
 import jwt from "jsonwebtoken";
 import { symbols } from "../helperFunctions";
+
 const JWT_SECRET = process.env.JWT_SECRET!;
 const ONE_DAY = 24 * 60 * 60; // seconds
 
-
 const router = Router();
-const CLIENT_ID = process.env.Client_ID;
-const googleClient = new OAuth2Client(CLIENT_ID);
-const googleAuthHandler: RequestHandler = async (req,res) => {
-    const {token} = req.body;
-    if (!token) return res.status(400).json({ error: "Token missing" });
-
-    try{
-        const ticket = await googleClient.verifyIdToken({
-            idToken: token,
-            audience: CLIENT_ID,
-        });
-
-        const payload = ticket.getPayload();
-        if (!payload) return res.status(401).json({"error": "Invalid Token"});
-
-        const {sub, email, name, picture} = payload;
-        const user = {sub, email, name, picture};
-        const client = pool.connect();
-        try{
-            (await client).query(
-                `INSERT INTO users (googleSub, email, name, picture, lastlogin)
-                VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
-                ON CONFLICT (googleSub) DO UPDATE 
-                SET lastlogin = CURRENT_TIMESTAMP
-                
-                `,
-                [sub, email, name, picture]
-            );
-        } catch{
-            console.error(symbols.fail, " FAILED TO CHECK DB OR INSERT OR UPDATE USER");
-        }
-        finally{
-            (await client).release()
-        }
-        //console.log(user);
-
-        //payload, secret, options
-        const JWTtoken = jwt.sign(
-            {
-                sub: user.sub,
-                email: user.email,
-                name: user.name,
-                picture: user.picture,
-            },
-            JWT_SECRET,
-            { expiresIn: ONE_DAY }
-        );
-
-        res.cookie('token', JWTtoken, {
-            httpOnly: true,
-            secure: true, 
-            maxAge: ONE_DAY * 1000,
-            sameSite: 'none',
-        });
 
 
-        res.status(200).json({user})
+async function fetchGoogleUserInfo(access_token: string) {
+  const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+    headers: { Authorization: `Bearer ${access_token}` },
+  });
 
-    }catch (error){
-        console.error("Token verification failed:", error);
-        res.status(401).json({ error: "Invalid or expired token" });
-    }
+  if (!res.ok) {
+    throw new Error(`Google UserInfo request failed: ${res.status}`);
+  }
+
+  return (await res.json()) as {
+    sub: string;
+    email: string;
+    name: string;
+    picture: string;
+  };
 }
+
+const googleAuthHandler: RequestHandler = async (req, res) => {
+  const { token: access_token } = req.body; // frontend sends { token: access_token }
+  if (!access_token) {
+    return res.status(400).json({ error: "Access token missing" });
+  }
+
+  try {
+    const { sub, email, name, picture } = await fetchGoogleUserInfo(access_token);
+    const client = await pool.connect();
+
+    try {
+      await client.query(
+        `INSERT INTO users (googleSub, email, name, picture, lastlogin)
+         VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
+         ON CONFLICT (googleSub) DO UPDATE 
+         SET lastlogin = CURRENT_TIMESTAMP`,
+        [sub, email, name, picture]
+      );
+    } catch (dbErr) {
+      console.error(symbols.fail, "FAILED TO CHECK DB OR INSERT OR UPDATE USER", dbErr);
+    } finally {
+      client.release();
+    }
+
+
+    const JWTtoken = jwt.sign(
+      { sub, email, name, picture },
+      JWT_SECRET,
+      { expiresIn: ONE_DAY }
+    );
+
+    res.cookie("token", JWTtoken, {
+      httpOnly: true,
+      secure: true,
+      maxAge: ONE_DAY * 1000,
+      sameSite: "none",
+    });
+
+    res.status(200).json({ user: { sub, email, name, picture } });
+  } catch (error) {
+    console.error("Google auth failed:", error);
+    res.status(401).json({ error: "Invalid or expired Google access token" });
+  }
+};
 
 router.post("/google-auth", googleAuthHandler);
 export default router;
