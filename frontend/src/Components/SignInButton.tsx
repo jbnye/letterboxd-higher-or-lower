@@ -1,10 +1,28 @@
-import {GoogleLogin } from "@react-oauth/google";
-import {useAuth} from "../Context/UserContext";
+import { GoogleLogin } from "@react-oauth/google";
+import { useAuth } from "../Context/UserContext";
+import { useState, useEffect } from "react";
 
 
 export default function GoogleSignInButton() {
-    const { setUser, setAuthStatus, authStatus, user, logout} = useAuth(); 
+    const { setUser, setAuthStatus, authStatus, user, logout } = useAuth();
+    const [isGoogleLoading, setIsGoogleLoading] = useState(true);
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsGoogleLoading(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (isGoogleLoading) {
+        return (
+            <div className="flex items-center justify-center h-12 w-full bg-gray-100 rounded border border-gray-300">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                <span className="ml-2 text-gray-600">Loading...</span>
+            </div>
+        );
+    }
 
     const handleLoginSuccess = async (credentialResponse: any) => {
         //console.log(credentialResponse);
@@ -41,13 +59,13 @@ export default function GoogleSignInButton() {
 
     return (
         <div className="w-full">
-        {authStatus === "not-authenticated" || !user ? (
-            <GoogleLogin
-            onSuccess={handleLoginSuccess}
-            onError={() => {}}
-            width="100%"
-            />
-        ) : (
+            {authStatus === "not-authenticated" || !user ? (
+                <GoogleLogin
+                    onSuccess={handleLoginSuccess}
+                    onError={() => {}}
+                    width="100%"
+                />
+            ) : (
             <div
             className="flex items-center justify-center text-sm gap-2 bg-white border border-gray-300 
                         rounded-md px-3 py-2 h-12 shadow-sm hover:shadow-md transition w-full"
