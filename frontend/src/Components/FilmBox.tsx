@@ -129,6 +129,7 @@ export default function FilmBox({ film, index, handleGuess, filmDisplayState, an
                   shadow-lg
                   hover:text-blue-300
                 "
+                onClick={(e) => e.stopPropagation()} 
               >
                 {film.title}
               </a>

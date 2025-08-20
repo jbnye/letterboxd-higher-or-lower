@@ -20,8 +20,15 @@ export const ThemeStatusProvider = ({children}: {children: React.ReactNode}) => 
         return window.matchMedia('(prefers-color-scheme: dark)').matches;
     });
 
+    const [isSoundOn, setIsSoundOn] = useState<boolean>(() => {
+        if (typeof window === "undefined") return true;
+        const stored = localStorage.getItem("isSoundOn");
+        if (stored === "true") return true;
+        if (stored === "false") return false;
+        return true; 
+    });
     const [breakpoint, setBreakpoint] = useState<"mobile" | "tablet" | "desktop">("desktop");
-    const [isSoundOn, setIsSoundOn] = useState<boolean>(true);
+
 
     useEffect(()=> {
         const checkBreakpoint = () => {
@@ -39,6 +46,10 @@ export const ThemeStatusProvider = ({children}: {children: React.ReactNode}) => 
         localStorage.setItem("darkMode", darkMode.toString());
         document.documentElement.classList.toggle("dark", darkMode);
     }, [darkMode]);
+
+    useEffect(()=> {
+        localStorage.setItem("isSoundOn", isSoundOn.toString());
+    }, [isSoundOn])
 
     const value = useMemo(() => ({
         darkMode,
