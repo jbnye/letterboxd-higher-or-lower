@@ -47,14 +47,14 @@ export default function WelcomePage({ onStartGame }: WelcomePageProps) {
                             style="w-17 h-17 p-3 sm:w-28 sm:h-28 l:w-32 l:h-32"
                         />
                     </div>
-                    <div className="flex flex-col w-[80%] sm:w-[15%] sm:min-w-[200px] gap-4 mt-6 sm:mt-8">
+                    <div className="flex flex-col w-[80%] items-center sm:w-[15%] sm:min-w-[200px] gap-4 mt-6 sm:mt-8">
                         <button
                             onClick={() => onStartGame(difficultyPicked)}
-                            className="p-2 h-12 font-bold md:h-auto text-2xl  bg-letterboxd-blue text-white rounded hover:bg-[#1093ef]"
+                            className="p-2 h-12 font-bold md:h-auto text-2xl w-[200px] bg-letterboxd-blue text-white rounded hover:bg-[#1093ef]"
                         >
                             Play
                         </button>
-                        <div className="mt-2">
+                        <div className="mt-2 justify-center w-[200px]">
                             {userHasBeenChecked === false ? <Spinner /> : (<GoogleSignInButton />)}
                         </div>
                     </div>
