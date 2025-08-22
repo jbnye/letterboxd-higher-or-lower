@@ -98,7 +98,6 @@ export async function loadLeaderboard() {
             await redisClient.set(
                 `leaderboard:${difficulty}`,
                 JSON.stringify(leaderboardArray),
-                { EX: 60 * 60 * 24 }
             );
         }
          console.log("Leaderboard cached in Redis!");

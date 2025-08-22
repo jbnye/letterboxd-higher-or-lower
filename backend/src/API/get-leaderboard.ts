@@ -10,6 +10,7 @@ export const getLeaderboard: RequestHandler = async (req,res) => {
     try {
         for (const difficulty of difficulties) {
             const top10raw = await redisClient.get(`leaderboard:${difficulty}`);
+            console.log("TOP 10 RAW",top10raw)
             let top10 = [];
             if (top10raw) {
                 const top10data = JSON.parse(top10raw);
