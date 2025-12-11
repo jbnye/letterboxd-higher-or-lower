@@ -3,14 +3,15 @@ import * as fs from 'fs/promises';
 import path from 'path';
 
 interface CsvRow {
-  Slug: string;
-  "Average Rating": string;  // still string because CSV fields are parsed as strings
-  "Watched Number": string;
-  Title: string;
-  Year: string;
-  Category: string;
-  "Poster URL": string;
+  slug: string;
+  averageRating: string;
+  watchedNumber: string;
+  title: string;
+  year: string;
+  category: string;
+  posterURL: string;
 }
+
 export async function validateCSV(filePath: string): Promise<string[]> {
     const content = await fs.readFile(filePath, 'utf-8');
 
@@ -26,14 +27,13 @@ export async function validateCSV(filePath: string): Promise<string[]> {
 
     for (const [index, row] of records.entries()) {
         const errors: string[] = [];
-
-        const slug = row["Slug"];
-        const rating = parseFloat(row["Average Rating"]);
-        const watchedCount = Number(row["Watched Number"]);
-        const title = row["Title"];
-        const year = row["Year"];
-        const category = row["Category"];
-        const posterURL = row["Poster URL"];
+        const slug = row.slug;
+        const rating = parseFloat(row.averageRating);
+        const watchedCount = Number(row.watchedNumber);
+        const title = row.title;
+        const year = row.year;
+        const category = row.category;
+        const posterURL = row.posterURL;
 
         // Slug check found 3 films that have their slug set to their film id actually in letterboxd
         if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
@@ -42,12 +42,12 @@ export async function validateCSV(filePath: string): Promise<string[]> {
 
         // Rating check
         if (isNaN(rating) || rating < 0 || rating > 5) {
-            errors.push(`Invalid rating: "${row["Average Rating"]}"`);
+            errors.push(`Invalid rating: "${row.averageRating}"`);
         }
 
         // Wacthed Count check
         if (isNaN(watchedCount) || watchedCount <= 0) {
-            errors.push(`Invalid watched count: "${row["Watched Number"]}"`);
+            errors.push(`Invalid watched count: "${row.watchedNumber}"`);
         }
 
         // Title check
