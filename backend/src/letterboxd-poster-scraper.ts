@@ -42,40 +42,59 @@ async function downloadImage(url: string, filePath: string, userAgent: string, s
 }
 
 
-export async function LBPosterScraper(slugsAndRatings: slugsAndRatings[]){
-
+export async function LBPosterScraper(slugsAndRatings: slugsAndRatings[]) {
     const userAgent = new UserAgent().toString();
     const postersMap = new Map<string, string>();
+
     try {
-        for(const film of slugsAndRatings){
-            const url = `https://letterboxd.com/ajax/poster/film/${film.slug}/std/292730/1000x1500/`;
-            const response = await axios.get(url, {
-                headers: {
-                    "User-Agent": userAgent,
-                    'Referer': `https://letterboxd.com/film/${film.slug}/`
+        for (const film of slugsAndRatings) {
+            const postersPath = path.join(postersDir, `${film.slug}.jpg`);
+            const jsonURL = `https://letterboxd.com/film/${film.slug}/poster/std/1000/?k=${film.cacheBuster}`;
+
+            let posterURL: string | undefined;
+            try {
+                const response = await axios.get(jsonURL, {
+                    headers: {
+                        "User-Agent": userAgent,
+                        "Referer": `https://letterboxd.com/film/${film.slug}/`
+                    }
+                });
+
+                posterURL = response.data?.url;
+                if (!posterURL) {
+                    console.warn(`⚠️ No poster URL found in JSON for ${film.slug}`);
+                    continue;
                 }
-            })
-            if (response.status !== 200) {
-                console.warn(`⚠️ Non-200 response for ${film.slug}: ${response.status}`);
-                await setTimeout(10000);
-                break;
+            } catch (err) {
+                console.warn(`⚠️ Failed to fetch poster JSON for ${film.slug}`);
+                continue;
             }
 
-            const $ = cheerio.load(response.data);
-            const posterURL = $('img.image:not(.-empty-poster-image)').attr('src') || '';
-            const postersPath = path.join(__dirname, "..", "posters", `${film.slug}.jpg`);
-            try {
-                await fs.access(postersPath); // Checks if file exists
-                console.log(`✅ Poster already exists for ${film.slug}, skipping download.`);
-            } catch {
-                    await downloadImage(posterURL, postersPath, userAgent, film.slug);
-            }
             postersMap.set(film.slug, posterURL);
-            //const delayTimer: number = Math.floor((Math.random() * 1000) + 0);
-            //await setTimeout(delayTimer);
+
+            let existsLocally = false;
+            try {
+                await fs.access(postersPath);
+                existsLocally = true;
+            } catch {}
+
+            if (existsLocally) {
+                console.log(`✅ Poster already exists locally for ${film.slug}. Skipping download.`);
+                continue;
+            }
+
+            try {
+                await downloadImage(posterURL, postersPath, userAgent, film.slug);
+                console.log(`✅ Downloaded poster for ${film.slug}`);
+            } catch (err) {
+                console.warn(`⚠️ Failed to download poster for ${film.slug}`);
+                continue;
+            }
         }
     } catch (error) {
+        console.error("Scraper error:", error);
         throw error;
     }
+
     return postersMap;
 }

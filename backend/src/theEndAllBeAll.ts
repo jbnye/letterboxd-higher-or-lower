@@ -39,13 +39,15 @@ async function main(){
     const filteredDirPath = path.join(__dirname, "..", "cache", "filteredLetterboxdPopularPages");
     const CSV_WRITE_PATH = path.join(__dirname, "..", "CSV", "ALLFILMS.csv");
     const combinedSlugs: slugsAndRatings[] = await SeperateTypesOfSlugs(unfilteredDirPath, filteredDirPath);
+    // console.log(combinedSlugs);
     // GET EVERYTHING EXCEPT POSTERURL
     const filmsNoPoster: Map<string, filmData> = await scrapePopularityFromCache(combinedSlugs);
+    // console.log(filmsNoPoster);
     //GET PSOTERURL
     const filmPosters: Map<string, string> = await LBPosterScraper(combinedSlugs);
 
     const correctFilms = new Map<string, filmData>();
-
+    // console.log(correctFilms);
     for (const [slug, film] of filmsNoPoster.entries()) {
         const posterURL = filmPosters.get(slug);
         const updatedFilm: filmData = {
@@ -61,7 +63,6 @@ async function main(){
     }
     const csvWriter = createLetterboxdCsvWriter(CSV_WRITE_PATH);
     await csvWriter.writeRecords([...correctFilms.values()]);
-
 }
 main();
 

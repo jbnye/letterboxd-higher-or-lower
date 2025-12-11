@@ -8,7 +8,8 @@ import path from "path";
 export interface slugsAndRatings{
     slug: string,
     averageRating: string,
-    category?: string
+    category?: string,
+    cacheBuster: string,
 }
 
 export async function extractSlugsAndRatingsFromFiles(dirPath:string): Promise<slugsAndRatings[]>{
@@ -20,16 +21,20 @@ export async function extractSlugsAndRatingsFromFiles(dirPath:string): Promise<s
             const fullPath = path.join(dirPath, fileName);
             const html = await fs.readFile(fullPath, "utf-8");
             const $ = cheerio.load(html);
-            $('li.listitem.poster-container[data-average-rating]').each((i, element) => {
+
+            $('li.posteritem[data-average-rating]').each((_, element) => {
                 const averageRating: string = $(element).attr("data-average-rating") || '0';
-                const slug: string = $(element).find(("div[data-film-slug]")).attr('data-film-slug') || 'empty';
-                //console.log(slug,averageRating);
+                const slug: string = $(element).find("div[data-item-slug]").attr('data-item-slug') || 'empty';
+                const cacheBuster = JSON.parse($(element).find("div[data-resolvable-poster-path]").attr("data-resolvable-poster-path")!).cacheBustingKey;
+                //console.log(slug, averageRating);
                 slugsAndRatings.push({
                     slug: slug,
                     averageRating: averageRating,
+                    cacheBuster: cacheBuster,
                 });
-            })
-            console.log("parsed: ",fileName);
+            });
+
+            console.log("parsed: ", fileName);
         }
     } catch (error){
         console.log(error);
